@@ -126,9 +126,8 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
         if path.startswith('/api/portal/'):
             if legacy_demo:
                 return JSONResponse(status_code=404,content={'detail':'Portal unavailable in isolated legacy demo mode'})
-        elif path.startswith('/api/') and path != '/api/health' and not legacy_demo:
-            if request.method not in ('GET','HEAD'):
-                return JSONResponse(status_code=403,content={'detail':'Legacy research mutations are disabled in portal mode'})
+        # Original research routes remain available; mutating routes enforce
+        # the configured demo admin token through their own authorize dependency.
         response=await call_next(request)
         if path.startswith('/api/portal/'):
             response.headers['Cache-Control']='no-store'
