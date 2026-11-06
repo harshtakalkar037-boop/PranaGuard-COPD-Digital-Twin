@@ -117,17 +117,21 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
                 description='Research prototype; not clinically validated. All patient data are fictional/simulated. Optional current modelled city context is excluded from frozen ML inputs. No real patient monitoring or physical device integration.')
     origins=[s.strip() for s in os.getenv('PRANAGUARD_CORS_ORIGINS','*').split(',') if s.strip()]
     app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=False,allow_methods=['*'],allow_headers=['Content-Type','X-Demo-Token','X-Device-Token'])
-    # The old demo was designed for an isolated synthetic cohort and has no
-    # patient-level authorization. Never mix it with the authenticated portal.
+    # Keep the authenticated patient/doctor portal and the original synthetic
+    # research workspace available together. Research API reads are synthetic-only;
+    # all state-changing legacy endpoints retain their explicit authorize dependency.
     @app.middleware('http')
     async def isolate_legacy(request, call_next):
         path=request.url.path
         if path.startswith('/api/portal/'):
-            if legacy_demo: return JSONResponse(status_code=404,content={'detail':'Portal unavailable in isolated legacy demo mode'})
+            if legacy_demo:
+                return JSONResponse(status_code=404,content={'detail':'Portal unavailable in isolated legacy demo mode'})
         elif path.startswith('/api/') and path != '/api/health' and not legacy_demo:
-            return JSONResponse(status_code=403,content={'detail':'Legacy demo API disabled in portal mode'})
+            if request.method not in ('GET','HEAD'):
+                return JSONResponse(status_code=403,content={'detail':'Legacy research mutations are disabled in portal mode'})
         response=await call_next(request)
-        if path.startswith('/api/portal/'): response.headers['Cache-Control']='no-store'
+        if path.startswith('/api/portal/'):
+            response.headers['Cache-Control']='no-store'
         return response
     app.include_router(portal_router)
     app.include_router(make_router(authorize,hub))
@@ -214,8 +218,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
         result=await asyncio.to_thread(perform);await hub.broadcast({'type':'twin_updated','replay':result});return result
     @app.websocket('/api/ws')
     async def websocket(socket:WebSocket):
-        if not legacy_demo:
-            await socket.close(code=1008);return
+        # Live events contain only synthetic replay/update notifications.
         await socket.accept();hub.clients.add(socket)
         try:
             await socket.send_json({'type':'connected','synthetic':True})
