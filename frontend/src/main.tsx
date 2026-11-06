@@ -4,4 +4,6 @@ import App from './App';
 import Portal from './Portal';
 import '@fontsource-variable/inter';
 import './styles.css';
-ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode>{location.pathname === '/legacy-demo' ? <App/> : <Portal/>}</React.StrictMode>);
+const path = location.pathname;
+const isResearchWorkspace = path === '/doctor/dashboard' || path === '/legacy-demo';
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode>{isResearchWorkspace ? <App/> : <Portal/>}</React.StrictMode>);
