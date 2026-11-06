@@ -1,10 +1,12 @@
 # Connected research portals
 
+> See `ROUTE_PERMISSION_MATRIX.md` for current scoped routes, the restrictive single-doctor gate, and limitations.
+
 ## Scope and safety
 
 The new `/`, `/doctor/login`, `/doctor/dashboard`, `/patient/login` and `/patient/dashboard` experiences use the existing FastAPI process and SQLite Store. Migration 003 adds accounts, sessions, explicit patient links, doctor assignments, check-ins, private uploads, reviews and per-user notifications. Every patient access is checked on the backend; patient identity for check-ins and uploads comes from the session. No cohort or model is regenerated. All data must be synthetic; this is not a clinical service.
 
-The original dashboard's APIs were designed for an isolated synthetic demo, with open reads and an optional shared write token. To prevent bypassing portal permissions, legacy `/api/*` endpoints except `/api/health` and the legacy WebSocket are disabled by default. Set `PRANAGUARD_UNSAFE_LEGACY_DEMO=1` to enable them and view `/legacy-demo`; this **disables portal APIs**. Use a separate throwaway `PRANAGUARD_DB` and no private data in that mode. Scoped explainability, what-if and evaluation results are available under Research tools in the protected doctor portal. The original charts, device integration, replay, data-source views and legacy navigation remain in the isolated demo only; individually scoping those features remains unfinished. Never expose legacy mode on a public network.
+The original dashboard APIs were designed for an isolated synthetic demo. In secure mode, a doctor session is required, assigned synthetic records are scoped where implemented, and remaining unscoped operations require the restrictive single-doctor whole-workspace gate. The legacy WebSocket is disabled. Set `PRANAGUARD_UNSAFE_LEGACY_DEMO=1` only for a separate throwaway database and isolated legacy demo; this disables portal APIs and removes research isolation. Never expose that mode on a public network.
 
 ## Setup and migration
 
@@ -69,7 +71,7 @@ Verification results and changed-file inventory: [docs/PORTAL_RESULTS.md](docs/P
 
 ## Daily care and controlled synthetic-demo provisioning
 
-Use a separate, disposable synthetic-only database and private upload folder. **Never enable predictable demo credentials on a public network or for real users.** For example, from the repository root with the venv activated:
+Use a separate, disposable synthetic-only database and private upload folder. **Never use this synthetic-only provisioning on a public network or for real users.** For example, from the repository root with the venv activated:
 
 ```sh
 mkdir -p demo/uploads
@@ -89,7 +91,7 @@ python -m backend.app.portal_admin assign-synthetic PG-0002 demo_doctor
 python -m backend.app.portal_admin assign-synthetic PG-0003 demo_doctor
 ```
 
-Log in as that doctor. On **Add Patient**, choose an assigned synthetic record and provision its account. The one-time screen shows the patient ID and temporary password; convey it securely. The initial password is predictable and only enabled by the explicit synthetic-demo switch. The patient must change it before accessing records, and the temporary password cannot be reused. Provisioning is disabled by default and never creates or assigns arbitrary records. An existing patient account can instead be linked via the `link` command. For a forgotten password, a trusted local administrator can run `python -m backend.app.portal_admin reset-password USERNAME`; it prints a random temporary password once, revokes existing sessions, and requires another change. The CLI is not an online recovery service.
+Log in as that doctor. On **Add Patient**, choose an assigned synthetic record and provision its account. The one-time screen shows the patient ID and temporary password; convey it securely. The initial password is randomly generated and provisioning is enabled only by the explicit synthetic-demo switch. The patient must change it before accessing records. The temporary password expires 24 hours after issuance and can be used for only one sign-in; its restricted session expires no later than the credential. If that session is lost, an administrator must issue a fresh credential. Provisioning is disabled by default and never creates or assigns arbitrary records. An existing patient account can instead be linked via the `link` command. For a forgotten password, a trusted local administrator can run `python -m backend.app.portal_admin reset-password USERNAME`; it prints a random temporary password once, revokes existing sessions, and requires another change. The CLI is not an online recovery service.
 
 The patient can use **Sputum Diary** to record and edit observations with private optional photos; edits retain prior snapshots and reset review status. **My Daily Care Plan** contains the active doctor-entered plan and meal, water and activity records. Clinicians can enter and deactivate plan versions, review records, and share updates. Date filters use UTC; daily progress is calculated in the browser's local date. No hydration target or exercise prescription is generated by the application. Notifications are in-app only.
 
@@ -116,3 +118,20 @@ npm run test:e2e
 ```
 
 Do not commit test credentials. The script provisions `PG-0001` and cannot be repeated against the same demo without resetting it. Set `E2E_SCREENSHOTS` to an appropriate output directory if screenshots are desired.
+
+### Research workspace access on the integration branch
+
+The original research APIs include unscoped operations. In secure portal mode, these remaining unscoped operations require a doctor session, a database with **exactly one doctor**, assignment to **every existing synthetic record**, and no non-synthetic profiles. The single-doctor condition is intentionally restrictive: without it a second doctor could create a record between a whole-workspace authorization check and an unscoped read. This does not protect against administrative changes made outside the application while a request is in flight; quiesce traffic for all user, assignment, patient and schema administration. The original `/api/overview`, `/api/patients` and `/api/validation` require assignment to every original synthetic twin; cohort results are filtered to those IDs. The eight original per-twin methods require assignment to the historical twin. Enhanced registry list, detail, observations and reviews enforce synthetic record assignment, and registration assigns its creator atomically; original alert lists and updates are scoped to assigned synthetic records; city-grid context is doctor-only and independent of patient records. See the matrix for each method and optional write token. Patients and anonymous users cannot access research endpoints. A trusted local administrator may assign the original existing synthetic cohort without changing the records:
+
+```sh
+python -m backend.app.portal_admin assign-cohort "$DOCTOR_USERNAME"
+```
+
+A new fictional record is assigned to its registering doctor and is not automatically assigned to another doctor. Registry idempotency retries require assignment to the existing record. A second doctor blocks all still-unscoped workspace functions, even if both have every record assigned; historical and explicitly scoped functionality remains available. This is a usability and release blocker until each remaining operation is safely scoped and independently tested. The secure research workspace polls instead of using the legacy unscoped WebSocket. The optional JSON `PRANAGUARD_DEMO_BOOTSTRAP` can set `assign_cohort: true` to assign the original verified synthetic cohort, but it never changes an existing password hash. It does not replace a controlled administrator process. Never enable it or the legacy mode with real patient data.
+
+
+Migration 006 does not change existing hashes or links. Accounts already marked `must_change_password` before this migration have no trustworthy issuance time, so their old temporary passwords and restricted sessions fail closed. A trusted administrator must deliberately run `reset-password` and securely convey a new 24-hour single-use credential. There is no automatic startup reset. Expired credentials are handled the same way. Protect CLI output from logs and terminal history. This is a synthetic demo workflow, not an online recovery service.
+
+### Enhanced research notifications
+
+The enhanced notification centre lists and counts only assigned synthetic patient events; detail and review enforce the same assignment and verify that a linked legacy alert belongs to that patient. Reviews check assignment in the write transaction. Shared city/system notices and the test/email controls remain available only with a single doctor assigned every synthetic record; they are hidden or denied in multi-doctor workspaces. The portal’s separate care notifications remain user-scoped.

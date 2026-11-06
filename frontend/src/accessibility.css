@@ -1,0 +1,153 @@
+/* Accessible text treatments for the integrated UI. The historical stylesheet
+   and scientific/design baseline remain untouched. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* Light workspace surfaces: readable contrast and more useful type sizes. */
+.pg-enhanced .breadcrumb>span,
+.pg-enhanced .page-eyebrow,
+.pg-enhanced .page-eyebrow .muted,
+.pg-enhanced .page-heading p,
+.pg-enhanced .metric-head,
+.pg-enhanced .metric-detail,
+.pg-enhanced .panel-head p,
+.pg-enhanced .replay-clock>div>span,
+.pg-enhanced .button.subtle,
+.pg-enhanced .notice,
+.pg-enhanced .environment-hero span,
+.pg-enhanced .environment-hero p,
+.pg-enhanced .environment-attribution,
+.pg-enhanced .environment-hero strong small,
+.pg-enhanced .environment-selector select,
+.pg-enhanced .bottom-insight strong,
+.pg-enhanced .bottom-insight p,
+.pg-enhanced .main-footer,
+.pg-enhanced .text-link{color:#435d4b}
+.pg-enhanced .notice.warning{color:#64511d}
+.pg-enhanced .metric-head,.pg-enhanced .metric-detail,
+.pg-enhanced .panel-head p,.pg-enhanced .environment-attribution,
+.pg-enhanced .main-footer,.pg-enhanced .bottom-insight p{font-size:11px}
+.pg-enhanced .page-eyebrow,.pg-enhanced .page-eyebrow .muted{font-size:10px}
+.pg-enhanced .notice{font-size:11px}
+.pg-enhanced .panel-head h3{font-size:15px}
+.pg-enhanced .segmented button{color:#405b48;font-size:11px}
+.pg-enhanced .segmented button.selected{color:#294e35}
+.pg-enhanced .cohort-table th{color:#415d49;font-size:11px}
+.pg-enhanced .cohort-table td{font-size:12px}
+.pg-enhanced .cohort-table td>small{color:#4b6552;font-size:11px}
+.pg-enhanced .patient-avatar{color:#3e5c45;font-size:11px}
+.pg-enhanced .patient-cell strong{color:#294b33;font-size:12px}
+.pg-enhanced .patient-cell>div>span{color:#4b6552;font-size:11px}
+.pg-enhanced .synthetic-tag{color:#405b48;font-size:9px}
+.pg-enhanced .pill{font-size:10px}
+.pg-enhanced .pill.low{color:#315f36}
+.pg-enhanced .pill.elevated{color:#735319}
+.pg-enhanced .pill.high{color:#7c3e30}
+.pg-enhanced .pill.neutral{color:#405b48}
+
+/* Care portal content only; preserve light text on the dark navigation rail. */
+.portal-main>header,.portal-page-heading>p,.portal-content .eyebrow,
+.portal-content .portal-card p,.portal-content .portal-card small,
+.portal-content .patient-selector-pages>span,.portal-content .prototype-note{color:#465f50}
+.portal-content .footnote{color:#465f50!important}
+.pg-enhanced .chart-note,.pg-enhanced .environment-details span,
+.pg-enhanced .environment-details strong,.pg-enhanced .table-footer{color:#435d4b}
+.pg-enhanced .chart-note,.pg-enhanced .environment-details span,
+.pg-enhanced .table-footer{font-size:11px}
+.portal-content .patient-selector-pages button{color:#465f50}
+/* Additional research and provenance views. Values and category wording are
+   unchanged; the deeper foregrounds are legible on the existing pale surfaces. */
+.pg-enhanced .main-shell .pgx-table small,
+.pg-enhanced .main-shell .pgx-pagination>span,
+.pg-enhanced .main-shell th,
+.pg-enhanced .main-shell .select-small,
+.pg-enhanced .main-shell .form-select,
+.pg-enhanced .main-shell .attribution,
+.pg-enhanced .main-shell .input-help,
+.pg-enhanced .main-shell .section-label span,
+.pg-enhanced .main-shell .section-label h3,
+.pg-enhanced .main-shell .context-grid span,
+.pg-enhanced .main-shell .context-grid strong,
+.pg-enhanced .main-shell .context-grid small,
+.pg-enhanced .main-shell .deviation-list span,
+.pg-enhanced .main-shell .deviation-list strong,
+.pg-enhanced .main-shell .deviation-list small,
+.pg-enhanced .main-shell .confusion>span,
+.pg-enhanced .main-shell .patient-picker label,
+.pg-enhanced .main-shell .baseline-row span,
+.pg-enhanced .main-shell .baseline-row small,
+.pg-enhanced .main-shell .range-endpoints,
+.pg-enhanced .main-shell .range-label,
+.pg-enhanced .main-shell .range-label strong,
+.pg-enhanced .main-shell .empty p,
+.pg-enhanced .main-shell .field-label,
+.pg-enhanced .main-shell .risk-card span,
+.pg-enhanced .main-shell .risk-card p,
+.pg-enhanced .main-shell .twin-banner p,
+.pg-enhanced .main-shell .twin-banner-right span,
+.pg-enhanced .main-shell .version-ledger button strong,
+.pg-enhanced .main-shell .version-ledger button span,
+.pg-enhanced .main-shell .version-ledger button small,
+.pg-enhanced .main-shell .explanation-top p,
+.pg-enhanced .main-shell .subheading,
+.pg-enhanced .main-shell .scenario-empty h3,
+.pg-enhanced .main-shell .scenario-empty p,
+.pg-enhanced .main-shell .scenario-empty span,
+.pg-enhanced .main-shell .saved-scenarios .muted,
+.pg-enhanced .main-shell .metric-number small,
+.pg-enhanced .main-shell .matrix-stats strong,
+.pg-enhanced .main-shell .matrix-cell,
+.pg-enhanced .main-shell .matrix-cell small,
+.pg-enhanced .main-shell .protocol-grid h4,
+.pg-enhanced .main-shell .protocol-grid strong,
+.pg-enhanced .main-shell .protocol-grid p,
+.pg-enhanced .main-shell .protocol-step,
+.pg-enhanced .main-shell .hash-code,
+.pg-enhanced .main-shell .status-rows strong,
+.pg-enhanced .main-shell .status-hero h2,
+.pg-enhanced .main-shell .status-hero p,
+.pg-enhanced .main-shell .pgx-reading>span,
+.pg-enhanced .main-shell .pgx-reading p,
+.pg-enhanced .main-shell .pgx-reading>small,
+.pg-enhanced .main-shell .pgx-context-source,
+.pg-enhanced .main-shell .pgx-help,
+.pg-enhanced .main-shell .pgx-definition dt,
+.pg-enhanced .main-shell .pgx-history small,
+.pg-enhanced .main-shell .pgx-notification small{color:#405b48}
+.pg-enhanced .main-shell .pgx-missing{color:#843e31}
+.pg-enhanced .main-shell .pgx-table small,
+.pg-enhanced .main-shell .pgx-pagination>span,
+.pg-enhanced .main-shell .attribution,
+.pg-enhanced .main-shell .input-help,
+.pg-enhanced .main-shell .section-label span,
+.pg-enhanced .main-shell .baseline-row span,
+.pg-enhanced .main-shell .baseline-row small,
+.pg-enhanced .main-shell .range-endpoints,
+.pg-enhanced .main-shell .confusion>span,
+.pg-enhanced .main-shell .pgx-reading p,
+.pg-enhanced .main-shell .pgx-reading>small,
+.pg-enhanced .main-shell .pgx-context-source{font-size:11px}
+.pg-enhanced .main-shell th{font-size:11px}
+.pg-enhanced .main-shell td{font-size:12px}
+.pg-enhanced .main-shell td>small{font-size:11px;color:#405b48}
+.portal-content .patient-list button>span{color:#365c45}
+.diagnostic-values summary{cursor:pointer;color:#285b43;font-size:11px;margin:12px 0}
+.diagnostic-values .table-scroll{max-height:250px;overflow:auto}
+.pg-enhanced .main-shell .horizon-card>div:first-child>span,
+.pg-enhanced .main-shell .horizon-card>p,
+.pg-enhanced .main-shell .validation-toolbar>div>span,
+.pg-enhanced .main-shell .matrix-stats>span,
+.pg-enhanced .main-shell .pgx-check,
+.pg-enhanced .main-shell .status-rows span,
+.pg-enhanced .main-shell .loading,
+.pg-enhanced .main-shell .form-input::placeholder{color:#405b48}
+.pg-enhanced .main-shell .horizon-card>p,
+.pg-enhanced .main-shell .status-rows span{font-size:11px}
+.pg-enhanced .main-shell .form-input{color:#405b48}
+/* Hidden Recharts tooltips must not widen the page after a viewport resize. */
+.pg-enhanced .recharts-tooltip-wrapper[style*="visibility: hidden"]{display:none}
+/* A closed off-canvas sidebar must not remain in the keyboard focus order. */
+@media (max-width:720px){.pg-enhanced .sidebar:not(.mobile-open){visibility:hidden}}
+/* Respect users who request reduced motion without changing static layouts. */
+@media (prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}

@@ -20,10 +20,16 @@ class Notifications:
                 c.execute('INSERT INTO notification_history(notification_id,created_at,to_status,action,note,actor) VALUES (?,?,?,?,?,?)',(nid,at,'active','created',reason,'demo_service'))
             return nid
 
-    def sync_legacy(self):
+    def sync_legacy(self,doctor_id=None):
         """Bridge persisted source alerts, never replace or silently delete them."""
         with self.store.connect() as c:
-            for a in c.execute('SELECT * FROM alerts ORDER BY id').fetchall():
+            if doctor_id is not None:c.execute('BEGIN IMMEDIATE')
+            query='SELECT a.* FROM alerts a'
+            args=()
+            if doctor_id is not None:
+                query+=" JOIN patients p ON p.patient_id=a.patient_id WHERE json_extract(p.profile,'$.synthetic')=1 AND EXISTS (SELECT 1 FROM doctor_patient_assignments d WHERE d.doctor_id=? AND d.patient_id=a.patient_id)"
+                args=(doctor_id,)
+            for a in c.execute(query+' ORDER BY a.id',args).fetchall():
                 nid=self.create(category='patient_monitoring',title=f"Experimental replay alert · {a['patient_id']}",
                     reason=f"Historical synthetic 72h model risk {a['risk']:.1%} crossed the demonstration threshold 0.35. Not a clinical alert; held-out sensitivity is zero at this threshold.",
                     source='Frozen LightGBM historical replay',source_type='synthetic_model',patient_id=a['patient_id'],legacy_alert_id=a['id'],
@@ -39,28 +45,52 @@ class Notifications:
     def serialize(row):
         d=dict(row);d['metadata']=json.loads(d['metadata']);d['unread']=d['read_at'] is None;return d
 
-    def list(self,patient_id=None,category=None,status=None,unread_only=False,limit=200):
-        self.sync_legacy();where=[];args=[]
+    @staticmethod
+    def scope(doctor_id):
+        """SQL scope shared by list, counts, detail and transactional updates.
+
+        Shared system notices are only exposed when the conservative single-
+        doctor complete-workspace condition is true in the same SQL statement.
+        Linked alerts must belong to the same patient as the notification.
+        """
+        if doctor_id is None:return '1=1',[]
+        patient="""EXISTS (SELECT 1 FROM patients p JOIN doctor_patient_assignments d
+                  ON d.patient_id=p.patient_id WHERE p.patient_id=n.patient_id
+                  AND d.doctor_id=? AND json_extract(p.profile,'$.synthetic')=1)
+                  AND (n.legacy_alert_id IS NULL OR EXISTS
+                  (SELECT 1 FROM alerts a WHERE a.id=n.legacy_alert_id AND a.patient_id=n.patient_id))"""
+        system="""n.patient_id IS NULL AND n.legacy_alert_id IS NULL
+                  AND (SELECT COUNT(*) FROM portal_users WHERE role='doctor')=1
+                  AND EXISTS (SELECT 1 FROM patients)
+                  AND NOT EXISTS (SELECT 1 FROM patients p WHERE json_extract(p.profile,'$.synthetic') IS NOT 1
+                  OR NOT EXISTS (SELECT 1 FROM doctor_patient_assignments d WHERE d.doctor_id=? AND d.patient_id=p.patient_id))"""
+        return f'(({patient}) OR ({system}))',[doctor_id,doctor_id]
+
+    def list(self,patient_id=None,category=None,status=None,unread_only=False,limit=200,doctor_id=None):
+        self.sync_legacy(doctor_id);scope,scope_args=self.scope(doctor_id);where=[scope];args=list(scope_args)
         for key,value in [('patient_id',patient_id),('category',category),('status',status)]:
             if value:where.append('n.'+key+'=?');args.append(value)
         if unread_only:where.append('n.read_at IS NULL')
-        clause=(' WHERE '+' AND '.join(where)) if where else ''
         with self.store.connect() as c:
-            rows=c.execute('SELECT n.* FROM notifications n'+clause+' ORDER BY n.id DESC LIMIT ?',[*args,limit]).fetchall()
-            counts=dict(c.execute("SELECT SUM(CASE WHEN read_at IS NULL THEN 1 ELSE 0 END) AS unread,COUNT(*) AS total,SUM(CASE WHEN status NOT IN ('resolved','closed') THEN 1 ELSE 0 END) AS open FROM notifications").fetchone())
+            if patient_id and doctor_id is not None and not c.execute("SELECT 1 FROM patients p JOIN doctor_patient_assignments d ON d.patient_id=p.patient_id WHERE p.patient_id=? AND d.doctor_id=? AND json_extract(p.profile,'$.synthetic')=1",(patient_id,doctor_id)).fetchone():
+                raise HTTPException(404,'Record not found')
+            rows=c.execute('SELECT n.* FROM notifications n WHERE '+' AND '.join(where)+' ORDER BY n.id DESC LIMIT ?',[*args,limit]).fetchall()
+            counts=dict(c.execute("SELECT SUM(CASE WHEN n.read_at IS NULL THEN 1 ELSE 0 END) AS unread,COUNT(*) AS total,SUM(CASE WHEN n.status NOT IN ('resolved','closed') THEN 1 ELSE 0 END) AS open FROM notifications n WHERE "+scope,scope_args).fetchone())
         return {'notifications':[self.serialize(r) for r in rows],'counts':{k:v or 0 for k,v in counts.items()},'demo_only':True,'limit':limit}
 
-    def detail(self,nid):
+    def detail(self,nid,doctor_id=None):
+        scope,args=self.scope(doctor_id)
         with self.store.connect() as c:
-            row=c.execute('SELECT * FROM notifications WHERE id=?',(nid,)).fetchone()
+            row=c.execute('SELECT n.* FROM notifications n WHERE n.id=? AND '+scope,[nid,*args]).fetchone()
             if not row:raise HTTPException(404,'Notification not found.')
             result=self.serialize(row)
             result['history']=[dict(r) for r in c.execute('SELECT * FROM notification_history WHERE notification_id=? ORDER BY id',(nid,))]
         return result
 
-    def update(self,nid,body):
+    def update(self,nid,body,doctor_id=None):
+        scope,args=self.scope(doctor_id)
         with self.store.connect() as c:
-            c.execute('BEGIN IMMEDIATE');row=c.execute('SELECT * FROM notifications WHERE id=?',(nid,)).fetchone()
+            c.execute('BEGIN IMMEDIATE');row=c.execute('SELECT n.* FROM notifications n WHERE n.id=? AND '+scope,[nid,*args]).fetchone()
             if not row:raise HTTPException(404,'Notification not found.')
             old=row['status'];target=body.status or old;at=stamp()
             if target!=old:
@@ -68,13 +98,13 @@ class Notifications:
                 c.execute('UPDATE notifications SET status=?,updated_at=? WHERE id=?',(target,at,nid))
                 if row['legacy_alert_id'] is not None:
                     legacy='resolved' if target in ('resolved','closed') else 'acknowledged'
-                    c.execute('UPDATE alerts SET status=?,note=?,updated_at=? WHERE id=?',(legacy,body.note or f'Demo notification review: {target}',at,row['legacy_alert_id']))
+                    c.execute('UPDATE alerts SET status=?,note=?,updated_at=? WHERE id=? AND patient_id=?',(legacy,body.note or f'Demo notification review: {target}',at,row['legacy_alert_id'],row['patient_id']))
             read_at=at if body.read is True else None if body.read is False else (at if target!=old else row['read_at'])
             if body.read is not None or target!=old:c.execute('UPDATE notifications SET read_at=? WHERE id=?',(read_at,nid))
             if target!=old or body.read is not None or body.note:
                 action='review' if target!=old else 'mark_read' if body.read is True else 'mark_unread' if body.read is False else 'note'
                 c.execute('INSERT INTO notification_history(notification_id,created_at,from_status,to_status,action,note) VALUES (?,?,?,?,?,?)',(nid,at,old,target,action,body.note or 'Read state updated in synthetic demo.'))
-        return self.detail(nid)
+        return self.detail(nid,doctor_id)
 
     def test(self):
         import uuid

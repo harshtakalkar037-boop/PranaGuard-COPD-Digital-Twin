@@ -58,7 +58,7 @@ with httpx.Client(base_url='http://127.0.0.1:8000/api/enhanced',headers=headers)
     c.post('/devices/'+did+'/stop',json={}).raise_for_status()
 ```
 
-The simulator itself submits to ingestion through the same REST route. Ingestion shape (illustrative field names; IDs/timestamps must come from actual registration/runtime):
+The simulator validates with the same schema and calls the same token-checked ingestion service in-process; external REST authorization is unchanged. Ingestion shape (illustrative field names; IDs/timestamps must come from actual registration/runtime):
 
 ```text
 patient_id: returned synthetic patient ID

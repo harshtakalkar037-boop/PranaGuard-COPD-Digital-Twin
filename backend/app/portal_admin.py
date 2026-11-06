@@ -4,8 +4,8 @@ import getpass
 import json
 import re
 import secrets
-from backend.app.config import DB_PATH
-from backend.app.portal import hash_password, timestamp
+from backend.app.config import DB_PATH, DATA
+from backend.app.portal import hash_password, timestamp, temporary_password_expiration
 from backend.app.store import Store
 
 def main():
@@ -15,6 +15,7 @@ def main():
     link=sub.add_parser('link');link.add_argument('patient_username');link.add_argument('patient_id');link.add_argument('doctor_username')
     assign=sub.add_parser('assign-synthetic');assign.add_argument('patient_id');assign.add_argument('doctor_username')
     reset=sub.add_parser('reset-password');reset.add_argument('username')
+    cohort=sub.add_parser('assign-cohort');cohort.add_argument('doctor_username')
     args=parser.parse_args();store=Store(DB_PATH)
     with store.connect() as c:
         if args.command=='create-doctor':
@@ -24,11 +25,24 @@ def main():
             c.execute('INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?)',(args.username,hash_password(password),'doctor',timestamp()))
             c.execute("INSERT INTO portal_admin_audit(action,username,created_at) VALUES ('create_doctor',?,?)",(args.username,timestamp()))
             print('Doctor created.')
+        elif args.command=='assign-cohort':
+            doctor=c.execute("SELECT id FROM portal_users WHERE username=? AND role='doctor'",(args.doctor_username,)).fetchone()
+            if not doctor: parser.error('Doctor account not found')
+            profiles=json.loads((DATA/'patients.json').read_text())
+            ids=[p['patient_id'] for p in profiles if p.get('synthetic')]
+            if not ids or len(ids)!=len(profiles) or len(set(ids))!=len(ids): parser.error('Original cohort is not entirely synthetic or has duplicate IDs')
+            for pid in ids:
+                record=c.execute('SELECT profile FROM patients WHERE patient_id=?',(pid,)).fetchone()
+                if not record or not json.loads(record['profile']).get('synthetic'): parser.error('Existing database cohort does not match the synthetic source')
+            for pid in ids:
+                c.execute('INSERT OR IGNORE INTO doctor_patient_assignments(doctor_id,patient_id) VALUES (?,?)',(doctor['id'],pid))
+            c.execute("INSERT INTO portal_admin_audit(action,username,created_at) VALUES ('assign_synthetic_cohort',?,?)",(args.doctor_username,timestamp()))
+            print(f'Assigned {len(ids)} existing synthetic cohort records; no patient account or record changed.')
         elif args.command=='reset-password':
             user=c.execute('SELECT id FROM portal_users WHERE username=?',(args.username,)).fetchone()
             if not user: parser.error('Account not found')
             password=secrets.token_urlsafe(24)
-            c.execute('UPDATE portal_users SET password_hash=?,must_change_password=1 WHERE id=?',(hash_password(password),user['id']))
+            c.execute('UPDATE portal_users SET password_hash=?,must_change_password=1,temporary_password_expires_at=?,temporary_password_used_at=NULL WHERE id=?',(hash_password(password),temporary_password_expiration(),user['id']))
             c.execute('DELETE FROM portal_sessions WHERE user_id=?',(user['id'],))
             c.execute("INSERT INTO portal_admin_audit(action,username,created_at) VALUES ('password_reset',?,?)",(args.username,timestamp()))
             print('One-time temporary password (deliver securely):',password)

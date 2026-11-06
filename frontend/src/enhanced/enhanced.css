@@ -78,3 +78,18 @@
 @media(max-width:1000px){.pgx-notification-layout{grid-template-columns:1fr}.pgx .panel-head{flex-wrap:wrap;gap:12px}.pgx .panel-head>div{min-width:0}}
 @media(max-width:720px){.pgx-toolbar{align-items:flex-start;gap:12px}.pgx-form-grid{grid-template-columns:1fr}.pgx-filters{align-items:stretch}.pgx-filters .select-small{flex:1 1 130px;min-width:0}.pgx-definition{grid-template-columns:minmax(80px,1fr) minmax(0,1.5fr);gap:10px;font-size:10px}.pgx-reading-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pgx-reading{padding:10px}.pgx-profile-title{font-size:17px}.pgx .two-col,.pgx .three-col{grid-template-columns:1fr}.pgx .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pgx-notification-list{max-height:460px}.pgx .panel{min-width:0}.pgx .button{max-width:100%;white-space:normal}.pgx-patient-filter{width:100%}}
 @media(prefers-reduced-motion:reduce){.pgx-notification{transition:none}}
+/* Keep research and care navigation in one scrollable rail rather than two
+   independently clipped lists on short screens. */
+.pg-enhanced .sidebar{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#385f51 transparent}
+.pg-enhanced .sidebar nav{min-height:auto;overflow:visible;flex:0 0 auto}
+@media(max-width:720px){
+ .pg-enhanced .topbar .breadcrumb{min-width:0;flex:1}
+ .pg-enhanced .topbar .breadcrumb strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .pg-enhanced .topbar-right>.button:first-child,.pg-enhanced .topbar-right>.user-avatar{display:none}
+ .pg-enhanced .topbar-right{flex-shrink:0}
+}
+/* The cohort controls remain usable at narrow widths; table columns scroll as a group. */
+.cohort-controls{flex-wrap:wrap;align-items:end}
+.cohort-filter,.cohort-sort{display:grid;gap:5px;color:#60786d;font-size:10px;font-weight:600}
+.cohort-sort select{border:1px solid #dce8e1;border-radius:7px;background:#fff;padding:8px;color:#28453c;font-size:11px}
+@media(max-width:720px){.cohort-filter{width:100%}.cohort-filter .segmented{overflow-x:auto;max-width:100%}.cohort-sort{width:100%}.cohort-sort select{width:100%}}

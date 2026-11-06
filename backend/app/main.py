@@ -1,5 +1,5 @@
 """FastAPI application. Offline by default; all patients synthetic."""
-import asyncio, json, os
+import asyncio, json, os, re
 from contextlib import asynccontextmanager
 from typing import Literal
 from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect, Depends, Header, Query
@@ -10,7 +10,7 @@ from backend.app.config import DB_PATH
 from backend.app.engine import TwinEngine, now
 from backend.app.enhanced.services import Services
 from backend.app.enhanced.routes import make_router
-from backend.app.portal import router as portal_router
+from backend.app.portal import router as portal_router, current
 
 class StrictModel(BaseModel):model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
 class Step(StrictModel):hours:int=Field(default=1,ge=1,le=72)
@@ -57,7 +57,7 @@ def bootstrap_demo_portal(engine):
             raise RuntimeError("Invalid patient password hash")
     with engine.store.connect() as c:
         c.execute(
-            "INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?) ON CONFLICT(username) DO UPDATE SET password_hash=excluded.password_hash WHERE portal_users.role='doctor'",
+            "INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?) ON CONFLICT(username) DO NOTHING",
             (doctor["username"], doctor["password_hash"], "doctor", now()),
         )
         d = c.execute("SELECT id,role FROM portal_users WHERE username=?", (doctor["username"],)).fetchone()
@@ -65,7 +65,7 @@ def bootstrap_demo_portal(engine):
             raise RuntimeError("Demo doctor username is already used by a different account")
         for item in patients:
             c.execute(
-                "INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?) ON CONFLICT(username) DO UPDATE SET password_hash=excluded.password_hash WHERE portal_users.role='patient'",
+                "INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?) ON CONFLICT(username) DO NOTHING",
                 (item["username"], item["password_hash"], "patient", now()),
             )
             p = c.execute("SELECT id,role FROM portal_users WHERE username=?", (item["username"],)).fetchone()
@@ -82,6 +82,12 @@ def bootstrap_demo_portal(engine):
                 "INSERT OR IGNORE INTO doctor_patient_assignments(doctor_id,patient_id) VALUES (?,?)",
                 (d["id"], item["patient_id"]),
             )
+        if cfg.get("assign_cohort") is True:
+            for pid, profile in engine.profiles.items():
+                stored = c.execute('SELECT profile FROM patients WHERE patient_id=?', (pid,)).fetchone()
+                if not profile.get('synthetic') or not stored or not json.loads(stored['profile']).get('synthetic'):
+                    raise RuntimeError('Cohort assignment requires matching existing synthetic records')
+                c.execute('INSERT OR IGNORE INTO doctor_patient_assignments(doctor_id,patient_id) VALUES (?,?)', (d['id'], pid))
 
 def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy_demo=None):
     if legacy_demo is None: legacy_demo = os.getenv("PRANAGUARD_UNSAFE_LEGACY_DEMO", "0") == "1"
@@ -116,21 +122,83 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
     app=FastAPI(title='PranaGuard synthetic COPD twin API',version='0.2.0',lifespan=lifespan,
                 description='Research prototype; not clinically validated. All patient data are fictional/simulated. Optional current modelled city context is excluded from frozen ML inputs. No real patient monitoring or physical device integration.')
     origins=[s.strip() for s in os.getenv('PRANAGUARD_CORS_ORIGINS','*').split(',') if s.strip()]
-    app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=False,allow_methods=['*'],allow_headers=['Content-Type','X-Demo-Token','X-Device-Token'])
-    # Keep the authenticated patient/doctor portal and the original synthetic
-    # research workspace available together. Research API reads are synthetic-only;
-    # all state-changing legacy endpoints retain their explicit authorize dependency.
+    app.state.hub=hub
+    app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=False,allow_methods=['*'],allow_headers=['Content-Type','Authorization','X-Demo-Token','X-Device-Token'])
+    # The original APIs include cohort-wide and unscoped registry operations.
+    # Unscoped methods require a single-doctor DB and complete synthetic
+    # assignment. Explicitly enumerated historical, registry and city routes
+    # instead use the narrower policies below.
     @app.middleware('http')
     async def isolate_legacy(request, call_next):
-        path=request.url.path
+        path = request.url.path
         if path.startswith('/api/portal/'):
             if legacy_demo:
-                return JSONResponse(status_code=404,content={'detail':'Portal unavailable in isolated legacy demo mode'})
-        # Original research routes remain available; mutating routes enforce
-        # the configured demo admin token through their own authorize dependency.
-        response=await call_next(request)
-        if path.startswith('/api/portal/'):
-            response.headers['Cache-Control']='no-store'
+                return JSONResponse(status_code=404, content={'detail':'Portal unavailable in isolated legacy demo mode'})
+        elif path.startswith('/api/') and path != '/api/health' and not legacy_demo:
+            try:
+                user = current(request, request.headers.get('authorization'))
+                if user['role'] != 'doctor':
+                    raise HTTPException(403, 'Doctor access required')
+                request.state.research_doctor_id = user['id']
+                # These original twin endpoints operate on one explicit ID only.
+                # Explicit registry, historical and city exceptions follow;
+                # all other original/enhanced routes remain whole-workspace gated.
+                per_patient={
+                    ('GET',''),('GET','history'),('GET','versions'),('GET','explanation'),
+                    ('GET','scenarios'),('POST','scenarios'),
+                    ('GET','interventions'),('POST','interventions'),
+                }
+                match=re.fullmatch(r'/api/patients/([^/]+)(?:/([^/]+))?',path)
+                scoped=match and (request.method,match.group(2) or '') in per_patient
+                historical_cohort=request.method=='GET' and path in ('/api/overview','/api/patients','/api/validation')
+                registry_match=re.fullmatch(r'/api/enhanced/registry/patients/([^/]+)(?:/([^/]+))?',path)
+                registry_patient=registry_match and (request.method,registry_match.group(2) or '') in {
+                    ('GET',''),('POST','observations'),('POST','reviews')}
+                registry_collection=path=='/api/enhanced/registry/patients' and request.method in ('GET','POST')
+                scoped_notifications=(request.method=='GET' and (path in ('/api/enhanced/notifications','/api/enhanced/notifications/counts') or re.fullmatch(r'/api/enhanced/notifications/[0-9]+',path))) or (request.method=='PATCH' and re.fullmatch(r'/api/enhanced/notifications/[0-9]+',path))
+                scoped_alerts=(request.method=='GET' and path=='/api/alerts') or (request.method=='PATCH' and re.fullmatch(r'/api/alerts/[^/]+',path))
+                city_context=(request.method=='GET' and re.fullmatch(r'/api/enhanced/environment/[^/]+',path)) or (request.method=='POST' and re.fullmatch(r'/api/enhanced/environment/[^/]+/refresh',path))
+                with request.app.state.engine.store.connect() as c:
+                    if scoped:
+                        pid=match.group(1)
+                        row=c.execute('SELECT p.profile FROM patients p JOIN doctor_patient_assignments a ON a.patient_id=p.patient_id WHERE p.patient_id=? AND a.doctor_id=?',(pid,user['id'])).fetchone()
+                        if pid not in request.app.state.engine.profiles or not row or not json.loads(row['profile']).get('synthetic'):
+                            raise HTTPException(404, 'Record not found')
+                    elif registry_patient:
+                        pid=registry_match.group(1)
+                        row=c.execute('SELECT p.profile FROM patients p JOIN doctor_patient_assignments a ON a.patient_id=p.patient_id WHERE p.patient_id=? AND a.doctor_id=?',(pid,user['id'])).fetchone()
+                        if not row or not json.loads(row['profile']).get('synthetic'):
+                            raise HTTPException(404, 'Record not found')
+                    elif registry_collection or city_context or scoped_alerts or scoped_notifications:
+                        # The registry handler restricts lists and idempotent retries
+                        # to this doctor. City-grid context contains no patient records; writes still
+                        # require the optional legacy token in the handler.
+                        pass
+                    elif historical_cohort:
+                        original=request.app.state.engine.profiles
+                        assigned={r['patient_id'] for r in c.execute('SELECT patient_id FROM doctor_patient_assignments WHERE doctor_id=?',(user['id'],))}
+                        stored={r['patient_id']:json.loads(r['profile']) for r in c.execute('SELECT patient_id,profile FROM patients') if r['patient_id'] in original}
+                        if not original or any(pid not in assigned or pid not in stored or not stored[pid].get('synthetic') or not profile.get('synthetic') for pid,profile in original.items()):
+                            raise HTTPException(403, 'Research cohort requires assignment to every historical synthetic twin')
+                        request.state.historical_cohort_only=True
+                    else:
+                        # Unscoped readers can otherwise pass the assignment check
+                        # immediately before a different doctor registers a record.
+                        # Until those operations are scoped, disallow them in
+                        # multi-doctor databases, even when all rows are assigned.
+                        # Administrative DB changes still require quiescing traffic.
+                        doctors=c.execute("SELECT COUNT(*) FROM portal_users WHERE role='doctor'").fetchone()[0]
+                        if doctors != 1:
+                            raise HTTPException(403, 'Unscoped workspace operations require a single-doctor synthetic database')
+                        rows = c.execute('SELECT patient_id,profile FROM patients').fetchall()
+                        assigned = {r['patient_id'] for r in c.execute('SELECT patient_id FROM doctor_patient_assignments WHERE doctor_id=?', (user['id'],))}
+                        if not rows or any(not json.loads(r['profile']).get('synthetic') or r['patient_id'] not in assigned for r in rows):
+                            raise HTTPException(403, 'Research workspace requires assignment to every synthetic record')
+            except HTTPException as exc:
+                return JSONResponse(status_code=exc.status_code, content={'detail':exc.detail})
+        response = await call_next(request)
+        if path.startswith('/api/'):
+            response.headers['Cache-Control'] = 'no-store'
         return response
     app.include_router(portal_router)
     app.include_router(make_router(authorize,hub))
@@ -143,10 +211,11 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
     def health(e:TwinEngine=Depends(engine)):
         return {'status':'ok','synthetic':True,'model_version':e.bundle['version']}
     @app.get('/api/overview')
-    def overview(e:TwinEngine=Depends(engine)):return e.cohort()
+    def overview(request:Request,e:TwinEngine=Depends(engine)):
+        return e.cohort(e.profiles if getattr(request.state,'historical_cohort_only',False) else None)
     @app.get('/api/patients')
-    def patients(q:str='',risk:Literal['all','low','elevated','high']='all',e:TwinEngine=Depends(engine)):
-        cohort=e.cohort()['patients']
+    def patients(request:Request,q:str='',risk:Literal['all','low','elevated','high']='all',e:TwinEngine=Depends(engine)):
+        cohort=e.cohort(e.profiles if getattr(request.state,'historical_cohort_only',False) else None)['patients']
         return {'patients':[p for p in cohort if (q.lower() in (p['display_name']+p['patient_id']+p['city']).lower()) and (risk=='all' or p['risk_category']==risk)]}
     @app.get('/api/patients/{pid}')
     def patient(pid:str,version:int|None=Query(default=None,ge=1),e:TwinEngine=Depends(engine)):return e.patient(pid,version)
@@ -167,17 +236,29 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
         with e.store.connect() as c:
             return {'scenarios':[{'id':r['id'],'state_version':r['state_version'],'created_at':r['created_at'],'assumptions':json.loads(r['assumptions']),'result':json.loads(r['result'])} for r in c.execute('SELECT * FROM scenarios WHERE patient_id=? ORDER BY id DESC LIMIT 20',(pid,))]}
     @app.get('/api/alerts')
-    def alerts(patient_id:str|None=None,e:TwinEngine=Depends(engine)):return {'alerts':e.store.alerts(patient_id)}
+    def alerts(request:Request,patient_id:str|None=None,e:TwinEngine=Depends(engine)):
+        return {'alerts':e.store.alerts(patient_id,doctor_id=getattr(request.state,'research_doctor_id',None))}
     @app.patch('/api/alerts/{alert_id}',dependencies=[Depends(authorize)])
-    async def update_alert(alert_id:int,body:AlertUpdate,e:TwinEngine=Depends(engine)):
+    async def update_alert(alert_id:int,body:AlertUpdate,request:Request,e:TwinEngine=Depends(engine)):
+        doctor_id=getattr(request.state,'research_doctor_id',None)
         with e.store.connect() as c:
-            row=c.execute('SELECT * FROM alerts WHERE id=?',(alert_id,)).fetchone()
+            # Check assignment and update under the same SQLite write lock.
+            c.execute('BEGIN IMMEDIATE')
+            sql='SELECT a.*,p.profile FROM alerts a JOIN patients p ON p.patient_id=a.patient_id WHERE a.id=?'
+            args=[alert_id]
+            if doctor_id is not None:
+                sql+=" AND json_extract(p.profile,'$.synthetic')=1 AND EXISTS (SELECT 1 FROM doctor_patient_assignments d WHERE d.doctor_id=? AND d.patient_id=a.patient_id)"
+                args.append(doctor_id)
+            row=c.execute(sql,args).fetchone()
             if not row:raise HTTPException(404,'Alert not found')
             if row['status']=='resolved':raise HTTPException(409,'Resolved alert is immutable. A later high-risk state may create a new alert.')
-            c.execute('UPDATE alerts SET status=?,note=?,updated_at=? WHERE id=?',(body.status,body.note,now(),alert_id))
+            updated=now()
+            c.execute('UPDATE alerts SET status=?,note=?,updated_at=? WHERE id=?',(body.status,body.note,updated,alert_id))
+            result=dict(row);result.update(status=body.status,note=body.note,updated_at=updated)
+            result['display_name']=json.loads(result.pop('profile'))['display_name'];result['synthetic']=True
         await asyncio.to_thread(app.state.enhanced.notifications.sync_legacy)
         await hub.broadcast({'type':'alert_updated','alert_id':alert_id})
-        return {'alert':next(a for a in e.store.alerts() if a['id']==alert_id)}
+        return {'alert':result}
     @app.get('/api/patients/{pid}/interventions')
     def interventions(pid:str,e:TwinEngine=Depends(engine)):
         e.patient(pid);return {'interventions':e.store.interventions(pid)}
@@ -217,7 +298,11 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
         result=await asyncio.to_thread(perform);await hub.broadcast({'type':'twin_updated','replay':result});return result
     @app.websocket('/api/ws')
     async def websocket(socket:WebSocket):
-        # Live events contain only synthetic replay/update notifications.
+        # Browser WebSockets cannot safely provide our bearer header. Keep the
+        # unscoped stream isolated; the authenticated workspace uses polling.
+        if not legacy_demo:
+            await socket.close(code=1008)
+            return
         await socket.accept();hub.clients.add(socket)
         try:
             await socket.send_json({'type':'connected','synthetic':True})
