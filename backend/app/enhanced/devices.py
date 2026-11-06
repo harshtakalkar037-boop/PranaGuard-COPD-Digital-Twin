@@ -1,9 +1,8 @@
-"""Generic backend-owned simulation through the authenticated ingestion REST endpoint.
+"""Generic backend-owned simulation through the validated ingestion service.
 No Bluetooth, commercial hardware SDK or real-device compatibility is implemented.
 """
 import asyncio,hashlib,hmac,json,math,random,secrets,uuid
 from datetime import timedelta
-import httpx
 from fastapi import HTTPException
 from backend.app.enhanced.settings import DEVICE_CATALOG,METRICS,stamp,parse_stamp,utcnow
 from backend.app.enhanced.registry import public_device,fingerprint
@@ -53,7 +52,7 @@ class Devices:
             if d['is_simulating']:
                 self.notifications.create(category='data_quality',title='Simulated device stream stopped',reason='The user explicitly stopped this synthetic stream. New readings are not being collected; no physical-device disconnection is implied.',source='Device simulation control',source_type='system_demo',patient_id=d['patient_id'],dedupe_key=f"device-stop:{did}:{d['run_id']}",metadata={'device_id':did},conn=c)
         return public_device(self.require(did))
-    def ingest(self,body,token):
+    def ingest(self,body,token,expected_run_id=None):
         d=self.require(body.device_id)
         if not token or not secrets.compare_digest(hashlib.sha256(token.encode()).hexdigest(),d['token_hash']):raise HTTPException(401,'Valid per-device ingestion token required (X-Device-Token).')
         if d['patient_id']!=body.patient_id:raise HTTPException(409,'Device/patient association mismatch.')
@@ -63,6 +62,9 @@ class Devices:
         data=body.model_dump(mode='json');data['readings']=sorted(data['readings'],key=lambda x:x['metric']);digest=fingerprint(data);received=stamp();observed=body.observed_at.isoformat()
         with self.store.connect() as c:
             c.execute('BEGIN IMMEDIATE')
+            if expected_run_id is not None:
+                run=c.execute('SELECT run_id,is_simulating FROM devices WHERE id=?',(body.device_id,)).fetchone()
+                if not run or not run['is_simulating'] or run['run_id']!=expected_run_id:raise HTTPException(409,'Simulation run changed.')
             existing=c.execute('SELECT * FROM ingestion_events WHERE device_id=? AND event_id=?',(body.device_id,body.event_id)).fetchone()
             if existing:
                 if existing['payload_hash']!=digest:raise HTTPException(409,'Event ID already exists with different content.')
@@ -94,22 +96,26 @@ class Devices:
         at=stamp()
         with self.store.connect() as c:due=[dict(r) for r in c.execute('SELECT * FROM devices WHERE is_simulating=1 AND (next_due_at IS NULL OR next_due_at<=?) LIMIT 16',(at,))]
         if not due:return
-        import os
-        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://simulation.internal') as client:
-            for d in due:
-                try:
-                    headers={'X-Device-Token':self.token_for(d['id'])};admin=os.getenv('PRANAGUARD_ADMIN_TOKEN','')
-                    if admin:headers['X-Demo-Token']=admin
-                    response=await client.post('/api/enhanced/ingestion',json=self.sample(d),headers=headers)
-                    if response.status_code!=200:raise RuntimeError(f'Ingestion returned HTTP{response.status_code}.')
-                    with self.store.connect() as c:c.execute('UPDATE devices SET sequence=sequence+1,next_due_at=? WHERE id=? AND run_id=? AND is_simulating=1',((utcnow()+timedelta(seconds=d['interval_seconds'])).isoformat(),d['id'],d['run_id']))
-                except Exception as exc:
-                    with self.store.connect() as c:
-                        live=c.execute('SELECT is_simulating FROM devices WHERE id=?',(d['id'],)).fetchone()
-                        if live and live['is_simulating']:
-                            detail=f'Synthetic ingestion failed ({type(exc).__name__}); simulation stopped. No physical device is involved.'
-                            c.execute("UPDATE devices SET status='error',is_simulating=0,last_error=?,next_due_at=NULL WHERE id=?",(detail,d['id']))
-                            self.notifications.create(category='data_quality',title='Simulated device ingestion error',reason=detail,source='Backend simulator ingestion API',source_type='system_demo',patient_id=d['patient_id'],dedupe_key=f"device-error:{d['id']}:{d['run_id']}",metadata={'device_id':d['id']},conn=c)
+        from backend.app.enhanced.schemas import Ingestion
+        for d in due:
+            try:
+                # The internal simulator is not a doctor session and must not
+                # bypass HTTP authorization. Use the same schema and token-checked
+                # ingestion service directly; external HTTP still requires its
+                # normal doctor session, optional admin token and device token.
+                body=Ingestion.model_validate(self.sample(d))
+                result=await asyncio.to_thread(self.ingest,body,self.token_for(d['id']),d['run_id'])
+                if not result['duplicate']:
+                    await app.state.hub.broadcast({'type':'enhanced_updated','patient_id':d['patient_id']})
+                with self.store.connect() as c:c.execute('UPDATE devices SET sequence=sequence+1,next_due_at=? WHERE id=? AND run_id=? AND is_simulating=1',((utcnow()+timedelta(seconds=d['interval_seconds'])).isoformat(),d['id'],d['run_id']))
+            except Exception as exc:
+                with self.store.connect() as c:
+                    c.execute('BEGIN IMMEDIATE')
+                    live=c.execute('SELECT is_simulating,run_id FROM devices WHERE id=?',(d['id'],)).fetchone()
+                    if live and live['is_simulating'] and live['run_id']==d['run_id']:
+                        detail=f'Synthetic ingestion failed ({type(exc).__name__}); simulation stopped. No physical device is involved.'
+                        c.execute("UPDATE devices SET status='error',is_simulating=0,last_error=?,next_due_at=NULL WHERE id=?",(detail,d['id']))
+                        self.notifications.create(category='data_quality',title='Simulated device ingestion error',reason=detail,source='Backend simulator ingestion service',source_type='system_demo',patient_id=d['patient_id'],dedupe_key=f"device-error:{d['id']}:{d['run_id']}",metadata={'device_id':d['id']},conn=c)
     def sweep_stale(self):
         for d in self.list()['devices']:
             anchor=d['last_seen_at'] or d['created_at'];age=(utcnow()-parse_stamp(anchor)).total_seconds()

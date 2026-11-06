@@ -14,14 +14,15 @@ def make_router(authorize,hub):
     @r.get('/status')
     def status(s=Depends(services)):return s.status()
     @r.get('/registry/patients')
-    def patients(q:str=Query(default='',max_length=100),city:str|None=None,status:Literal['historical_twin','baseline_not_started','collecting_baseline','baseline_collected_no_model']|None=None,risk:Literal['low','elevated','high','unavailable']|None=None,sex:Literal['Female','Male','Other','Not specified']|None=None,s=Depends(services)):
-        return s.registry.list(q,city,status,risk,sex)
+    def patients(request:Request,q:str=Query(default='',max_length=100),city:str|None=None,status:Literal['historical_twin','baseline_not_started','collecting_baseline','baseline_collected_no_model']|None=None,risk:Literal['low','elevated','high','unavailable']|None=None,sex:Literal['Female','Male','Other','Not specified']|None=None,s=Depends(services)):
+        return s.registry.list(q,city,status,risk,sex,doctor_id=getattr(request.state,'research_doctor_id',None))
     @r.post('/registry/patients',dependencies=write)
-    async def register(body:Registration,s=Depends(services)):
-        result=await asyncio.to_thread(s.registry.register,body);await changed();return result
+    async def register(body:Registration,request:Request,s=Depends(services)):
+        doctor_id=getattr(request.state,'research_doctor_id',None)
+        result=await asyncio.to_thread(s.registry.register,body,doctor_id);await changed();return result
     @r.get('/registry/patients/{pid}')
-    async def patient(pid:str,s=Depends(services)):
-        result=await asyncio.to_thread(s.registry.detail,pid);result['environment']=await s.environment.get(result['profile']['city']);return result
+    async def patient(pid:str,request:Request,s=Depends(services)):
+        result=await asyncio.to_thread(s.registry.detail,pid,getattr(request.state,'research_doctor_id',None));result['environment']=await s.environment.get(result['profile']['city']);return result
     @r.post('/registry/patients/{pid}/observations',dependencies=write)
     async def observation(pid:str,body:Observation,s=Depends(services)):
         result=await asyncio.to_thread(s.registry.observation,pid,body);await changed();return result
@@ -56,18 +57,18 @@ def make_router(authorize,hub):
     async def refresh(city:str,body:EmptyBody,s=Depends(services)):
         result=await s.environment.get(city,refresh=True);await changed();return result
     @r.get('/notifications/counts')
-    def counts(s=Depends(services)):return s.notifications.list(limit=1)['counts']
+    def counts(request:Request,s=Depends(services)):return s.notifications.list(limit=1,doctor_id=getattr(request.state,'research_doctor_id',None))['counts']
     @r.get('/notifications')
-    def notifications(patient_id:str|None=None,category:Literal['patient_monitoring','environment','data_quality','system']|None=None,status:Literal['active','acknowledged','under_review','resolved','closed']|None=None,unread_only:bool=False,limit:int=Query(default=200,ge=1,le=500),s=Depends(services)):
-        return s.notifications.list(patient_id,category,status,unread_only,limit)
+    def notifications(request:Request,patient_id:str|None=None,category:Literal['patient_monitoring','environment','data_quality','system']|None=None,status:Literal['active','acknowledged','under_review','resolved','closed']|None=None,unread_only:bool=False,limit:int=Query(default=200,ge=1,le=500),s=Depends(services)):
+        return s.notifications.list(patient_id,category,status,unread_only,limit,doctor_id=getattr(request.state,'research_doctor_id',None))
     @r.post('/notifications/test',dependencies=write)
     async def test_notification(body:EmptyBody,s=Depends(services)):
         result=await asyncio.to_thread(s.notifications.test);await changed();return result
     @r.get('/notifications/{nid}')
-    def notification(nid:int,s=Depends(services)):return s.notifications.detail(nid)
+    def notification(nid:int,request:Request,s=Depends(services)):return s.notifications.detail(nid,doctor_id=getattr(request.state,'research_doctor_id',None))
     @r.patch('/notifications/{nid}',dependencies=write)
-    async def update_notification(nid:int,body:NotificationUpdate,s=Depends(services)):
-        result=await asyncio.to_thread(s.notifications.update,nid,body);await changed();return result
+    async def update_notification(nid:int,body:NotificationUpdate,request:Request,s=Depends(services)):
+        result=await asyncio.to_thread(s.notifications.update,nid,body,getattr(request.state,'research_doctor_id',None));await changed();return result
     @r.get('/email')
     def email(s=Depends(services)):return s.email.history()
     @r.post('/email/test',dependencies=write)

@@ -109,17 +109,23 @@ class TwinEngine:
                 'timestamp':str(self.frame.iloc[cursor]['timestamp']) if cursor<len(self.frame) else '',
                 'mode':'deterministic offline replay','seed':2026,'demo':self.demo,'interval_seconds':2}
 
-    def cohort(self):
+    def cohort(self,patient_ids=None):
+        # Scoped portal callers supply exactly the authorized historical IDs.
+        # Legacy callers retain the original unfiltered behavior.
+        ids=None if patient_ids is None else tuple(patient_ids)
+        if ids is not None and not ids:raise ValueError('Scoped cohort requires patient IDs')
+        where=(' WHERE patient_id IN ('+','.join('?' for _ in ids)+')') if ids is not None else ''
+        args=ids if ids is not None else ()
         with self.store.connect() as c:
-            rows=c.execute('SELECT s.state FROM states s JOIN (SELECT patient_id,MAX(version) AS v FROM states GROUP BY patient_id) latest ON s.patient_id=latest.patient_id AND s.version=latest.v').fetchall()
+            rows=c.execute('SELECT s.state FROM states s JOIN (SELECT patient_id,MAX(version) AS v FROM states'+where+' GROUP BY patient_id) latest ON s.patient_id=latest.patient_id AND s.version=latest.v',args).fetchall()
         states=[json.loads(r['state']) for r in rows]
         with self.store.connect() as c:
             trend=[dict(r) for r in c.execute('''SELECT hour,MIN(timestamp) AS timestamp,
                 AVG(json_extract(state,'$.risks."24"')) AS risk_24,
                 AVG(json_extract(state,'$.risks."48"')) AS risk_48,
                 AVG(json_extract(state,'$.risks."72"')) AS risk_72
-                FROM states GROUP BY hour ORDER BY hour DESC LIMIT 48''')][::-1]
-        alerts=self.store.alerts();open_counts={}
+                FROM states'''+where+''' GROUP BY hour ORDER BY hour DESC LIMIT 48''',args)][::-1]
+        alerts=self.store.alerts(pids=ids);open_counts={}
         for a in alerts:
             if a['status']!='resolved':open_counts[a['patient_id']]=open_counts.get(a['patient_id'],0)+1
         patients=[{'patient_id':s['patient_id'],**s['profile'],'risks':s['risks'],'risk_category':s['risk_category'],

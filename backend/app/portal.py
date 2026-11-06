@@ -17,6 +17,10 @@ from backend.app.config import ROOT
 
 router = APIRouter(prefix='/api/portal', tags=['Research portals'])
 MAX_FILE = 10 * 1024 * 1024
+TEMPORARY_PASSWORD_HOURS = 24
+
+def temporary_password_expiration():
+    return (datetime.now(timezone.utc)+timedelta(hours=TEMPORARY_PASSWORD_HOURS)).isoformat()
 
 def timestamp(): return datetime.now(timezone.utc).isoformat()
 def store(request: Request): return request.app.state.engine.store
@@ -37,11 +41,11 @@ def current(request: Request, authorization: str | None = Header(default=None)):
     if not authorization or not authorization.startswith('Bearer '): raise HTTPException(401, 'Authentication required')
     token_hash = hashlib.sha256(authorization[7:].encode()).hexdigest()
     with store(request).connect() as c:
-        user = c.execute('SELECT u.id,u.username,u.role,u.must_change_password FROM portal_sessions s JOIN portal_users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?', (token_hash,timestamp())).fetchone()
-    if not user: raise HTTPException(401, 'Session expired or invalid')
+        user = c.execute('SELECT u.id,u.username,u.role,u.must_change_password,u.temporary_password_expires_at,u.temporary_password_used_at FROM portal_sessions s JOIN portal_users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?', (token_hash,timestamp())).fetchone()
+    if not user or (user['must_change_password'] and (not user['temporary_password_expires_at'] or user['temporary_password_expires_at']<=timestamp() or not user['temporary_password_used_at'])): raise HTTPException(401, 'Session expired or invalid')
     if user['must_change_password'] and request.url.path not in ('/api/portal/me','/api/portal/logout','/api/portal/password'):
         raise HTTPException(403, 'Password change required')
-    return dict(user)
+    return {key:user[key] for key in ('id','username','role','must_change_password')}
 
 def role(user, expected):
     if user['role'] != expected: raise HTTPException(403, 'Not permitted')
@@ -111,19 +115,33 @@ def login(body: LoginCredentials, request: Request):
         # Perform a hash even for missing usernames.
         valid=verify_password(body.password,row['password_hash'] if row else 'scrypt$00000000000000000000000000000000$'+'00'*32)
         if not row or not valid: raise HTTPException(401,'Invalid credentials')
-        token=secrets.token_urlsafe(32)
-        c.execute('DELETE FROM portal_sessions WHERE expires_at<=?',(timestamp(),))
-        c.execute('INSERT INTO portal_sessions VALUES (?,?,?)',(hashlib.sha256(token.encode()).hexdigest(),row['id'],(datetime.now(timezone.utc)+timedelta(hours=8)).isoformat()))
+        now=timestamp(); token=secrets.token_urlsafe(32)
+        expires=(datetime.now(timezone.utc)+timedelta(hours=8)).isoformat()
+        if row['must_change_password']:
+            # Consume atomically so concurrent login attempts cannot reuse the
+            # secret. Pre-migration credentials with no deadline fail closed.
+            used=c.execute('UPDATE portal_users SET temporary_password_used_at=? WHERE id=? AND password_hash=? AND must_change_password=1 AND temporary_password_used_at IS NULL AND temporary_password_expires_at>?',(now,row['id'],row['password_hash'],now))
+            if used.rowcount!=1: raise HTTPException(401,'Invalid credentials')
+            expires=min(expires,row['temporary_password_expires_at'])
+        c.execute('DELETE FROM portal_sessions WHERE expires_at<=?',(now,))
+        # Also prevent an in-flight login with the old hash surviving a reset.
+        created=c.execute('INSERT INTO portal_sessions(token_hash,user_id,expires_at) SELECT ?,id,? FROM portal_users WHERE id=? AND password_hash=?',(hashlib.sha256(token.encode()).hexdigest(),expires,row['id'],row['password_hash']))
+        if created.rowcount!=1: raise HTTPException(401,'Invalid credentials')
     return {'token':token,'role':row['role'],'username':row['username'],'must_change_password':bool(row['must_change_password'])}
 
 @router.post('/password')
-def change_password(body:PasswordChange,request:Request,user=Depends(current)):
+def change_password(body:PasswordChange,request:Request,user=Depends(current),authorization:str=Header()):
     with store(request).connect() as c:
         row=c.execute('SELECT password_hash FROM portal_users WHERE id=?',(user['id'],)).fetchone()
         if not verify_password(body.current_password,row['password_hash']): raise HTTPException(401,'Invalid credentials')
         link=c.execute('SELECT patient_id FROM patient_user_links WHERE user_id=?',(user['id'],)).fetchone()
         if body.new_password==body.current_password or (link and body.new_password==link['patient_id']+'@123'): raise HTTPException(422,'Choose a different password')
-        c.execute('UPDATE portal_users SET password_hash=?,must_change_password=0 WHERE id=?',(hash_password(body.new_password),user['id']))
+        now=timestamp()
+        updated=c.execute('''UPDATE portal_users SET password_hash=?,must_change_password=0,temporary_password_expires_at=NULL,temporary_password_used_at=NULL
+            WHERE id=? AND password_hash=? AND (must_change_password=0 OR (temporary_password_used_at IS NOT NULL AND temporary_password_expires_at>?))
+            AND EXISTS(SELECT 1 FROM portal_sessions WHERE user_id=portal_users.id AND token_hash=? AND expires_at>?)''',
+            (hash_password(body.new_password),user['id'],row['password_hash'],now,hashlib.sha256(authorization[7:].encode()).hexdigest(),now))
+        if updated.rowcount!=1: raise HTTPException(401,'Session expired or invalid')
         c.execute('DELETE FROM portal_sessions WHERE user_id=?',(user['id'],))
         c.execute('INSERT INTO portal_audit(actor_id,action,created_at) VALUES (?,?,?)',(user['id'],'password_changed',timestamp()))
     return {'message':'Password changed. Sign in again.'}
@@ -155,6 +173,8 @@ def patients(request:Request,user=Depends(current)):
 def details(pid:str,request:Request,user=Depends(current)):
     with store(request).connect() as c:
         access(c,user,pid)
+        row=c.execute('SELECT profile FROM patients WHERE patient_id=?',(pid,)).fetchone()
+        profile=json.loads(row['profile']) if row else None
         checkins=[dict(r) for r in c.execute('SELECT * FROM symptom_checkins WHERE patient_id=? ORDER BY id DESC LIMIT 100',(pid,))]
         uploads=[dict(r) for r in c.execute('SELECT id,patient_id,kind,original_name,mime,description,created_at,review_status FROM patient_uploads WHERE patient_id=? ORDER BY id DESC LIMIT 100',(pid,))]
         reviews=[dict(r) for r in c.execute('SELECT * FROM doctor_reviews WHERE patient_id=? '+('AND shared=1 ' if user['role']=='patient' else '')+'ORDER BY id DESC LIMIT 100',(pid,))]
@@ -163,13 +183,22 @@ def details(pid:str,request:Request,user=Depends(current)):
         history=request.app.state.engine.history(pid) if user['role']=='doctor' else None
     except KeyError: twin=None;history=None
     if user['role']=='patient' and twin: twin={'profile':twin['profile'],'timestamp':twin['timestamp'],'synthetic':True}
-    return {'twin':twin,'history':history,'checkins':checkins,'uploads':uploads,'reviews':reviews}
+    return {'profile':profile,'twin':twin,'history':history,'checkins':checkins,'uploads':uploads,'reviews':reviews}
 
 @router.get('/patients/{pid}/environment')
 async def environment(pid:str,request:Request,user=Depends(current)):
-    with store(request).connect() as c: access(c,user,pid)
-    twin=request.app.state.engine.patient(pid)
-    return await request.app.state.enhanced.environment.get(twin['profile']['city'])
+    with store(request).connect() as c:
+        access(c,user,pid)
+        row=c.execute('SELECT profile FROM patients WHERE patient_id=?',(pid,)).fetchone()
+    if not row: raise HTTPException(404,'Record not found')
+    # Historical cohort uses its original engine profile; newly registered
+    # synthetic records have only a persisted profile and no historical twin.
+    if pid in request.app.state.engine.profiles:
+        city=request.app.state.engine.profiles[pid]['city']
+    else:
+        city=json.loads(row['profile']).get('city')
+    if not city: raise HTTPException(422,'City context unavailable for this record')
+    return await request.app.state.enhanced.environment.get(city)
 
 @router.post('/checkins',status_code=201)
 def checkin(body:Checkin,request:Request,user=Depends(current)):
@@ -440,13 +469,44 @@ def provision_demo(pid:str,request:Request,user=Depends(current)):
         access(c,user,pid)
         row=c.execute('SELECT profile FROM patients WHERE patient_id=?',(pid,)).fetchone()
         if not row or not json.loads(row['profile']).get('synthetic'): raise HTTPException(403,'Only synthetic records are supported')
-        temporary=pid+'@123'
+        temporary=secrets.token_urlsafe(18);expires_at=temporary_password_expiration()
         try:
-            cur=c.execute("INSERT INTO portal_users(username,password_hash,role,created_at,must_change_password) VALUES (?,?,'patient',?,1)",(pid,hash_password(temporary),timestamp()))
+            cur=c.execute("INSERT INTO portal_users(username,password_hash,role,created_at,must_change_password,temporary_password_expires_at) VALUES (?,?,'patient',?,1,?)",(pid,hash_password(temporary),timestamp(),expires_at))
             c.execute('INSERT INTO patient_user_links(user_id,patient_id) VALUES (?,?)',(cur.lastrowid,pid))
         except sqlite3.IntegrityError: raise HTTPException(409,'Account or link already exists')
         audit(c,user,pid,'synthetic_account_provisioned',cur.lastrowid)
-    return {'login_id':pid,'patient_id':pid,'assigned_doctor':user['username'],'status':'Password change required','temporary_password':temporary}
+    return {'login_id':pid,'patient_id':pid,'assigned_doctor':user['username'],'status':'Password change required','temporary_password':temporary,'temporary_password_expires_at':expires_at}
+
+@router.get('/care-queue')
+def care_queue(request:Request,user=Depends(current)):
+    """Workflow state only; ordering is not a clinical urgency score."""
+    role(user,'doctor')
+    with store(request).connect() as c:
+        rows=c.execute("""
+            SELECT 'checkin' AS kind,s.id,s.patient_id,s.created_at AS timestamp,s.review_status AS status
+              FROM symptom_checkins s JOIN doctor_patient_assignments a ON a.patient_id=s.patient_id
+             WHERE a.doctor_id=? AND s.review_status='Pending Review'
+            UNION ALL
+            SELECT 'sputum',s.id,s.patient_id,s.created_at,s.review_status
+              FROM sputum_entries s JOIN doctor_patient_assignments a ON a.patient_id=s.patient_id
+             WHERE a.doctor_id=? AND s.review_status='Pending Review'
+            UNION ALL
+            SELECT 'upload',u.id,u.patient_id,u.created_at,u.review_status
+              FROM patient_uploads u JOIN doctor_patient_assignments a ON a.patient_id=u.patient_id
+             WHERE a.doctor_id=? AND u.review_status='Pending Review'
+            UNION ALL
+            SELECT 'daily',d.id,d.patient_id,d.created_at,d.review_status
+              FROM daily_care_logs d JOIN doctor_patient_assignments a ON a.patient_id=d.patient_id
+             WHERE a.doctor_id=? AND d.review_status='Pending Review'
+            UNION ALL
+            SELECT 'followup',r.id,r.patient_id,r.follow_up_date,r.status
+              FROM doctor_reviews r JOIN doctor_patient_assignments a ON a.patient_id=r.patient_id
+             WHERE a.doctor_id=? AND r.follow_up_date IS NOT NULL
+               AND r.follow_up_date<=date('now') AND r.status!='Completed'
+             ORDER BY timestamp DESC LIMIT 200
+        """,(user['id'],)*5).fetchall()
+    return {'items':[dict(row) for row in rows], 'limit':200,
+            'notice':'Workflow states only; not a measure of clinical urgency.'}
 
 @router.get('/doctor-summary')
 def doctor_summary(request:Request,user=Depends(current)):

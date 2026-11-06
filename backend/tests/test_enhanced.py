@@ -47,7 +47,7 @@ def test_migration_is_additive_idempotent_and_checksum_guard(tmp_path):
     s=Store(db);Store(db)
     with s.connect() as c:
         assert c.execute('SELECT COUNT(*) FROM patients').fetchone()[0]==1
-        assert c.execute('SELECT COUNT(*) FROM schema_migrations').fetchone()[0]==5
+        assert c.execute('SELECT COUNT(*) FROM schema_migrations').fetchone()[0]==6
         assert not c.execute('PRAGMA foreign_key_check').fetchall()
         c.execute("UPDATE schema_migrations SET sha256='tampered'")
     with pytest.raises(RuntimeError,match='checksum'):Store(db)
@@ -104,7 +104,7 @@ def test_association_mismatch_and_stopped_ingestion(ec):
     ec.post('/api/enhanced/devices/'+d['id']+'/stop',json={});assert ingest(ec,d,event(d)).status_code==409
     assert any('stopped' in n['title'] for n in ec.get('/api/enhanced/notifications').json()['notifications'])
 
-def test_backend_simulator_uses_actual_rest_ingestion_and_stops(ec):
+def test_backend_simulator_uses_validated_ingestion_and_stops(ec):
     d=device(ec);s=ec.app.state.enhanced
     ec.portal.call(s.devices.tick,ec.app)
     assert len(ec.get('/api/enhanced/devices/'+d['id']+'/readings').json()['readings'])==2
@@ -233,9 +233,18 @@ def test_monitoring_and_current_environment_never_change_frozen_twin(ec):
     assert data['no_real_patient_records'] and any(r['source_type']=='simulated_device' for r in data['records'])
     assert all(not r['used_by_frozen_model'] for r in data['records'] if r['category']=='current_environment')
 
-def test_protected_scientific_and_design_files_are_byte_identical():
+def test_protected_scientific_and_design_baseline_with_documented_font_fix():
     root=Path(__file__).resolve().parents[2];manifest=json.loads((root/'docs/enhanced/BASELINE_MANIFEST.json').read_text())
-    for path,digest in manifest['protected_files'].items():assert hashlib.sha256((root/path).read_bytes()).hexdigest()==digest,path
+    for path,digest in manifest['protected_files'].items():
+        content=(root/path).read_bytes()
+        if path=='frontend/src/styles.css':
+            # The pre-existing font fix in 14bb7535de is the sole approved change.
+            # Check the complete current file AND reconstruct the recorded baseline.
+            assert hashlib.sha256(content).hexdigest()=='c3fc6f4abf0a66e968e9514419cc6c5e7f8cbca32d0c30d7e76a92def7cf2939'
+            before=b'"Inter Variable",Inter';after=b'Inter'
+            assert content.count(before)==1
+            content=content.replace(before,after,1)
+        assert hashlib.sha256(content).hexdigest()==digest,path
 
 def test_email_disabled_preview_recipient_override_and_rate_limit(ec):
     r=ec.post('/api/enhanced/email/test',json={});assert r.json()['status']=='not_sent_disabled' and not r.json()['inbox_delivery_verified']
@@ -319,8 +328,21 @@ def test_background_service_error_is_sanitized_and_notifies(ec):
     text=ec.get('/api/enhanced/notifications').text
     assert 'background service problem' in text and 'do-not-leak-service-detail' not in text
 
-def test_simulator_authenticates_through_admin_guard_when_configured(ec,monkeypatch):
+def test_simulator_uses_internal_ingestion_when_admin_guard_is_configured(ec,monkeypatch):
     d=device(ec);monkeypatch.setenv('PRANAGUARD_ADMIN_TOKEN','backend-only-test-admin')
     ec.portal.call(ec.app.state.enhanced.devices.tick,ec.app)
     assert len(ec.get('/api/enhanced/devices/'+d['id']+'/readings').json()['readings'])==2
     assert ec.post('/api/enhanced/notifications/test',json={}).status_code==401
+
+
+def test_stale_simulator_run_cannot_ingest_or_stop_restarted_run(ec):
+    from backend.app.enhanced.schemas import Ingestion
+    devices=ec.app.state.enhanced.devices;d=device(ec)
+    old=devices.require(d['id']);body=Ingestion.model_validate(devices.sample(old))
+    assert ec.post('/api/enhanced/devices/'+d['id']+'/stop',json={}).status_code==200
+    assert ec.post('/api/enhanced/devices/'+d['id']+'/start',json={'interval_seconds':2}).status_code==200
+    from fastapi import HTTPException
+    with pytest.raises(HTTPException) as error:devices.ingest(body,devices.token_for(d['id']),old['run_id'])
+    assert error.value.status_code==409
+    assert devices.require(d['id'])['is_simulating']==1
+    assert not ec.get('/api/enhanced/devices/'+d['id']+'/readings').json()['readings']

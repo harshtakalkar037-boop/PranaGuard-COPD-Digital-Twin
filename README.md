@@ -1,9 +1,9 @@
 # PranaGuard — Patient-Specific COPD Digital Twin
 
-> **Connected portal upgrade:** See [docs/COMPLETION_REPORT.md](docs/COMPLETION_REPORT.md) for the engineering report and [docs/PORTALS.md](docs/PORTALS.md) for setup, migration, provisioning, workflow and security limitations. The default app opens the public landing page. Legacy demo APIs are disabled by default because they do not enforce patient-level permissions; the older instructions below describe the isolated legacy demonstration, not the new portal. No real patient data or clinical use.
+> **Current integration branch:** See [release readiness](docs/FINAL_RELEASE_READINESS.md), [portal setup](docs/PORTALS.md) and the [route permission matrix](docs/ROUTE_PERMISSION_MATRIX.md). Secure mode requires a doctor session for research APIs, with assigned synthetic-record scoping where implemented and a restrictive single-doctor gate elsewhere. The secure WebSocket is disabled. This branch is not verified as deployed or production-ready. No real patient data or clinical use.
 
 
-## Enhanced ZIP edition (2026-11-05)
+## Enhanced synthetic demonstration
 
 Built **only in an isolated copy of the user-supplied fork** [`harshtakalkar037-boop/PranaGuard-COPD-Digital-Twin`](https://github.com/harshtakalkar037-boop/PranaGuard-COPD-Digital-Twin), based on commit `95a4e2b00fcb2d9df7210c6b87ecba171a0c4e91`. No push, deployment or modification of either remote/original workspace is claimed. The URLs and submission presentation below describe the original project, **not a deployment of these enhancements**.
 
@@ -12,7 +12,7 @@ Built **only in an isolated copy of the user-supplied fork** [`harshtakalkar037-
 | Capability | Actual status |
 |---|---|
 | Fictional registration, profiles, review/history | Implemented; additive SQLite migrations; original 120-patient cohort preserved |
-| Device integration | Software simulations only, backend-generated through validated REST ingestion; no hardware compatibility claim |
+| Device integration | Software simulations only; the backend uses the same validated, token-checked ingestion service as the REST route; no hardware compatibility claim |
 | New-patient predictions | **Not enabled.** 72h observation coverage is required; device-only streams still lack the compatible full evaluated feature frame. No manufactured probabilities |
 | Current environment | Actual Open-Meteo/CAMS requests verified for Pune/Mumbai/Delhi/Bengaluru; default is explicit historical fallback until enabled |
 | AQI | Actual provider U.S. AQI; **not CPCB Indian NAQI**; city-model context, not personal exposure |
@@ -20,7 +20,7 @@ Built **only in an isolated copy of the user-supplied fork** [`harshtakalkar037-
 | Email | Disabled by default; preview/outbox and explicit SMTP test supported; actual localhost SMTP capture tested; no external inbox-delivery claim |
 | CPCB, IMD, real hardware, clinical use | Not integrated/validated; planned only |
 
-Start from the ZIP using [section 12](#12-run-locally). **Do not run reset, training or data-generation commands to install the enhancement.** The ZIP includes the copied original synthetic SQLite snapshot with 3000 saved states. First boot applies only additive schema migrations; registration and monitoring persist across restarts. Active simulations intentionally do not auto-resume.
+Use [section 12](#12-run-locally) for the repository checkout. **Do not run reset, training or data-generation commands to install.** First boot initializes a missing local database from the frozen synthetic artifacts and applies additive migrations. Active simulations intentionally do not auto-resume; durable persistence requires explicitly configured storage.
 
 - [Audit and implementation plan](docs/enhanced/AUDIT_AND_PLAN.md)
 - [Feature status and boundaries](docs/enhanced/FEATURE_STATUS.md)
@@ -83,7 +83,7 @@ The demo uses four illustrative Indian locations: Pune, Mumbai, Delhi and Bengal
 - **Project presentation:** [16-slide PPTX](docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pptx) · [PDF](docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pdf)
 - **Technical report:** [Markdown](docs/TECHNICAL_REPORT.md) · [PDF](docs/PranaGuard_Technical_Report.pdf)
 
-The hosted API health response reports that the service is running and that its data are synthetic. Free hosting may take time to wake after inactivity. The application is a demonstration environment, not a production clinical service.
+These historical links are not evidence that the current integration branch, accounts, configuration, persistence or authorization have been deployed and verified. The application is a demonstration environment, not a production clinical service.
 
 ## 5. Key features implemented
 
@@ -108,7 +108,7 @@ This is a **stateful, data-driven research twin**. It is not a validated mechani
 | Data and ML | pandas, NumPy, scikit-learn, LightGBM, joblib |
 | Explainability | Native LightGBM TreeSHAP; reference-perturbation fallback documented for non-tree models |
 | Persistence | SQLite with WAL, foreign keys and transactional writes |
-| Communication | REST API and WebSockets |
+| Communication | REST API; legacy WebSocket disabled in secure mode |
 | Tests | pytest, Vitest, React Testing Library, Playwright Chromium |
 | Deliverables | Editable PowerPoint, PDF exports, SVG architecture diagram and technical documentation |
 
@@ -194,33 +194,35 @@ submission_metadata.json     Submission metadata
 
 ## 12. Run locally
 
-Tested with Python 3.13, Node.js 20 and npm. The ZIP includes a preserved synthetic SQLite snapshot; the application can also initialize a new database without training. No database server is required.
+Use Python 3.13 and Node 20.19+ (or Node 22.12+). From the repository root, use a **new disposable synthetic-only** database and uploads directory:
 
 ```bash
-# Extract the delivered PranaGuard-Enhanced.zip first. The remote fork does not contain these local enhancements.
-cd PranaGuard-Enhanced
-
 python3.13 -m venv .venv
-source .venv/bin/activate
+. .venv/bin/activate
 python -m pip install -r requirements.txt
-cp .env.example .env
 npm --prefix frontend ci
-python -m scripts.bootstrap
+mkdir -p demo/uploads
+export PRANAGUARD_DB="$PWD/demo/demo.sqlite"
+export PRANAGUARD_UPLOAD_DIR="$PWD/demo/uploads"
+export PRANAGUARD_SYNTHETIC_DEMO_PROVISIONING=1
+python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
 ```
 
-Start the backend from the repository root:
+First startup initializes the 120 frozen synthetic profiles if the database is new and applies checksum-verified additive migrations. In a second trusted shell, from the repository root, set the **same** database path and activate the virtual environment. Create a doctor interactively and explicitly assign the original cohort:
 
 ```bash
-python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
-```
-
-In a second terminal, from the repository root:
-
-```bash
+. .venv/bin/activate
+export PRANAGUARD_DB="$PWD/demo/demo.sqlite"
+python -m backend.app.portal_admin create-doctor demo_doctor
+python -m backend.app.portal_admin assign-cohort demo_doctor
 npm --prefix frontend run dev
 ```
 
-Open http://127.0.0.1:5173. Vite proxies API requests and WebSockets to the local FastAPI server. Use a single Uvicorn worker; distributed replay coordination is not implemented.
+Open http://localhost:5173 and sign in as that doctor. In Care Action Centre, **Add Patient** can provision an assigned synthetic record when the demo switch above is enabled. The generated one-time password is displayed once: deliver it securely; it expires after 24 hours and requires a password change. Alternatively patients can self-register unlinked, then a trusted administrator can run `python -m backend.app.portal_admin link USERNAME PG-0001 demo_doctor`. For recovery use `python -m backend.app.portal_admin reset-password USERNAME` in a trusted shell; it revokes existing sessions and prints a new temporary credential once. Do not log or commit credentials. See [portal setup](docs/PORTALS.md) for details.
+
+Vite proxies `/api` to the local backend; use a single Uvicorn worker. `.env.example` documents optional configuration; copying it is not required. If using it, ensure its database/upload values match both the server and CLI. With the admin token unset, secure-mode research writes still require doctor authorization; setting it adds a shared write token entered in the research UI, not a substitute for identity. The unsafe legacy flag intentionally disables portal protection and must never be network-exposed.
+
+SQLite and private uploads need persistent storage, coordinated backups and restore tests for any hosted deployment. Free/ephemeral hosting does not provide that guarantee. See [release readiness](docs/FINAL_RELEASE_READINESS.md) for unresolved infrastructure, access-control, accessibility and security checks; do not deploy real patient data.
 
 **Historical research reproduction only (not enhancement setup):** the commands below rewrite protected data/model/evaluation files. Run them only in a separate disposable copy, never in this preserved enhanced working directory. No retraining/regeneration was performed for this enhancement. To reproduce the original pipeline using the bundled cache:
 
@@ -266,7 +268,7 @@ Project code, original documents and model bundle are released under the [MIT Li
 
 **Research demonstration only. Not a medical device. No clinical validation. Not for clinical decision-making.**
 
-All displayed patient records are synthetic. The public demo is not suitable for real patient data. Read-only data and the WebSocket are publicly accessible; the optional shared admin token protects writes only and is not production-grade identity or role-based access control. The system does not provide a clinical consent workflow, certified device ingestion, regulated audit retention or a guarantee of encryption at rest.
+All displayed patient records must be synthetic. The secure portal requires authenticated sessions and applies record-level policies where implemented; remaining global research functions are conservatively gated, and the legacy WebSocket is disabled. Unsafe legacy mode exposes unprotected reads and must remain isolated. The optional shared write token is not identity or production-grade access control. The system does not provide a clinical consent workflow, certified device ingestion, regulated audit retention or a guarantee of encryption at rest.
 
 Before any real-world study, the project would require ethics review, informed consent, clinician-adjudicated outcomes, appropriately governed longitudinal data, prospective multi-site evaluation, subgroup and calibration assessment, secure identity/access management, clinical oversight and a validated safety process.
 
