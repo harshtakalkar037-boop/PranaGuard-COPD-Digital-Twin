@@ -50,7 +50,7 @@ try{
  if(!await username.evaluate(el=>document.activeElement===el && getComputedStyle(el).outlineStyle!=='none'))throw new Error('Login field lacks visible focus');
  await username.fill('missing-user');await page.keyboard.press('Tab');
  if(!await page.getByLabel('Password',{exact:true}).evaluate(el=>document.activeElement===el))throw new Error('Login focus order does not move from username to password');
- await page.getByLabel('Password',{exact:true}).fill('incorrect');await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('alert').getByText('Invalid credentials').waitFor();
+ await page.getByLabel('Password',{exact:true}).fill('incorrect');await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('alert').getByText('Invalid credentials',{exact:false}).waitFor();
  await login('doctor',doctor,doctorPassword);
  for(const view of research)await scan(`/doctor/dashboard?patient=${encodeURIComponent(patientId)}#${view}`);
  for(const view of care)await scan(`/doctor/dashboard?patient=${encodeURIComponent(patientId)}#care:${encodeURIComponent(view)}`);

@@ -21,9 +21,9 @@ describe('daily care safety and loading states',()=>{
   await waitFor(()=>expect(screen.getByText("No personal hydration target has been set. Please follow your doctor's advice.")).toBeVisible());
  });
  it('shows errors rather than false zero progress or an absent target',async()=>{
-  vi.stubGlobal('fetch',vi.fn(async()=>({ok:false,json:async()=>({detail:'Unable to load'})})));
+  vi.stubGlobal('fetch',vi.fn(async()=>({ok:false,status:503,json:async()=>({detail:'Unable to load'})})));
   render(<DailyPatient pid="PG-0001" doctor={false} revision={0} refresh={()=>{}}/>);
-  await waitFor(()=>expect(screen.getAllByText('Unable to load').length).toBeGreaterThan(0));
+  await waitFor(()=>expect(screen.getAllByText('Server error (HTTP 503): Unable to load').length).toBeGreaterThan(0));
   expect(screen.queryByText(/No personal hydration target has been set/)).not.toBeInTheDocument();
   expect(screen.queryByText(/0 meals recorded/)).not.toBeInTheDocument();
  });

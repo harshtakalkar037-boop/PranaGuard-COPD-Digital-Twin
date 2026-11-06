@@ -20,6 +20,31 @@ beforeEach(()=>{
 });
 const ready=async()=>{render(<App/>);await screen.findByRole('heading',{name:'Your patient cohort'});};
 describe('backend-fed dashboard',()=>{
+ it('selects an assigned twin for a partial cohort and disables global replay controls',async()=>{
+  const chosen=overview.patients.find(p=>p.patient_id!=='PG-0071')!;
+  const partial={...overview,patients:[chosen],replay:{...overview.replay,demo:null},permissions:{complete_historical_cohort:false,can_control_replay:false}};
+  const previous=fetchMock.getMockImplementation() as (input:string,options?:RequestInit)=>Promise<Response>;
+  fetchMock.mockImplementation(async(input:string,options?:RequestInit)=>input.endsWith('/overview')?new Response(JSON.stringify(partial),{status:200}):previous(input,options));
+  await ready();await userEvent.click(screen.getByRole('button',{name:'Patient twins'}));
+  await waitFor(()=>expect(screen.getByLabelText('Selected synthetic twin')).toHaveValue(chosen.patient_id));
+  expect(screen.getByRole('button',{name:'1h'})).toBeDisabled();
+  expect(screen.getByText(/Replay controls require a single-doctor workspace/)).toBeInTheDocument();
+ });
+ it('shows an empty assigned cohort without selecting the global demo patient',async()=>{
+  const empty={...overview,patients:[],summary:{total:0,high:0,elevated:0,low:0,open_alerts:0,missing_measurements:0},trend:[],replay:{...overview.replay,demo:null},permissions:{complete_historical_cohort:false,can_control_replay:false}};
+  const previous=fetchMock.getMockImplementation() as (input:string,options?:RequestInit)=>Promise<Response>;
+  fetchMock.mockImplementation(async(input:string,options?:RequestInit)=>input.endsWith('/overview')?new Response(JSON.stringify(empty),{status:200}):previous(input,options));
+  await ready();expect(screen.getByText(/No historical twin trend is available/)).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button',{name:'Patient twins'}));
+  expect(screen.getByText(/No historical synthetic twins are assigned/)).toBeInTheDocument();
+  expect(screen.getByLabelText('Selected synthetic twin')).toHaveValue('');
+ });
+ it('shows authorization errors without describing a backend outage',async()=>{
+  const previous=fetchMock.getMockImplementation() as (input:string,options?:RequestInit)=>Promise<Response>;
+  fetchMock.mockImplementation(async(input:string,options?:RequestInit)=>input.endsWith('/overview')?new Response(JSON.stringify({detail:'Doctor access required'}),{status:403}):previous(input,options));
+  render(<App/>);expect(await screen.findByRole('alert')).toHaveTextContent('Permission denied (HTTP 403)');expect(screen.queryByText(/Backend unavailable/)).not.toBeInTheDocument();expect(screen.getByRole('button',{name:'Retry'})).toBeInTheDocument();
+ });
+
  it('renders the real captured cohort response and explicit synthetic labels',async()=>{await ready();expect(screen.getByText('120')).toBeInTheDocument();expect(screen.getByText('93')).toBeInTheDocument();expect(screen.getByText('SYNTHETIC PATIENTS ONLY')).toBeInTheDocument();});
  it('explains unavailable enhanced sources without claiming a historical fallback',async()=>{
   const previous=fetchMock.getMockImplementation() as (input:string,options?:RequestInit)=>Promise<Response>;fetchMock.mockImplementation(async(input:string,options?:RequestInit)=>input.includes('/enhanced/environment/')||input.includes('/enhanced/registry/patients')?new Response(JSON.stringify({detail:'Research workspace requires assignment to every synthetic record'}),{status:403}):previous(input,options));
@@ -39,6 +64,14 @@ describe('backend-fed dashboard',()=>{
  it('executes replay controls through POST, not fake local counters',async()=>{await ready();await userEvent.click(screen.getByRole('button',{name:'1h'}));await waitFor(()=>expect(fetchMock.mock.calls.some(c=>String(c[0]).includes('/replay/step')&&JSON.parse(c[1]!.body as string).hours===1)).toBe(true));});
 });
 describe('API error handling',()=>{
+ it.each([[401,'Authentication required'],[403,'Permission denied'],[404,'Record not found'],[422,'Invalid request'],[500,'Server error']])('distinguishes HTTP %i errors',async(status,label)=>{
+  fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({detail:'Example'}),{status}));await expect(api('/test')).rejects.toThrow(label);
+ });
+ it('distinguishes network failure and invalid JSON',async()=>{
+  fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));await expect(api('/test')).rejects.toThrow('Network error');
+  fetchMock.mockResolvedValueOnce(new Response('<html>not json</html>',{status:200}));await expect(api('/test')).rejects.toThrow('Invalid server response');
+ });
+
  it('reports backend validation errors',async()=>{fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({detail:'Assumption outside supported range'}),{status:422}));await expect(api('/test')).rejects.toThrow('Assumption outside supported range');});
  it('attaches only explicitly configured session authorization',async()=>{sessionStorage.setItem('pg-demo-token','test-token');await api('/health');expect(fetchMock.mock.calls[0][1]!.headers).toMatchObject({'X-Demo-Token':'test-token'});});
 });

@@ -1,5 +1,6 @@
 """Persistent personalized digital twin, hourly deterministic replay, exact model inference."""
 import hashlib, json, threading, warnings
+from contextlib import nullcontext
 from datetime import datetime, timezone
 import joblib
 import numpy as np
@@ -109,31 +110,30 @@ class TwinEngine:
                 'timestamp':str(self.frame.iloc[cursor]['timestamp']) if cursor<len(self.frame) else '',
                 'mode':'deterministic offline replay','seed':2026,'demo':self.demo,'interval_seconds':2}
 
-    def cohort(self,patient_ids=None):
+    def cohort(self,patient_ids=None,conn=None):
         # Scoped portal callers supply exactly the authorized historical IDs.
         # Legacy callers retain the original unfiltered behavior.
         ids=None if patient_ids is None else tuple(patient_ids)
-        if ids is not None and not ids:raise ValueError('Scoped cohort requires patient IDs')
-        where=(' WHERE patient_id IN ('+','.join('?' for _ in ids)+')') if ids is not None else ''
+        where=(' WHERE patient_id IN ('+','.join('?' for _ in ids)+')' if ids else ' WHERE 0') if ids is not None else ''
         args=ids if ids is not None else ()
-        with self.store.connect() as c:
+        with (nullcontext(conn) if conn is not None else self.store.connect()) as c:
             rows=c.execute('SELECT s.state FROM states s JOIN (SELECT patient_id,MAX(version) AS v FROM states'+where+' GROUP BY patient_id) latest ON s.patient_id=latest.patient_id AND s.version=latest.v',args).fetchall()
-        states=[json.loads(r['state']) for r in rows]
-        with self.store.connect() as c:
+            states=[json.loads(r['state']) for r in rows]
             trend=[dict(r) for r in c.execute('''SELECT hour,MIN(timestamp) AS timestamp,
                 AVG(json_extract(state,'$.risks."24"')) AS risk_24,
                 AVG(json_extract(state,'$.risks."48"')) AS risk_48,
                 AVG(json_extract(state,'$.risks."72"')) AS risk_72
                 FROM states'''+where+''' GROUP BY hour ORDER BY hour DESC LIMIT 48''',args)][::-1]
-        alerts=self.store.alerts(pids=ids);open_counts={}
-        for a in alerts:
-            if a['status']!='resolved':open_counts[a['patient_id']]=open_counts.get(a['patient_id'],0)+1
+            # Count all scoped open alerts in SQL, not only the list endpoint's
+            # most recent 500 rows. The same read snapshot holds for every query.
+            alert_where=where+(' AND ' if where else ' WHERE ')+"status!='resolved'"
+            open_counts={r['patient_id']:r['n'] for r in c.execute('SELECT patient_id,COUNT(*) AS n FROM alerts'+alert_where+' GROUP BY patient_id',args)}
         patients=[{'patient_id':s['patient_id'],**s['profile'],'risks':s['risks'],'risk_category':s['risk_category'],
                    'current':s['current'],'version':s['version'],'timestamp':s['timestamp'],'missing_fields':s['missing_fields'],
                    'prediction_supported':s['prediction_supported'],'open_alerts':open_counts.get(s['patient_id'],0)} for s in states]
         return {'patients':patients,'summary':{'total':len(patients),'high':sum(p['risk_category']=='high' for p in patients),
                 'elevated':sum(p['risk_category']=='elevated' for p in patients),'low':sum(p['risk_category']=='low' for p in patients),
-                'open_alerts':sum(a['status']!='resolved' for a in alerts),'missing_measurements':sum(len(s['missing_fields']) for s in states)},
+                'open_alerts':sum(open_counts.values()),'missing_measurements':sum(len(s['missing_fields']) for s in states)},
                 'replay':self.replay_status(),'model_version':self.bundle['version'],'synthetic':True,'trend':trend}
 
     def patient(self,pid,version=None):return self.store.latest(pid,version)

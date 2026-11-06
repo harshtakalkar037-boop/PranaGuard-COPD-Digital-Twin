@@ -26,7 +26,7 @@ describe('portal request isolation',()=>{
   vi.stubGlobal('fetch',fetcher);
   const {result,rerender}=renderHook(({revision})=>usePortal<{patient:string}>('/patients/one',revision),{initialProps:{revision:0}});
   await waitFor(()=>expect(result.current.data).toEqual({patient:'one'}));
-  rerender({revision:1});await waitFor(()=>expect(result.current.error).toBe('Denied'));
+  rerender({revision:1});await waitFor(()=>expect(result.current.error).toBe('Permission denied (HTTP 403): Denied'));
   expect(result.current.data).toBeNull();
  });
  it('does not display late data from a previous or null patient path',async()=>{

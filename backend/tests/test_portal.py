@@ -81,7 +81,7 @@ def test_repeatable_migration(portal):
 
 def test_scoped_research_tools(portal):
     doc=auth(portal,'doc');patient=auth(portal,'alice')
-    assert portal.get('/api/portal/validation',headers=doc).status_code==200
+    assert portal.get('/api/portal/validation',headers=doc).status_code==403
     assert portal.get('/api/portal/validation',headers=patient).status_code==403
     assert portal.get('/api/portal/patients/PG-0002/explanation?horizon=24',headers=doc).status_code==404
     result=portal.get('/api/portal/patients/PG-0001/explanation?horizon=24',headers=doc)
@@ -187,10 +187,11 @@ def test_local_admin_reset_revokes_sessions(portal,monkeypatch,capsys):
     with portal.app.state.engine.store.connect() as c:
         assert c.execute("SELECT COUNT(*) FROM portal_admin_audit WHERE action='password_reset' AND username='reset_test'").fetchone()[0]==1
 
-def test_research_workspace_requires_complete_synthetic_assignment(portal):
+def test_research_overview_supports_partial_assignment_and_validation_requires_full_cohort(portal):
     doc=auth(portal,'doc'); patient=auth(portal,'alice')
     assert portal.get('/api/overview',headers=patient).status_code==403
-    assert portal.get('/api/overview',headers=doc).status_code==403
+    assert portal.get('/api/overview',headers=doc).status_code==200
+    assert portal.get('/api/validation',headers=doc).status_code==403
     engine=portal.app.state.engine
     with engine.store.connect() as c:
         doctor=c.execute("SELECT id FROM portal_users WHERE username='doc'").fetchone()['id']
@@ -199,6 +200,7 @@ def test_research_workspace_requires_complete_synthetic_assignment(portal):
     overview=portal.get('/api/overview',headers=doc)
     assert overview.status_code==200
     assert len(overview.json()['patients'])==len(engine.profiles)==120
+    assert portal.get('/api/portal/validation',headers=doc).status_code==200
     assert portal.get('/api/enhanced/registry/patients',headers=doc).status_code==200
     with engine.store.connect() as c:
         c.execute('DELETE FROM doctor_patient_assignments WHERE doctor_id=? AND patient_id=?',(doctor,'PG-0002'))
@@ -425,8 +427,9 @@ def test_scoped_original_twin_methods_do_not_require_global_access(portal):
         assert portal.request(method,modified,headers=doc,json=body).status_code==404
         response=portal.request(method,path,headers=doc,json=body)
         assert response.status_code==200,(method,path,response.text)
-    # Unscoped cohort remains fail-closed for partially assigned doctors.
-    assert portal.get('/api/overview',headers=doc).status_code==403
+    # Overview now scopes to assigned historical twins, while validation stays restricted.
+    assert 'PG-0001' in [p['patient_id'] for p in portal.get('/api/overview',headers=doc).json()['patients']]
+    assert portal.get('/api/validation',headers=doc).status_code==403
 
 
 def test_portal_per_record_methods_reject_cross_patient_and_child_ids(portal):
@@ -491,8 +494,10 @@ def test_historical_cohort_is_scoped_before_aggregation_and_alert_limit(portal):
         city=portal.get('/api/enhanced/environment/Pune',headers=doctor);assert city.status_code==200 and fake_id not in city.text
         assert portal.get('/api/enhanced/environment/Pune',headers=patient).status_code==403
         with engine.store.connect() as c:c.execute('DELETE FROM doctor_patient_assignments WHERE doctor_id=? AND patient_id=?',(doc_id,'PG-0001'))
-        assert portal.get('/api/overview',headers=doctor).status_code==403
-        assert portal.get('/api/patients',headers=doctor).status_code==403
+        partial=portal.get('/api/overview',headers=doctor);assert partial.status_code==200
+        assert len(partial.json()['patients'])==119 and partial.json()['replay']['demo'] is None
+        assert all(p['patient_id']!='PG-0001' for p in portal.get('/api/patients',headers=doctor).json()['patients'])
+        assert portal.get('/api/validation',headers=doctor).status_code==403
     finally:
         with engine.store.connect() as c:
             c.execute('INSERT OR IGNORE INTO doctor_patient_assignments VALUES (?,?)',(doc_id,'PG-0001'))
@@ -774,3 +779,43 @@ def test_enhanced_notifications_are_scoped_for_lists_counts_and_atomic_review(tm
         assert c.get(f'/api/enhanced/notifications/{own}',headers=one).status_code==404
         assert c.patch(f'/api/enhanced/notifications/{own}',headers=one,json={'read':True}).status_code==404
         assert c.get('/api/enhanced/notifications').status_code==401
+
+
+def test_partial_cohort_isolation_empty_synthetic_and_aggregates(tmp_path):
+    import json
+    with TestClient(create_app(tmp_path/'partial.sqlite',background_tasks=False,legacy_demo=False)) as c:
+        e=c.app.state.engine
+        with e.store.connect() as db:
+            for name in ('scope_a','scope_b','scope_empty'):
+                db.execute('INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?)',(name,hash_password(PASSWORD),'doctor',timestamp()))
+            ids={r['username']:r['id'] for r in db.execute("SELECT id,username FROM portal_users")}
+            db.execute('INSERT INTO doctor_patient_assignments VALUES (?,?)',(ids['scope_a'],'PG-0001'))
+            db.execute('INSERT INTO doctor_patient_assignments VALUES (?,?)',(ids['scope_b'],'PG-0002'))
+            db.execute("INSERT INTO alerts(patient_id,state_version,created_at,risk,horizon,status) VALUES ('PG-0001',1,?,.5,72,'new')",(timestamp(),))
+            db.executemany("INSERT INTO alerts(patient_id,state_version,created_at,risk,horizon,status) VALUES ('PG-0002',1,?,.9,72,'new')",[(timestamp(),)]*501)
+        a=auth(c,'scope_a');b=auth(c,'scope_b');empty=auth(c,'scope_empty')
+        one=c.get('/api/overview',headers=a);assert one.status_code==200
+        assert [p['patient_id'] for p in one.json()['patients']]==['PG-0001']
+        expected=e.cohort(['PG-0001'])
+        assert one.json()['summary']==expected['summary'] and one.json()['trend']==expected['trend']
+        assert one.json()['summary']['open_alerts']==1
+        assert one.json()['replay']['demo'] is None
+        assert 'PG-0002' not in one.text and c.get('/api/patients/PG-0002',headers=a).status_code==404
+        assert [p['patient_id'] for p in c.get('/api/patients',headers=b).json()['patients']]==['PG-0002']
+        assert c.get('/api/overview',headers=b).json()['summary']['open_alerts']==501
+        assert c.get('/api/patients',headers=a,params={'q':'PG-0002'}).json()['patients']==[]
+        assert c.get('/api/validation',headers=a).status_code==403
+        assert c.get('/api/portal/validation',headers=a).status_code==403
+        no=c.get('/api/overview',headers=empty).json()
+        assert no['patients']==[] and no['trend']==[] and all(v==0 for v in no['summary'].values())
+        assert no['replay']['demo'] is None and c.get('/api/patients',headers=empty).json()['patients']==[]
+        with e.store.connect() as db:
+            profile=json.loads(db.execute("SELECT profile FROM patients WHERE patient_id='PG-0001'").fetchone()[0]);profile['synthetic']=False
+            db.execute("UPDATE patients SET profile=? WHERE patient_id='PG-0001'",(json.dumps(profile),))
+        assert c.get('/api/overview',headers=a).json()['patients']==[]
+        assert c.get('/api/patients/PG-0001',headers=a).status_code==404
+        with e.store.connect() as db:
+            profile['synthetic']='true'
+            db.execute("UPDATE patients SET profile=? WHERE patient_id='PG-0001'",(json.dumps(profile),))
+        assert c.get('/api/overview',headers=a).json()['patients']==[]
+        assert c.get('/api/patients/PG-0001',headers=a).status_code==404

@@ -2,7 +2,7 @@ import {useEffect,useRef,useState} from 'react';
 import type {FormEvent,ReactNode} from 'react';
 import {ArrowRight,Bell,CloudSun,FileText,HeartPulse,Home,LogOut,ShieldCheck,Stethoscope,Users,Waves} from 'lucide-react';
 import './portal.css';
-import {handleExpiredSession} from './session';
+import {requestJson} from './api';
 import './landing.css';
 import {Sputum,DailyPatient,DailySummary,PlanView,PlanManagement,LogHistory,Provision} from './DailyCare';
 
@@ -19,7 +19,7 @@ type Env={city:string;components:{air:EnvComponent;weather:EnvComponent};scope:s
 const token=()=>sessionStorage.getItem('pg-portal-token')||'';
 export async function request<T>(path:string,options:RequestInit={}):Promise<T>{
  const headers=new Headers(options.headers);if(token()&&!headers.has('Authorization'))headers.set('Authorization',`Bearer ${token()}`);if(options.body && !(options.body instanceof FormData))headers.set('Content-Type','application/json');
- const r=await fetch('/api/portal'+path,{...options,headers});if(!r.ok){let message='Request failed';try{const body=await r.json();message=typeof body.detail==='string'?body.detail:'Please check your entries.'}catch{/* no body */}if(r.status===401)handleExpiredSession(headers.get('Authorization')?.replace(/^Bearer /,''),message);throw new Error(message);}return r.json();
+ return requestJson<T>('/api/portal'+path,{...options,headers},headers.get('Authorization')?.replace(/^Bearer /,''));
 }
 export const post=<T,>(path:string,body:unknown)=>request<T>(path,{method:'POST',body:JSON.stringify(body)});
 function Brand(){return <a href="/" className="portal-brand"><span><Waves size={22}/></span><strong>prana<span>guard</span></strong></a>}

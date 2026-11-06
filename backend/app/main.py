@@ -10,7 +10,7 @@ from backend.app.config import DB_PATH
 from backend.app.engine import TwinEngine, now
 from backend.app.enhanced.services import Services
 from backend.app.enhanced.routes import make_router
-from backend.app.portal import router as portal_router, current
+from backend.app.portal import router as portal_router, current, require_full_historical_assignment
 
 class StrictModel(BaseModel):model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
 class Step(StrictModel):hours:int=Field(default=1,ge=1,le=72)
@@ -157,7 +157,8 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
                 }
                 match=re.fullmatch(r'/api/patients/([^/]+)(?:/([^/]+))?',path)
                 scoped=match and (request.method,match.group(2) or '') in per_patient
-                historical_cohort=request.method=='GET' and path in ('/api/overview','/api/patients','/api/validation')
+                historical_cohort=request.method=='GET' and path=='/api/validation'
+                scoped_cohort=request.method=='GET' and path in ('/api/overview','/api/patients')
                 registry_match=re.fullmatch(r'/api/enhanced/registry/patients/([^/]+)(?:/([^/]+))?',path)
                 registry_patient=registry_match and (request.method,registry_match.group(2) or '') in {
                     ('GET',''),('POST','observations'),('POST','reviews')}
@@ -169,24 +170,20 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
                     if scoped:
                         pid=match.group(1)
                         row=c.execute('SELECT p.profile FROM patients p JOIN doctor_patient_assignments a ON a.patient_id=p.patient_id WHERE p.patient_id=? AND a.doctor_id=?',(pid,user['id'])).fetchone()
-                        if pid not in request.app.state.engine.profiles or not row or not json.loads(row['profile']).get('synthetic'):
+                        if pid not in request.app.state.engine.profiles or not row or json.loads(row['profile']).get('synthetic') is not True:
                             raise HTTPException(404, 'Record not found')
                     elif registry_patient:
                         pid=registry_match.group(1)
                         row=c.execute('SELECT p.profile FROM patients p JOIN doctor_patient_assignments a ON a.patient_id=p.patient_id WHERE p.patient_id=? AND a.doctor_id=?',(pid,user['id'])).fetchone()
-                        if not row or not json.loads(row['profile']).get('synthetic'):
+                        if not row or json.loads(row['profile']).get('synthetic') is not True:
                             raise HTTPException(404, 'Record not found')
-                    elif registry_collection or city_context or scoped_alerts or scoped_notifications:
+                    elif registry_collection or city_context or scoped_alerts or scoped_notifications or scoped_cohort:
                         # The registry handler restricts lists and idempotent retries
                         # to this doctor. City-grid context contains no patient records; writes still
                         # require the optional legacy token in the handler.
                         pass
                     elif historical_cohort:
-                        original=request.app.state.engine.profiles
-                        assigned={r['patient_id'] for r in c.execute('SELECT patient_id FROM doctor_patient_assignments WHERE doctor_id=?',(user['id'],))}
-                        stored={r['patient_id']:json.loads(r['profile']) for r in c.execute('SELECT patient_id,profile FROM patients') if r['patient_id'] in original}
-                        if not original or any(pid not in assigned or pid not in stored or not stored[pid].get('synthetic') or not profile.get('synthetic') for pid,profile in original.items()):
-                            raise HTTPException(403, 'Research cohort requires assignment to every historical synthetic twin')
+                        require_full_historical_assignment(c,request.app.state.engine,user['id'])
                         request.state.historical_cohort_only=True
                     else:
                         # Unscoped readers can otherwise pass the assignment check
@@ -217,12 +214,31 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
     @app.get('/api/health')
     def health(e:TwinEngine=Depends(engine)):
         return {'status':'ok','synthetic':True,'model_version':e.bundle['version']}
+    def doctor_cohort(request:Request,e:TwinEngine):
+        doctor_id=getattr(request.state,'research_doctor_id',None)
+        if doctor_id is None: # isolated unsafe legacy mode only
+            return e.cohort()
+        with e.store.connect() as c:
+            # Assignment, synthetic classification, states, trends and alerts
+            # share one SQLite read snapshot rather than a middleware ID check.
+            c.execute('BEGIN')
+            assigned={r['patient_id'] for r in c.execute("SELECT p.patient_id FROM patients p JOIN doctor_patient_assignments d ON d.patient_id=p.patient_id WHERE d.doctor_id=? AND json_type(p.profile,'$.synthetic')='true'",(doctor_id,))}
+            ids=[pid for pid,profile in e.profiles.items() if profile.get('synthetic') is True and pid in assigned]
+            result=e.cohort(ids,conn=c)
+            complete=len(ids)==len(e.profiles) and bool(ids)
+            doctors=c.execute("SELECT COUNT(*) FROM portal_users WHERE role='doctor'").fetchone()[0]
+            whole_workspace=doctors==1 and c.execute("SELECT COUNT(*) FROM patients p WHERE json_type(p.profile,'$.synthetic') IS NOT 'true' OR NOT EXISTS (SELECT 1 FROM doctor_patient_assignments d WHERE d.doctor_id=? AND d.patient_id=p.patient_id)",(doctor_id,)).fetchone()[0]==0
+            result['permissions']={'complete_historical_cohort':complete,'can_control_replay':whole_workspace}
+            if not complete:
+                # The global demo metadata includes another twin's identity/risk.
+                result['replay']={**result['replay'],'demo':None}
+            return result
     @app.get('/api/overview')
     def overview(request:Request,e:TwinEngine=Depends(engine)):
-        return e.cohort(e.profiles if getattr(request.state,'historical_cohort_only',False) else None)
+        return doctor_cohort(request,e)
     @app.get('/api/patients')
     def patients(request:Request,q:str='',risk:Literal['all','low','elevated','high']='all',e:TwinEngine=Depends(engine)):
-        cohort=e.cohort(e.profiles if getattr(request.state,'historical_cohort_only',False) else None)['patients']
+        cohort=doctor_cohort(request,e)['patients']
         return {'patients':[p for p in cohort if (q.lower() in (p['display_name']+p['patient_id']+p['city']).lower()) and (risk=='all' or p['risk_category']==risk)]}
     @app.get('/api/patients/{pid}')
     def patient(pid:str,version:int|None=Query(default=None,ge=1),e:TwinEngine=Depends(engine)):return e.patient(pid,version)

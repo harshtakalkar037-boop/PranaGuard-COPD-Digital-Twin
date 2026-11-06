@@ -275,9 +275,19 @@ class ScenarioInput(Strict):
     adherence: float = Field(default=.95,ge=0,le=1,allow_inf_nan=False)
     activity_multiplier: float = Field(default=1,ge=.5,le=1.5,allow_inf_nan=False)
 
+def require_full_historical_assignment(c,engine,doctor_id):
+    original=engine.profiles
+    assigned={r['patient_id'] for r in c.execute('SELECT patient_id FROM doctor_patient_assignments WHERE doctor_id=?',(doctor_id,))}
+    stored={r['patient_id']:json.loads(r['profile']) for r in c.execute('SELECT patient_id,profile FROM patients') if r['patient_id'] in original}
+    if not original or any(pid not in assigned or pid not in stored or stored[pid].get('synthetic') is not True or profile.get('synthetic') is not True for pid,profile in original.items()):
+        raise HTTPException(403,'Research cohort requires assignment to every historical synthetic twin')
+
 @router.get('/validation')
 def validation(request:Request,user=Depends(current)):
     role(user,'doctor')
+    with store(request).connect() as c:
+        c.execute('BEGIN')
+        require_full_historical_assignment(c,request.app.state.engine,user['id'])
     evaluation=request.app.state.engine.evaluation
     # Do not expose the protocol's patient ID lists to unassigned users.
     return {'model_version':evaluation['model_version'],'warning':evaluation['warning'],'results':evaluation['results']}
