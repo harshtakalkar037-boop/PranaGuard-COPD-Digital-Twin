@@ -36,12 +36,60 @@ class Hub:
             except Exception:self.clients.discard(socket)
 
 
+
+def bootstrap_demo_portal(engine):
+    """Idempotently provision synthetic-only demo accounts from password hashes."""
+    raw = os.getenv("PRANAGUARD_DEMO_BOOTSTRAP", "")
+    if not raw:
+        return
+    cfg = json.loads(raw)
+    doctor = cfg["doctor"]
+    patients = cfg["patients"]
+    if len(patients) < 5:
+        raise RuntimeError("Demo bootstrap requires at least five synthetic patients")
+    if not doctor["password_hash"].startswith("scrypt$"):
+        raise RuntimeError("Invalid doctor password hash")
+    for item in patients:
+        profile = engine.profiles.get(item["patient_id"])
+        if not profile or not profile.get("synthetic"):
+            raise RuntimeError("Demo bootstrap may link only existing synthetic patient records")
+        if not item["password_hash"].startswith("scrypt$"):
+            raise RuntimeError("Invalid patient password hash")
+    with engine.store.connect() as c:
+        c.execute(
+            "INSERT OR IGNORE INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?)",
+            (doctor["username"], doctor["password_hash"], "doctor", now()),
+        )
+        d = c.execute("SELECT id,role FROM portal_users WHERE username=?", (doctor["username"],)).fetchone()
+        if not d or d["role"] != "doctor":
+            raise RuntimeError("Demo doctor username is already used by a different account")
+        for item in patients:
+            c.execute(
+                "INSERT OR IGNORE INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?)",
+                (item["username"], item["password_hash"], "patient", now()),
+            )
+            p = c.execute("SELECT id,role FROM portal_users WHERE username=?", (item["username"],)).fetchone()
+            if not p or p["role"] != "patient":
+                raise RuntimeError("Demo patient username is already used by a different account")
+            c.execute(
+                "INSERT OR IGNORE INTO patient_user_links(user_id,patient_id) VALUES (?,?)",
+                (p["id"], item["patient_id"]),
+            )
+            link = c.execute("SELECT patient_id FROM patient_user_links WHERE user_id=?", (p["id"],)).fetchone()
+            if not link or link["patient_id"] != item["patient_id"]:
+                raise RuntimeError("Demo patient account is already linked to a different record")
+            c.execute(
+                "INSERT OR IGNORE INTO doctor_patient_assignments(doctor_id,patient_id) VALUES (?,?)",
+                (d["id"], item["patient_id"]),
+            )
+
 def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy_demo=None):
     if legacy_demo is None: legacy_demo = os.getenv("PRANAGUARD_UNSAFE_LEGACY_DEMO", "0") == "1"
     hub=Hub()
     @asynccontextmanager
     async def lifespan(app):
         app.state.engine=await asyncio.to_thread(TwinEngine,db_path or DB_PATH)
+        await asyncio.to_thread(bootstrap_demo_portal, app.state.engine)
         app.state.enhanced=Services(app.state.engine,enhanced_settings)
         async def enhanced_loop():
             while True:
