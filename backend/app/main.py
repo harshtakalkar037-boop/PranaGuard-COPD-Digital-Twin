@@ -57,7 +57,7 @@ def bootstrap_demo_portal(engine):
             raise RuntimeError("Invalid patient password hash")
     with engine.store.connect() as c:
         c.execute(
-            "INSERT OR IGNORE INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?)",
+            "INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?) ON CONFLICT(username) DO UPDATE SET password_hash=excluded.password_hash WHERE portal_users.role='doctor'",
             (doctor["username"], doctor["password_hash"], "doctor", now()),
         )
         d = c.execute("SELECT id,role FROM portal_users WHERE username=?", (doctor["username"],)).fetchone()
@@ -65,7 +65,7 @@ def bootstrap_demo_portal(engine):
             raise RuntimeError("Demo doctor username is already used by a different account")
         for item in patients:
             c.execute(
-                "INSERT OR IGNORE INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?)",
+                "INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?) ON CONFLICT(username) DO UPDATE SET password_hash=excluded.password_hash WHERE portal_users.role='patient'",
                 (item["username"], item["password_hash"], "patient", now()),
             )
             p = c.execute("SELECT id,role FROM portal_users WHERE username=?", (item["username"],)).fetchone()
