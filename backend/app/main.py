@@ -131,6 +131,13 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
     @app.middleware('http')
     async def isolate_legacy(request, call_next):
         path = request.url.path
+        # CORS preflight requests intentionally carry no bearer token. Let
+        # CORSMiddleware answer them before applying API authentication/scope.
+        if request.method == 'OPTIONS':
+            response = await call_next(request)
+            if path.startswith('/api/'):
+                response.headers['Cache-Control'] = 'no-store'
+            return response
         if path.startswith('/api/portal/'):
             if legacy_demo:
                 return JSONResponse(status_code=404, content={'detail':'Portal unavailable in isolated legacy demo mode'})

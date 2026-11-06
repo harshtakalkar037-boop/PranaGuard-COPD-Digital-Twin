@@ -10,6 +10,17 @@ from scripts.train import split_masks
 def test_read_endpoints(client,path):
     r=client.get(path);assert r.status_code==200;assert r.json()
 
+def test_cors_preflight_is_not_blocked_by_auth_middleware(client):
+    response=client.options('/api/overview',headers={
+        'Origin':'https://prana-guard-copd-digital-twin.vercel.app',
+        'Access-Control-Request-Method':'GET',
+        'Access-Control-Request-Headers':'authorization,content-type',
+    })
+    assert response.status_code == 200, response.text
+    assert response.headers.get('access-control-allow-origin') == '*'
+    assert 'GET' in response.headers.get('access-control-allow-methods','')
+    assert 'authorization' in response.headers.get('access-control-allow-headers','').lower()
+
 def test_patient_label_and_predictions(client,engine):
     pid=engine.demo['patient_id'];r=client.get(f'/api/patients/{pid}');assert r.status_code==200
     d=r.json();assert d['synthetic'] and d['profile']['synthetic'];assert set(d['risks'])=={'24','48','72'}
