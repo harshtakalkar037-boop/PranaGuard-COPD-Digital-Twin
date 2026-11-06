@@ -1,0 +1,204 @@
+{
+  "executed_at": "2026-11-05T14:06:36.320669+00:00",
+  "scope": "Actual browser and HTTP integration; no real patients/hardware; verification DB only",
+  "status": "PASS",
+  "passed": 38,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "Patient registry navigation and original cohort available",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "ID search backed by registry API",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Patient registry empty state",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Explicit fictional-data confirmation required",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Validated fictional registration, server ID and SQLite persistence",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Manual baseline values do not bypass72h warm-up or fabricate predictions",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Correct selected fictional-profile JSON export",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Persistent manual symptoms/adherence and demo monitoring rule",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Profile review extends existing intervention ledger",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Actual backend simulation and ingestion: pulse_oximeter",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Actual backend simulation and ingestion: smartwatch",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Actual backend simulation and ingestion: fitness_band",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Actual backend simulation and ingestion: portable_spirometer",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Explicit Start/Stop and all4 generic capability types",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Stopped simulation does not create further readings",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Patient trends render actual persisted ingestion data",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Monitoring state versions and missingness isolated from model outputs",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Persisted monitoring version selection",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Registration, readings, observation and review survive browser reload",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Patient/category notification filtering",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Demonstrable test notification and unread/read persistence",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Active\u2192acknowledged\u2192under_review\u2192resolved\u2192closed with append-only history",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Disabled email records honest not-sent status; no patient email",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Actual/cached provider context and honest timestamps: Pune",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Actual/cached provider context and honest timestamps: Mumbai",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Actual/cached provider context and honest timestamps: Delhi",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Actual/cached provider context and honest timestamps: Bengaluru",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Dedicated record-level provenance/classification/missingness section",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Backend provenance JSON export contains selected patient records",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Original model twin, probabilities, features and baseline unchanged after enhancements",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Original sidebar theme/font retained across new sections",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Desktop new views have no viewport overflow",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "390px responsive navigation/layout: Patients",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "390px responsive navigation/layout: Device integration",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "390px responsive navigation/layout: Environment",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "390px responsive navigation/layout: Notifications",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "390px responsive navigation/layout: Data sources",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "No external browser assets, JS/console errors or failed browser API calls",
+      "status": "PASS",
+      "detail": ""
+    }
+  ],
+  "browser_errors": [],
+  "console_errors": [],
+  "failed_api": [],
+  "external_browser_requests": [],
+  "fictional_patient_id": "PG-DEMO-24BE5BE35541"
+}

@@ -1,0 +1,9 @@
+[project]
+name = "pranaguard"
+version = "0.1.0"
+description = "Synthetic COPD body × environment digital twin research prototype"
+requires-python = ">=3.13"
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["backend/tests"]
+addopts = "-q"
