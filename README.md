@@ -1,5 +1,8 @@
 # PranaGuard — Patient-Specific COPD Digital Twin
 
+> **Connected portal upgrade:** See [docs/COMPLETION_REPORT.md](docs/COMPLETION_REPORT.md) for the engineering report and [docs/PORTALS.md](docs/PORTALS.md) for setup, migration, provisioning, workflow and security limitations. The default app opens the public landing page. Legacy demo APIs are disabled by default because they do not enforce patient-level permissions; the older instructions below describe the isolated legacy demonstration, not the new portal. No real patient data or clinical use.
+
+
 ## Enhanced ZIP edition (2026-11-05)
 
 Built **only in an isolated copy of the user-supplied fork** [`harshtakalkar037-boop/PranaGuard-COPD-Digital-Twin`](https://github.com/harshtakalkar037-boop/PranaGuard-COPD-Digital-Twin), based on commit `95a4e2b00fcb2d9df7210c6b87ecba171a0c4e91`. No push, deployment or modification of either remote/original workspace is claimed. The URLs and submission presentation below describe the original project, **not a deployment of these enhancements**.

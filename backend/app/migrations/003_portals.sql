@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS portal_users (id INTEGER PRIMARY KEY, username TEXT NOT NULL UNIQUE COLLATE NOCASE, password_hash TEXT NOT NULL, role TEXT NOT NULL CHECK(role IN ('doctor','patient')), created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS portal_sessions (token_hash TEXT PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES portal_users(id) ON DELETE CASCADE, expires_at TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS portal_sessions_user ON portal_sessions(user_id);
+CREATE TABLE IF NOT EXISTS patient_user_links (user_id INTEGER PRIMARY KEY REFERENCES portal_users(id), patient_id TEXT NOT NULL UNIQUE REFERENCES patients(patient_id));
+CREATE TABLE IF NOT EXISTS doctor_patient_assignments (doctor_id INTEGER NOT NULL REFERENCES portal_users(id), patient_id TEXT NOT NULL REFERENCES patients(patient_id), PRIMARY KEY(doctor_id,patient_id));
+CREATE INDEX IF NOT EXISTS assignments_patient ON doctor_patient_assignments(patient_id);
+CREATE TABLE IF NOT EXISTS symptom_checkins (id INTEGER PRIMARY KEY, patient_id TEXT NOT NULL REFERENCES patients(patient_id), created_at TEXT NOT NULL, breathlessness TEXT NOT NULL, cough TEXT NOT NULL, sputum_amount TEXT NOT NULL, sputum_colour TEXT NOT NULL, wheezing TEXT NOT NULL, fatigue TEXT NOT NULL, fever TEXT NOT NULL, comments TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS checkins_patient ON symptom_checkins(patient_id,id DESC);
+CREATE TABLE IF NOT EXISTS patient_uploads (id INTEGER PRIMARY KEY, patient_id TEXT NOT NULL REFERENCES patients(patient_id), kind TEXT NOT NULL CHECK(kind IN ('photo','care_plan')), original_name TEXT NOT NULL, stored_name TEXT NOT NULL UNIQUE, mime TEXT NOT NULL, description TEXT NOT NULL, created_at TEXT NOT NULL, review_status TEXT NOT NULL DEFAULT 'Pending Review');
+CREATE INDEX IF NOT EXISTS uploads_patient ON patient_uploads(patient_id,id DESC);
+CREATE TABLE IF NOT EXISTS doctor_reviews (id INTEGER PRIMARY KEY, patient_id TEXT NOT NULL REFERENCES patients(patient_id), doctor_id INTEGER NOT NULL REFERENCES portal_users(id), checkin_id INTEGER REFERENCES symptom_checkins(id), upload_id INTEGER REFERENCES patient_uploads(id), status TEXT NOT NULL, notes TEXT NOT NULL, follow_up TEXT NOT NULL, follow_up_date TEXT, shared INTEGER NOT NULL CHECK(shared IN (0,1)), created_at TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS reviews_patient ON doctor_reviews(patient_id,id DESC);
+CREATE TABLE IF NOT EXISTS portal_notifications (id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES portal_users(id), patient_id TEXT REFERENCES patients(patient_id), title TEXT NOT NULL, description TEXT NOT NULL, link TEXT NOT NULL, created_at TEXT NOT NULL, read_at TEXT);
+CREATE INDEX IF NOT EXISTS portal_notifications_user ON portal_notifications(user_id,id DESC);

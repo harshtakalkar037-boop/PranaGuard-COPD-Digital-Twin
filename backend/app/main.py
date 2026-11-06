@@ -10,6 +10,7 @@ from backend.app.config import DB_PATH
 from backend.app.engine import TwinEngine, now
 from backend.app.enhanced.services import Services
 from backend.app.enhanced.routes import make_router
+from backend.app.portal import router as portal_router
 
 class StrictModel(BaseModel):model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
 class Step(StrictModel):hours:int=Field(default=1,ge=1,le=72)
@@ -35,7 +36,8 @@ class Hub:
             except Exception:self.clients.discard(socket)
 
 
-def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
+def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy_demo=None):
+    if legacy_demo is None: legacy_demo = os.getenv("PRANAGUARD_UNSAFE_LEGACY_DEMO", "0") == "1"
     hub=Hub()
     @asynccontextmanager
     async def lifespan(app):
@@ -67,6 +69,19 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
                 description='Research prototype; not clinically validated. All patient data are fictional/simulated. Optional current modelled city context is excluded from frozen ML inputs. No real patient monitoring or physical device integration.')
     origins=[s.strip() for s in os.getenv('PRANAGUARD_CORS_ORIGINS','*').split(',') if s.strip()]
     app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=False,allow_methods=['*'],allow_headers=['Content-Type','X-Demo-Token','X-Device-Token'])
+    # The old demo was designed for an isolated synthetic cohort and has no
+    # patient-level authorization. Never mix it with the authenticated portal.
+    @app.middleware('http')
+    async def isolate_legacy(request, call_next):
+        path=request.url.path
+        if path.startswith('/api/portal/'):
+            if legacy_demo: return JSONResponse(status_code=404,content={'detail':'Portal unavailable in isolated legacy demo mode'})
+        elif path.startswith('/api/') and path != '/api/health' and not legacy_demo:
+            return JSONResponse(status_code=403,content={'detail':'Legacy demo API disabled in portal mode'})
+        response=await call_next(request)
+        if path.startswith('/api/portal/'): response.headers['Cache-Control']='no-store'
+        return response
+    app.include_router(portal_router)
     app.include_router(make_router(authorize,hub))
     def engine(request:Request):return request.app.state.engine
     @app.exception_handler(KeyError)
@@ -151,6 +166,8 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         result=await asyncio.to_thread(perform);await hub.broadcast({'type':'twin_updated','replay':result});return result
     @app.websocket('/api/ws')
     async def websocket(socket:WebSocket):
+        if not legacy_demo:
+            await socket.close(code=1008);return
         await socket.accept();hub.clients.add(socket)
         try:
             await socket.send_json({'type':'connected','synthetic':True})

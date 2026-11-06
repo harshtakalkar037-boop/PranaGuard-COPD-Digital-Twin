@@ -13,7 +13,7 @@ from backend.app.enhanced.environment import AIR_FIELDS,WEATHER_FIELDS
 def _session_client(tmp_path_factory):
     # Load the large immutable historical frame once, not once per parameter case.
     db=tmp_path_factory.mktemp('enhanced-isolated-tests')/'enhanced.sqlite'
-    with TestClient(create_app(db,Settings(),background_tasks=False)) as c:yield c
+    with TestClient(create_app(db,Settings(),background_tasks=False,legacy_demo=True)) as c:yield c
 
 @pytest.fixture
 def ec(_session_client):
@@ -47,7 +47,7 @@ def test_migration_is_additive_idempotent_and_checksum_guard(tmp_path):
     s=Store(db);Store(db)
     with s.connect() as c:
         assert c.execute('SELECT COUNT(*) FROM patients').fetchone()[0]==1
-        assert c.execute('SELECT COUNT(*) FROM schema_migrations').fetchone()[0]==2
+        assert c.execute('SELECT COUNT(*) FROM schema_migrations').fetchone()[0]==5
         assert not c.execute('PRAGMA foreign_key_check').fetchall()
         c.execute("UPDATE schema_migrations SET sha256='tampered'")
     with pytest.raises(RuntimeError,match='checksum'):Store(db)
@@ -277,12 +277,12 @@ def test_smtp_configuration_failure_redacts_errors(ec,monkeypatch):
 
 def test_restart_preserves_registered_data_but_stops_simulation(tmp_path):
     db=tmp_path/'restart.sqlite'
-    with TestClient(create_app(db,Settings(),background_tasks=False)) as c:
+    with TestClient(create_app(db,Settings(),background_tasks=False,legacy_demo=True)) as c:
         d=device(c);assert ingest(c,d,event(d)).status_code==200
     import gc
     del c
     gc.collect()
-    with TestClient(create_app(db,Settings(),background_tasks=False)) as c:
+    with TestClient(create_app(db,Settings(),background_tasks=False,legacy_demo=True)) as c:
         profile=c.get('/api/enhanced/registry/patients/'+d['patient_id']).json()
         assert len(profile['readings'])==2 and profile['devices'][0]['status']=='disconnected' and not profile['devices'][0]['is_simulating']
         assert profile['latest_monitoring']['snapshot']['model_predictions'] is None

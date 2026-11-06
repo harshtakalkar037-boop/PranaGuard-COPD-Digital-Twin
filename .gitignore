@@ -15,3 +15,7 @@ frontend/dist/
 playwright-report/
 
 *.tsbuildinfo
+
+private_uploads/
+
+/demo/

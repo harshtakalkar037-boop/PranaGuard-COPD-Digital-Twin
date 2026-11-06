@@ -15,7 +15,7 @@ import scenario from './__fixtures__/scenario.json';
 vi.mock('recharts',async importOriginal=>{const original=await importOriginal<typeof import('recharts')>();return {...original,ResponsiveContainer:({children}:{children:ReactElement<{width?:number;height?:number}>})=><div>{cloneElement(children,{width:700,height:250})}</div>};});
 let fetchMock:ReturnType<typeof vi.fn>;
 beforeEach(()=>{
- const responses=(url:string)=>url.includes('/overview')?overview:url.includes('/history')?history:url.includes('/explanation')?explanation:url.includes('/validation')?validation:url.includes('/status')?status:url.includes('/interventions')?{interventions:[]}:url.includes('/alerts')?{alerts:[]}:url.includes('/scenarios')?{scenarios:[]}:url.includes('/replay')?overview.replay:twin;
+ const responses=(url:string)=>url.includes('/enhanced/environment/')?{components:{weather:{freshness:'historical',valid_at:null},air:{freshness:'historical',source:'Historical'}},metrics:[],live_requests_enabled:false}:url.includes('/enhanced/registry/patients')?{patients:[]}:url.includes('/overview')?overview:url.includes('/history')?history:url.includes('/explanation')?explanation:url.includes('/validation')?validation:url.includes('/status')?status:url.includes('/interventions')?{interventions:[]}:url.includes('/alerts')?{alerts:[]}:url.includes('/scenarios')?{scenarios:[]}:url.includes('/replay')?overview.replay:twin;
  fetchMock=vi.fn(async(input:string,options?:RequestInit)=>new Response(JSON.stringify(options?.method==='POST'&&input.includes('/scenarios')?scenario:responses(input)),{status:200}));vi.stubGlobal('fetch',fetchMock);
 });
 const ready=async()=>{render(<App/>);await screen.findByRole('heading',{name:'Your patient cohort'});};

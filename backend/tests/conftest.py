@@ -4,7 +4,7 @@ from backend.app.main import create_app
 @pytest.fixture(scope='session')
 def client(tmp_path_factory):
     db=tmp_path_factory.mktemp('pg-db')/'test.sqlite'
-    with TestClient(create_app(db)) as c:yield c
+    with TestClient(create_app(db, legacy_demo=True)) as c:yield c
 @pytest.fixture()
 def engine(client):
     e=client.app.state.engine;e.reset();return e
