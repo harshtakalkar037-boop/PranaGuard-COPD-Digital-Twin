@@ -1,0 +1,5 @@
+# Database and persistence
+
+The current implementation uses SQLite in WAL mode, foreign keys, transactional writes and additive checksum-checked migrations 001–006. Original patients, states, alerts, interventions and scenarios coexist with portal and enhanced tables. `PRANAGUARD_DB` selects the database and `PRANAGUARD_UPLOAD_DIR` selects private file storage. See [portal operations](PORTALS.md), [integration inventory](INTEGRATION_INVENTORY.md) and [release readiness](FINAL_RELEASE_READINESS.md).
+
+A local disposable restart test is not proof of production persistence. Render's actual mount, backups and restore have not been inspected. Before any approved migration, quiesce traffic, back up SQLite using its backup API together with private uploads, rehearse additive migrations and restore on an isolated copy, and verify durable volumes. Never run a replay reset as a migration or overwrite production records.

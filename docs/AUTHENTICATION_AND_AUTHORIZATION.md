@@ -1,0 +1,5 @@
+# Authentication and authorization
+
+See the [route matrix](ROUTE_PERMISSION_MATRIX.md) for endpoint requirements and [portal guide](PORTALS.md) for provisioning. Portal sessions are opaque bearer tokens, stored hashed in SQLite; passwords use salted scrypt. Temporary demo credentials are random, expire, and require a password change. Patient accounts are linked to one record; doctors are explicitly assigned. Doctor historical cohort queries use a read snapshot for assignment, state, trends and counts; both validation endpoints require full original cohort assignment. Secure-mode WebSockets are disabled. Remaining global operations require a conservative one-doctor full-workspace gate and administration must be quiesced.
+
+SessionStorage is JavaScript-accessible. Rate limiting, hardened session architecture, MFA, upload malware scanning, consent, production observability and independent security review remain open. Never use real patient information or enable unsafe legacy mode on a network.

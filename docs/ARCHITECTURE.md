@@ -1,3 +1,5 @@
+> Current implementation note: historical overview/list now use assigned-only synthetic IDs in a single SQLite read snapshot; both global validation endpoints require the full historical cohort. The other global gates and deployment limitations remain. See [route permissions](ROUTE_PERMISSION_MATRIX.md) and [current audit](COMPLETE_APPLICATION_AUDIT.md).
+
 # Implemented architecture
 
 Separate editable architecture deliverables: [PPTX](architecture/PranaGuard_Architecture.pptx), [PDF](architecture/PranaGuard_Architecture.pdf), [SVG](architecture/PranaGuard_Architecture.svg).

@@ -1,0 +1,3 @@
+# Deployment and release
+
+`frontend/vercel.json` proxies `/api/*` to the configured Render hostname and routes other paths to the SPA. This is repository configuration, not proof of production settings or deployed revision. Public landing and health retrieval are insufficient to verify authentication, record isolation, storage or backups. [FINAL_RELEASE_READINESS.md](FINAL_RELEASE_READINESS.md) contains migration, backup/restore, staging and rollback planning; [COMPLETE_APPLICATION_AUDIT.md](COMPLETE_APPLICATION_AUDIT.md) records current evidence. Any deployment requires authorized infrastructure access, reviewed configuration and secrets, a recoverable backup, and live end-to-end verification. Do not use real patient information.

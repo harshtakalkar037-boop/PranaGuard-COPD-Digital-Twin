@@ -2,7 +2,7 @@
 
 Generated from the application OpenAPI route list and reviewed against handlers. Applies only with `PRANAGUARD_UNSAFE_LEGACY_DEMO` off (the default). Legacy mode intentionally disables the portal and removes the research isolation gate; never enable it for real or shared data. HTTP docs/schema are public metadata; `/api/ws` closes with policy code 1008 in secure mode. Unknown paths do not grant data access.
 
-**S** = valid unexpired, unrevoked bearer session; **P** = S plus patient role and a linked record; **D** = S plus doctor role; **A** = S plus patient-own or doctor-assigned record (404 on failed record authorization); **D+A** = both doctor and assigned record. Pending temporary-password sessions can only access `/me`, `/password`, and `/logout`, until their deadline. **L** = D in a database with exactly one doctor, assigned to *every* existing DB patient, all profiles synthetic; this conservative whole-workspace gate precedes the remaining unscoped original/enhanced HTTP routes. It prevents another pre-existing doctor from creating a fictional record between an authorization check and an unscoped read. Administrative database changes must only occur with traffic quiesced: the check is not atomic against out-of-band changes. **H** = D assigned to every original synthetic twin with matching synthetic database profiles; aggregates, trend and alert counts are filtered to those original IDs before calculation and limits. **T** = the configured legacy `X-Demo-Token`, when configured, in addition to the listed doctor authorization. Ingestion also checks its device token. If T is not configured it adds no protection.
+**S** = valid unexpired, unrevoked bearer session; **P** = S plus patient role and a linked record; **D** = S plus doctor role; **A** = S plus patient-own or doctor-assigned record (404 on failed record authorization); **D+A** = both doctor and assigned record. Pending temporary-password sessions can only access `/me`, `/password`, and `/logout`, until their deadline. **L** = D in a database with exactly one doctor, assigned to *every* existing DB patient, all profiles synthetic; this conservative whole-workspace gate precedes the remaining unscoped original/enhanced HTTP routes. It prevents another pre-existing doctor from creating a fictional record between an authorization check and an unscoped read. Administrative database changes must only occur with traffic quiesced: the check is not atomic against out-of-band changes. **H** = D assigned to every original synthetic twin with matching synthetic database profiles; required for global validation. **C** = D, restricted to their assigned historical synthetic twins, including aggregates and trends; empty assignment returns an empty cohort. **T** = the configured legacy `X-Demo-Token`, when configured, in addition to the listed doctor authorization. Ingestion also checks its device token. If T is not configured it adds no protection.
 
 L is intentionally over-restrictive: a second doctor blocks unscoped research features even if both doctors have full assignment. Historical cohort/validation, assigned twin and registry methods, assigned alerts and enhanced notifications, and city context remain available under their explicit rules. It is not a substitute for per-record scoping of global routes. There is no general online administration API; the doctor-assigned synthetic demo provisioning endpoint is listed below, and local `portal_admin` requires trusted host access.
 
@@ -22,7 +22,7 @@ L is intentionally over-restrictive: a second doctor blocks unscoped research fe
 | POST | `/api/portal/patients/{pid}/reviews` | D+A: related submission IDs must belong to same patient |
 | GET | `/api/portal/notifications` | S: own notifications only |
 | POST | `/api/portal/notifications/{notification_id}/read` | S: own notification only |
-| GET | `/api/portal/validation` | D: aggregate validation without patient ID lists |
+| GET | `/api/portal/validation` | H: aggregate validation without patient ID lists |
 | GET | `/api/portal/patients/{pid}/explanation` | D+A: assigned patient |
 | POST | `/api/portal/patients/{pid}/scenarios` | D+A: assigned patient |
 | POST | `/api/portal/sputum` | P: own linked patient, ID inferred |
@@ -61,8 +61,8 @@ L is intentionally over-restrictive: a second doctor blocks unscoped research fe
 | POST | `/api/enhanced/email/test` | L + T |
 | GET | `/api/enhanced/provenance` | L |
 | GET | `/api/health` | Public health/model version only |
-| GET | `/api/overview` | H: original historical cohort only |
-| GET | `/api/patients` | H: original historical cohort only |
+| GET | `/api/overview` | C: assigned historical synthetic records, aggregates, trends and alert counts; partial cohorts omit global demo-patient metadata |
+| GET | `/api/patients` | C: assigned historical synthetic records only |
 | GET | `/api/patients/{pid}` | D+A: assigned original synthetic twin |
 | GET | `/api/patients/{pid}/history` | D+A: assigned original synthetic twin |
 | GET | `/api/patients/{pid}/versions` | D+A: assigned original synthetic twin |

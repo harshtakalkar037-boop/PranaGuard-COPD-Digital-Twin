@@ -1,5 +1,7 @@
 # Final integration and release-readiness report
 
+> Later phase update: the historical overview/list now support assigned-only partial cohorts; both global validation endpoints require full historical assignment. See [current application audit](COMPLETE_APPLICATION_AUDIT.md) for newer results and outstanding work. Earlier sections below are dated historical evidence.
+
 **Date:** 2026-11-06
 
 **Branch:** `arena/74d3a29f-pranaguard-copd-digital-twin`
