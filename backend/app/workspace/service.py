@@ -8,6 +8,8 @@ def utcnow():return datetime.now(timezone.utc)
 def stamp():return utcnow().isoformat()
 
 SESSION_HOURS=12
+LOGIN_FAILURE_LIMIT=5
+LOGIN_FAILURE_WINDOW_MINUTES=15
 # Valid forward transitions for the care-review workflow.
 TRANSITIONS={'new':{'awaiting_review','under_review','closed'},
              'awaiting_review':{'under_review','closed'},
@@ -40,14 +42,38 @@ class Workspace:
                     c.execute('INSERT OR IGNORE INTO patient_assignments VALUES (?,?,?)',(pid,'dr-atlas',stamp()))
     # ---------- authentication ----------
     def login(self,username,password):
+        normalized=username.strip().lower()
+        username_hash=hashlib.sha256(normalized.encode()).hexdigest()
+        failure_status=None
+        result=None
         with self.store.connect() as c:
-            row=c.execute('SELECT * FROM care_users WHERE username=?',(username.strip().lower(),)).fetchone()
-            if not row or not secrets.compare_digest(row['pass_hash'],hash_password(password,row['salt'])):
-                raise HTTPException(401,'Incorrect demo username or password.')
-            token='pgw_'+secrets.token_urlsafe(32);digest=hashlib.sha256(token.encode()).hexdigest()
-            c.execute('DELETE FROM care_sessions WHERE username=? AND expires_at<?',(row['username'],stamp()))
-            c.execute('INSERT INTO care_sessions VALUES (?,?,?,?)',(digest,row['username'],stamp(),(utcnow()+timedelta(hours=SESSION_HOURS)).isoformat()))
-        return {'token':token,'user':self.public_user(row)}
+            c.execute('BEGIN IMMEDIATE')
+            now=stamp()
+            failure=c.execute('SELECT * FROM care_login_failures WHERE username_hash=?',(username_hash,)).fetchone()
+            active=failure is not None and failure['window_expires_at']>now
+            if active and failure['failure_count']>=LOGIN_FAILURE_LIMIT:
+                failure_status=429
+            else:
+                if failure is not None and not active:
+                    c.execute('DELETE FROM care_login_failures WHERE username_hash=?',(username_hash,))
+                row=c.execute('SELECT * FROM care_users WHERE username=?',(normalized,)).fetchone()
+                valid=bool(row and secrets.compare_digest(row['pass_hash'],hash_password(password,row['salt'])))
+                if not valid:
+                    count=(failure['failure_count']+1) if active else 1
+                    expires=(failure['window_expires_at'] if active else (utcnow()+timedelta(minutes=LOGIN_FAILURE_WINDOW_MINUTES)).isoformat())
+                    c.execute('INSERT OR REPLACE INTO care_login_failures(username_hash,failure_count,window_expires_at) VALUES (?,?,?)',(username_hash,count,expires))
+                    failure_status=429 if count>=LOGIN_FAILURE_LIMIT else 401
+                else:
+                    c.execute('DELETE FROM care_login_failures WHERE username_hash=?',(username_hash,))
+                    token='pgw_'+secrets.token_urlsafe(32);digest=hashlib.sha256(token.encode()).hexdigest()
+                    c.execute('DELETE FROM care_sessions WHERE username=? AND expires_at<?',(row['username'],now))
+                    c.execute('INSERT INTO care_sessions VALUES (?,?,?,?)',(digest,row['username'],now,(utcnow()+timedelta(hours=SESSION_HOURS)).isoformat()))
+                    result={'token':token,'user':self.public_user(row)}
+        if failure_status==429:
+            raise HTTPException(429,'Too many failed sign-in attempts. Try again after the 15-minute lockout window.')
+        if failure_status==401:
+            raise HTTPException(401,'Incorrect demo username or password.')
+        return result
     def public_user(self,row):
         with self.store.connect() as c:
             assigned=c.execute('SELECT COUNT(*) AS n FROM patient_assignments WHERE doctor=?',(row['username'],)).fetchone()['n']
