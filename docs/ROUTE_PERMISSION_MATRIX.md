@@ -15,6 +15,7 @@ L is intentionally over-restrictive: a second doctor blocks unscoped research fe
 | GET | `/api/portal/me` | S: own account/link |
 | GET | `/api/portal/patients` | D: assigned records only |
 | GET | `/api/portal/patients/{pid}` | A: patient own or D assigned; patient sees shared reviews only |
+| GET | `/api/portal/patients/{pid}/queue-items/{kind}/{record_id}` | D+A: exact record must belong to the assigned synthetic patient; no upload storage name |
 | GET | `/api/portal/patients/{pid}/environment` | A: own/assigned patient city context |
 | POST | `/api/portal/checkins` | P: own linked patient, ID inferred |
 | POST | `/api/portal/uploads` | P: own linked patient; linked sputum entry must be own |
