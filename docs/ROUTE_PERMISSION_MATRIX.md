@@ -20,8 +20,9 @@ L is intentionally over-restrictive: a second doctor blocks unscoped research fe
 | POST | `/api/portal/uploads` | P: own linked patient; linked sputum entry must be own |
 | GET | `/api/portal/uploads/{upload_id}` | A: upload’s own/assigned patient |
 | POST | `/api/portal/patients/{pid}/reviews` | D+A: related submission IDs must belong to same patient |
-| GET | `/api/portal/notifications` | S: own notifications only |
-| POST | `/api/portal/notifications/{notification_id}/read` | S: own notification only |
+| POST | `/api/portal/patients/{pid}/reviews/{review_id}/complete-followup` | D+A: dated review must belong to assigned synthetic patient; private completion note, recorded once |
+| GET | `/api/portal/notifications` | S: own notifications, filtered against current synthetic patient assignment/link |
+| POST | `/api/portal/notifications/{notification_id}/read` | S: own notification and current synthetic assignment/link |
 | GET | `/api/portal/validation` | H: aggregate validation without patient ID lists |
 | GET | `/api/portal/patients/{pid}/explanation` | D+A: assigned patient |
 | POST | `/api/portal/patients/{pid}/scenarios` | D+A: assigned patient |

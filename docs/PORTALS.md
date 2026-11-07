@@ -27,7 +27,7 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:5173. Vite proxies `/api` to the existing FastAPI backend. On first backend start, Store applies checksum-verified SQL migrations, including `003_portals.sql`, `004_daily_care.sql` and `005_admin_audit.sql`, transactionally. Existing databases are preserved; back up SQLite with its backup API before upgrading, and back up the private uploads directory together with it. Do not run replay reset, data-generation or training scripts as a migration. Set `PRANAGUARD_DB` consistently for the server and administration commands. The default is `data/pranaguard.sqlite`; if absent, the existing engine initializes the cohort from existing synthetic artifacts. Uploads default to `private_uploads/` (Git-ignored); configure `PRANAGUARD_UPLOAD_DIR` for a private persistent directory outside any web-served tree.
+Open http://localhost:5173. Vite proxies `/api` to the existing FastAPI backend. On first backend start, Store applies checksum-verified SQL migrations, including `003_portals.sql` through `007_followup_completion.sql`, transactionally. Existing databases are preserved; back up SQLite with its backup API before upgrading, and back up the private uploads directory together with it. Do not run replay reset, data-generation or training scripts as a migration. Set `PRANAGUARD_DB` consistently for the server and administration commands. The default is `data/pranaguard.sqlite`; if absent, the existing engine initializes the cohort from existing synthetic artifacts. Uploads default to `private_uploads/` (Git-ignored); configure `PRANAGUARD_UPLOAD_DIR` for a private persistent directory outside any web-served tree.
 
 ## Provision and test
 
@@ -54,7 +54,8 @@ All endpoints below are under `/api/portal`. `POST /register` creates only patie
 - `POST /checkins`: patient derived from session; strict symptom fields; assigned doctors notified transactionally.
 - `POST /uploads`: multipart `kind`, `file`, optional `description`. Extension and magic signature validated; random disk name. `GET /uploads/{id}` checks ownership or assignment, returns an attachment with `nosniff`, and never reveals storage paths.
 - `POST /patients/{id}/reviews`: assigned doctor only; optional check-in/upload associations checked against the same patient; shared updates generate notifications.
-- `GET /notifications` and `POST /notifications/{id}/read`: account-scoped history and persistent read status.
+- `POST /patients/{id}/reviews/{review_id}/complete-followup`: assigned doctor records a private completion note once; the original review remains unchanged and the completion is audited.
+- `GET /notifications` and `POST /notifications/{id}/read`: account-scoped history and persistent read status, filtered by current patient link/assignment.
 
 ## Security and limitations
 
