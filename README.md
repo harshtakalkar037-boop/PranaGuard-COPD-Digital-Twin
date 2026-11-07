@@ -112,31 +112,153 @@ The frozen cohort is read-only research data. Demo write flows are designed to t
 - Patient sessions are blocked with HTTP 403 from doctor-only prediction endpoints.
 - All risk outputs are labelled as experimental synthetic-data estimates and not intended for diagnosis, triage, or treatment decisions.
 
-## 6. Architecture and technology
+## 6. System architecture and technology
 
-| Layer | Technology |
+PranaGuard follows a **layered client–API–domain–data architecture**. The browser application presents separate research, clinician, and patient experiences. A FastAPI service exposes the research and care-workspace APIs, while the digital-twin engine, model artifacts, and persistence layer remain on the backend. The architecture keeps the synthetic research replay distinct from user-entered demo care-workspace records and optional environmental context.
+
+### 6.1 High-level system architecture
+
+The following diagram is maintained as Mermaid source in this README, so the architecture remains version-controlled and editable alongside the implementation.
+
+```mermaid
+flowchart TB
+    subgraph CLIENT["Presentation layer · Vercel"]
+        WEB["React + TypeScript SPA"]
+        ROUTES["Research dashboard · Twin views · Study Explorer"]
+        CARE["Clinician workspace · Patient workspace"]
+        WEB --> ROUTES
+        WEB --> CARE
+    end
+
+    subgraph API["Application/API layer · Render"]
+        FASTAPI["FastAPI application · Uvicorn"]
+        CORS["CORS · Request validation · API routing"]
+        RESEARCH["Research API routes"]
+        V3["Experimental v3 model API"]
+        WORKSPACE["Workspace API routes"]
+        AUTH["Demo session authentication · Role and assignment checks"]
+        WS["WebSocket hub · Replay update events"]
+        FASTAPI --> CORS
+        CORS --> RESEARCH
+        CORS --> V3
+        CORS --> WORKSPACE
+        WORKSPACE --> AUTH
+        FASTAPI --> WS
+    end
+
+    subgraph DOMAIN["Domain and intelligence layer"]
+        TWIN["TwinEngine · Longitudinal replay"]
+        FEATURES["Feature engineering · Data validation"]
+        INFERENCE["Frozen baseline inference · 24/48/72h horizons"]
+        EXPERIMENT["Versioned experiment and evaluation artifacts"]
+        CARESERVICES["Care workspace services · Audit · Documents · Follow-ups"]
+        ENVSVC["Optional environmental context service"]
+        TWIN --> FEATURES
+        FEATURES --> INFERENCE
+        EXPERIMENT -. "separate experimental path" .-> V3
+    end
+
+    subgraph DATA["Persistence and artifact layer"]
+        SQLITE[("SQLite · WAL · Foreign keys · Migrations")]
+        SYNTH["Synthetic longitudinal dataset · Patient profiles"]
+        MODELS["Versioned model bundle · Evaluation metadata"]
+        WORKDATA["Workspace records · Sessions · Reviews · Documents"]
+        ENV["Cached environmental data · Source manifest"]
+        SQLITE --- WORKDATA
+        SQLITE --- TWIN
+        SYNTH --> FEATURES
+        MODELS --> INFERENCE
+        ENV --> ENVSVC
+    end
+
+    WEB <-->|"HTTPS · REST / JSON"| FASTAPI
+    WEB <-->|"WebSocket events"| WS
+    RESEARCH --> TWIN
+    V3 --> EXPERIMENT
+    WORKSPACE --> CARESERVICES
+    AUTH --> SQLITE
+    CARESERVICES --> SQLITE
+    TWIN <--> SQLITE
+    ENVSVC --> SQLITE
+
+    classDef client fill:#eaf2ff,stroke:#4776b8,color:#17365d
+    classDef api fill:#eaf7f1,stroke:#3b8b68,color:#174d37
+    classDef domain fill:#fff4df,stroke:#c18a32,color:#65420b
+    classDef data fill:#f2edff,stroke:#8064b5,color:#38265e
+    class WEB,ROUTES,CARE client
+    class FASTAPI,CORS,RESEARCH,V3,WORKSPACE,AUTH,WS api
+    class TWIN,FEATURES,INFERENCE,EXPERIMENT,CARESERVICES,ENVSVC domain
+    class SQLITE,SYNTH,MODELS,WORKDATA,ENV data
+```
+
+### 6.2 Layer responsibilities
+
+| Layer / component | Responsibility |
+|---|---|
+| **Presentation — React SPA** | Renders the research dashboard, patient twin views, study explorer, clinician workspace, and patient workspace. Uses shared API configuration for backend requests. |
+| **API — FastAPI** | Hosts REST endpoints, request/response validation, CORS configuration, application lifecycle, and route composition. Uvicorn runs the service. |
+| **Research API** | Exposes cohort, patient, history, replay, scenario, alert, and research-evidence operations over the synthetic twin. |
+| **Experimental model API** | Exposes the separately versioned v3 study path. Its experimental evidence is not interchangeable with frozen baseline runtime outputs. |
+| **Workspace API and services** | Handles demo sign-in, doctor/patient workspace operations, assignment-scoped access, patient-submitted records, document sharing/downloads, follow-ups, and audit events. |
+| **TwinEngine** | Loads and validates the synthetic longitudinal dataset, derives features, loads the frozen model bundle, generates patient states, and manages deterministic replay/version history. |
+| **Model and feature layer** | Performs feature engineering and inference for the supported 24-, 48-, and 72-hour horizons. Model artifacts and evaluation metadata are versioned separately from workspace records. |
+| **Environmental service** | Provides optional city-level environmental context when enabled. This context is displayed separately and is not silently injected into frozen baseline model inputs. |
+| **Persistence — SQLite** | Stores replay state and application/workspace records using transactions, WAL mode, foreign keys, and additive checksummed migrations. |
+| **Research artifacts** | Stores the synthetic cohort, patient profiles, model bundle, experiment outputs, evaluation evidence, and environmental source manifest as repository-managed files. |
+
+### 6.3 Main request and data flows
+
+1. **Dashboard read:** the browser calls the FastAPI research endpoints over HTTPS. The API delegates cohort and patient-state requests to the twin engine, which reads the synthetic dataset/model artifacts and persisted replay state.
+2. **Replay update:** the backend replay loop advances the twin when replay is running, persists the resulting state version, and broadcasts update events through the WebSocket hub to connected clients.
+3. **Clinician/patient workflow:** the browser authenticates with the workspace API. Workspace services apply the relevant demo role and doctor-assignment/patient ownership checks before reading or changing workspace records. Actions such as reviews, corrections, document sharing, and follow-ups are recorded in workspace persistence/audit data.
+4. **Document download:** the frontend requests the document file from the configured backend API origin. The backend authorizes the workspace request and returns the stored file bytes with the document's media type and filename.
+5. **Experimental study path:** the v3 API uses its own experiment/model evidence path. Its results remain distinct from the frozen baseline replay path.
+6. **Environmental context:** optional provider data is handled by the environmental service and surfaced as contextual information; it is not represented as a personal sensor measurement or a frozen-model feature.
+
+### 6.4 Deployment topology
+
+| Component | Deployment / runtime | Notes |
+|---|---|---|
+| Frontend | Vercel · React/Vite production build | Static web application served to the browser. |
+| Backend | Render · FastAPI/Uvicorn | API and WebSocket service; configured through backend environment variables. |
+| Writable demo database | Local SQLite file on the Render service | Current Free-plan filesystem is ephemeral. Demo writes may be lost on restart, redeploy, or filesystem reset. |
+| Model/data artifacts | Packaged with the backend repository | Synthetic data, model bundle, experiment evidence, and manifests are loaded by backend services. |
+| Optional environmental provider | Backend integration, disabled by default | Requires explicit configuration; availability depends on provider and deployment settings. |
+
+### 6.5 Technology stack
+
+| Area | Technology |
 |---|---|
 | Frontend | React, TypeScript, Vite, Tailwind CSS, Recharts, Lucide React |
 | Backend/API | Python, FastAPI, Uvicorn, Pydantic |
 | Data and ML | pandas, NumPy, scikit-learn, LightGBM, joblib |
 | Persistence | SQLite, WAL, foreign keys, transactional writes, additive migrations |
-| Communication | REST API and WebSockets |
+| Communication | HTTPS REST/JSON and WebSockets |
 | Testing | pytest, Vitest, React Testing Library, Playwright Chromium |
+
+### 6.6 Repository structure
 
 ```text
 backend/app/
-  main.py, engine.py, store.py      frozen research API and twin engine
-  enhanced/                         registry, alerts, devices, environment, evidence
-  workspace/                        authentication, directory, patient profile, care workflows
-  migrations/                       additive, checksummed database migrations
-models_store/, baseline_outcomes/   frozen model artifacts and baseline evidence
-experiments-v2…v4, docs/model*/      versioned studies and evaluation artifacts
+  main.py                         FastAPI application, lifecycle, route composition
+  engine.py                       Synthetic digital-twin engine and replay
+  store.py                        SQLite persistence and migration runner
+  enhanced/                       Alerts, devices, environment, evidence services/routes
+  workspace/                      Demo auth, clinician/patient workflows, documents
+  migrations/                     Additive, checksummed SQL migrations
+
+models_store/                      Frozen model artifacts
+baseline_outcomes/                 Baseline replay evidence
+experiments-v2…v4/                 Versioned experimental studies
+docs/                              Architecture-adjacent reports and verification evidence
+
 frontend/src/
-  pages/                            original dashboard and research pages
-  pages-enhanced/                   study and model-science pages
-  workspace/                        login, directory, profile, Care Action Centre
-docs/                               implementation reports and verification evidence
+  pages/                           Original dashboard and research pages
+  pages-enhanced/                  Study and model-science pages
+  workspace/                       Login, directory, patient profile, care workflows
 ```
+
+> **Architecture and safety boundary:** this is a research/demo deployment, not a production clinical system. Demo authentication is not production identity management; the hosted SQLite filesystem is not durable storage; model outputs are not clinically validated; and the optional environmental feed is not a personal exposure sensor. Do not store real patient information or use the system for diagnosis, triage, prescribing, or treatment decisions.
 
 ## 7. Data, model methodology, and interpretation
 
