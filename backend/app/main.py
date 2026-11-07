@@ -136,7 +136,8 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         if horizon not in (24,48,72):raise HTTPException(422,'Horizon must be 24, 48 or 72 hours.')
         return e.explain(pid,horizon,version)
     @app.post('/api/patients/{pid}/scenarios',dependencies=[Depends(authorize)])
-    def scenario(pid:str,body:Scenario,request:Request,e:TwinEngine=Depends(engine)):\n        return e.scenario(pid,body.model_dump(),authorize=workspace_write_authorizer(request,pid))
+    def scenario(pid:str,body:Scenario,request:Request,e:TwinEngine=Depends(engine)):
+        return e.scenario(pid,body.model_dump(),authorize=workspace_write_authorizer(request,pid))
     @app.get('/api/patients/{pid}/scenarios')
     def scenarios(pid:str,e:TwinEngine=Depends(engine)):
         e.patient(pid)
@@ -152,7 +153,8 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     async def update_alert(alert_id:int,body:AlertUpdate,request:Request,e:TwinEngine=Depends(engine)):
         with e.store.connect() as c:
             c.execute('BEGIN IMMEDIATE')
-            check=workspace_write_authorizer(request)\n            if check is not None:check(c)
+            check=workspace_write_authorizer(request)
+            if check is not None:check(c)
             row=c.execute('SELECT * FROM alerts WHERE id=?',(alert_id,)).fetchone()
             allowed=getattr(request.state,'workspace_patient_ids',None)
             if allowed is not None and row is not None and row['patient_id'] not in allowed:
@@ -171,7 +173,8 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         with e.lock:
             with e.store.connect() as c:
                 c.execute('BEGIN IMMEDIATE')
-                check=workspace_write_authorizer(request,pid)\n                if check is not None:check(c)
+                check=workspace_write_authorizer(request,pid)
+                if check is not None:check(c)
                 state=e.patient(pid)
                 cur=c.execute('INSERT INTO interventions(patient_id,kind,note,created_at,state_version) VALUES (?,?,?,?,?)',(pid,body.kind,body.note,now(),state['version']))
                 iid=cur.lastrowid
