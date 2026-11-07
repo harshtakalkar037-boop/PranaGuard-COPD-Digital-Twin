@@ -91,7 +91,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         if request.method not in ('GET','HEAD') and user.get('role')!='doctor':
             return JSONResponse(status_code=403,content={'detail':'Only an assigned demo doctor can perform research-workspace writes.'})
         if path.startswith('/api/enhanced/') or path.startswith('/api/model48/') or path in ('/api/validation','/api/replay','/api/status') or path.startswith('/api/replay/'):
-            if user.get('role')!='doctor' or len(assigned)!=len(request.app.state.engine.profiles):
+            if user.get('role')!='doctor' or not set(request.app.state.engine.profiles).issubset(assigned):
                 return JSONResponse(status_code=403,content={'detail':'This research operation requires a doctor account assigned to the complete synthetic cohort.'})
         match=re.match(r'^/api/patients/([^/]+)(?:/|$)',path)
         if match and match.group(1) not in assigned:
@@ -219,7 +219,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
                     await socket.close(code=4401);return
                 user=socket.app.state.workspace.principal(message[5:])
                 assigned=socket.app.state.workspace.assigned_ids(user)
-                if user.get('role')!='doctor' or len(assigned)!=len(socket.app.state.engine.profiles):
+                if user.get('role')!='doctor' or not set(socket.app.state.engine.profiles).issubset(assigned):
                     await socket.close(code=4403);return
             except (HTTPException,asyncio.TimeoutError,WebSocketDisconnect):
                 await socket.close(code=4401);return
