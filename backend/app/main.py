@@ -78,7 +78,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     @app.middleware('http')
     async def enforce_workspace_scope(request, call_next):
         path=request.url.path
-        if not path.startswith('/api/') or path in ('/api/health','/api/workspace/login') or path.startswith('/api/workspace/'):
+        if request.method=='OPTIONS' or not path.startswith('/api/') or path in ('/api/health','/api/workspace/login') or path.startswith('/api/workspace/'):
             return await call_next(request)
         authorization=request.headers.get('authorization','')
         token=authorization[7:] if authorization.startswith('Bearer ') else None
@@ -88,6 +88,8 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
             return JSONResponse(status_code=exc.status_code,content={'detail':exc.detail})
         workspace=request.app.state.workspace
         assigned=workspace.assigned_ids(user)
+        if request.method not in ('GET','HEAD') and user.get('role')!='doctor':
+            return JSONResponse(status_code=403,content={'detail':'Only an assigned demo doctor can perform research-workspace writes.'})
         if path.startswith('/api/enhanced/') or path in ('/api/validation','/api/model48/study','/api/replay','/api/status') or path.startswith('/api/replay/'):
             if user.get('role')!='doctor' or len(assigned)!=len(request.app.state.engine.profiles):
                 return JSONResponse(status_code=403,content={'detail':'This research operation requires a doctor account assigned to the complete synthetic cohort.'})
