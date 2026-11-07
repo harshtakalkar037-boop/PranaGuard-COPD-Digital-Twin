@@ -100,6 +100,14 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         request.state.workspace_patient_ids=assigned
         return await call_next(request)
     def engine(request:Request):return request.app.state.engine
+    def workspace_write_authorizer(request:Request,pid:str|None=None):
+        if os.getenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH','0')!='1':return None
+        user=request.state.workspace_user
+        header=request.headers.get('authorization','')
+        token=header[7:] if header.startswith('Bearer ') else None
+        def check(conn):
+            request.app.state.workspace.authorize_write(conn,token,user['username'],pid,full_cohort=True)
+        return check
     @app.exception_handler(KeyError)
     async def key_error(request,exc):return JSONResponse(status_code=404,content={'detail':str(exc)})
     @app.exception_handler(ValueError)
@@ -128,7 +136,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         if horizon not in (24,48,72):raise HTTPException(422,'Horizon must be 24, 48 or 72 hours.')
         return e.explain(pid,horizon,version)
     @app.post('/api/patients/{pid}/scenarios',dependencies=[Depends(authorize)])
-    def scenario(pid:str,body:Scenario,e:TwinEngine=Depends(engine)):return e.scenario(pid,body.model_dump())
+    def scenario(pid:str,body:Scenario,request:Request,e:TwinEngine=Depends(engine)):\n        return e.scenario(pid,body.model_dump(),authorize=workspace_write_authorizer(request,pid))
     @app.get('/api/patients/{pid}/scenarios')
     def scenarios(pid:str,e:TwinEngine=Depends(engine)):
         e.patient(pid)
@@ -144,6 +152,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     async def update_alert(alert_id:int,body:AlertUpdate,request:Request,e:TwinEngine=Depends(engine)):
         with e.store.connect() as c:
             c.execute('BEGIN IMMEDIATE')
+            check=workspace_write_authorizer(request)\n            if check is not None:check(c)
             row=c.execute('SELECT * FROM alerts WHERE id=?',(alert_id,)).fetchone()
             allowed=getattr(request.state,'workspace_patient_ids',None)
             if allowed is not None and row is not None and row['patient_id'] not in allowed:
@@ -158,10 +167,12 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     def interventions(pid:str,e:TwinEngine=Depends(engine)):
         e.patient(pid);return {'interventions':e.store.interventions(pid)}
     @app.post('/api/patients/{pid}/interventions',dependencies=[Depends(authorize)])
-    def add_intervention(pid:str,body:Intervention,e:TwinEngine=Depends(engine)):
+    def add_intervention(pid:str,body:Intervention,request:Request,e:TwinEngine=Depends(engine)):
         with e.lock:
-            state=e.patient(pid)
             with e.store.connect() as c:
+                c.execute('BEGIN IMMEDIATE')
+                check=workspace_write_authorizer(request,pid)\n                if check is not None:check(c)
+                state=e.patient(pid)
                 cur=c.execute('INSERT INTO interventions(patient_id,kind,note,created_at,state_version) VALUES (?,?,?,?,?)',(pid,body.kind,body.note,now(),state['version']))
                 iid=cur.lastrowid
         return {'intervention':next(i for i in e.store.interventions(pid) if i['id']==iid),'notice':'Logged only. This does not change the patient state or imply a treatment effect.'}
