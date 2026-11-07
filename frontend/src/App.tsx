@@ -39,9 +39,9 @@ function App(){
   api<{user:SessionUser}>('/workspace/me').then(r=>{setUser(r.user);setAuthState('ready');}).catch(e=>{if(e instanceof ApiError&&e.status===401){sessionStorage.removeItem('pg-workspace-session');}setAuthState('signed-out');});},[]);
  const isEnhanced=enhancedViews.includes(view);
  const profileExport=['registry','devices'].includes(view);const exportPid=profileExport?registryPid:pid;
- const {data:overview,error:loadError}=useRemote<Overview>(authState==='ready'?'/overview':null,revision);
+ const {data:overview,error:loadError}=useRemote<Overview>(authState==='ready'?'/workspace/overview':null,revision);
  const refresh=()=>setRevision(r=>r+1);
- useEffect(()=>{if(overview&&!pid)setPid(overview.replay.demo.patient_id);},[overview,pid]);
+ useEffect(()=>{if(overview&&!pid){const firstAssigned=overview.patients?.[0]?.patient_id;const replayPatient=overview.replay?.demo?.patient_id;setPid(firstAssigned||replayPatient||'');}},[overview,pid]);
  useEffect(()=>{let ws:WebSocket;try{ws=new WebSocket(websocketUrl());ws.onopen=()=>setSocket(true);ws.onclose=()=>setSocket(false);ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==='twin_updated'||m.type==='alert_updated'||m.type==='enhanced_updated')setRevision(r=>r+1);};}catch{setSocket(false);}const timer=window.setInterval(()=>setRevision(r=>r+1),15000);return ()=>{ws?.close();clearInterval(timer);};},[]);
  useEffect(()=>{if(toast){const timer=setTimeout(()=>setToast(''),4500);return ()=>clearTimeout(timer);}},[toast]);
  function navigate(next:View){setView(next);location.hash=next;setMenu(false);}
