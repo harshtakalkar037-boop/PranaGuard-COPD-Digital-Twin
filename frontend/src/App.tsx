@@ -70,7 +70,7 @@ const openProfile=(id:string)=>{setRegistryPid(id);navigate('profile');};
  {view==='sources'&&<SourcesPage revision={revision} refresh={refresh} notify={setToast} openProfile={openProfile}/>}
  {view==='overview'&&<OverviewPage overview={overview} query={query} setQuery={setQuery} onOpen={open} navigate={navigate}/>}
  {['patient','explain','scenario','activity'].includes(view)&&!pid&&<Notice tone="warning">No synthetic twin is assigned to this demo account. Ask a workspace administrator to assign a fictional patient before opening research or care views.</Notice>}
- {['patient','explain','scenario','activity'].includes(view)&&<div className="patient-picker"><Users size={16}/><label htmlFor="patient-select">Selected synthetic twin</label><select id="patient-select" value={pid} onChange={e=>setPid(e.target.value)}>{overview.patients.map(p=><option key={p.patient_id} value={p.patient_id}>{p.patient_id} · {p.display_name} · {p.city}</option>)}</select><Pill tone="neutral">SYNTHETIC</Pill></div>}
+ {['patient','explain','scenario','activity'].includes(view)&&pid&&<div className="patient-picker"><Users size={16}/><label htmlFor="patient-select">Selected synthetic twin</label><select id="patient-select" value={pid} onChange={e=>setPid(e.target.value)}>{overview.patients.map(p=><option key={p.patient_id} value={p.patient_id}>{p.patient_id} · {p.display_name} · {p.city}</option>)}</select><Pill tone="neutral">SYNTHETIC</Pill></div>}
  {view==='patient'&&pid&&<PatientPage pid={pid} revision={revision} navigate={navigate}/>}
  {view==='explain'&&pid&&<ExplainPage pid={pid} revision={revision}/>}
  {view==='scenario'&&pid&&<ScenarioPage pid={pid} revision={revision} notify={setToast}/>}
