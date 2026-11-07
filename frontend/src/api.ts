@@ -44,5 +44,7 @@ export function websocketUrl():string {
   url.pathname = '/api/ws';
   url.search = '';
   url.hash = '';
+  const session=sessionStorage.getItem('pg-workspace-session');
+  if(session)url.searchParams.set('token',session);
   return url.toString();
 }
