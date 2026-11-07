@@ -209,6 +209,37 @@ class Workspace:
             if status:c.execute('INSERT INTO care_review_events(review_id,created_at,event,actor,note) VALUES (?,?,?,?,?)',(rid,at,f"{row['status']} → {status}",user['username'],note or ''))
             elif note or follow_up_at is not None:c.execute('INSERT INTO care_review_events(review_id,created_at,event,actor,note) VALUES (?,?,?,?,?)',(rid,at,'note/follow-up updated',user['username'],note or ''))
         return {'review':self.review_detail(user,rid)['review']}
+    def complete_follow_up(self,user,rid,note=''):
+        at=stamp()
+        with self.store.connect() as c:
+            c.execute('BEGIN IMMEDIATE')
+            row=c.execute('SELECT * FROM care_reviews WHERE id=?',(rid,)).fetchone()
+            if not row:raise HTTPException(404,'Review not found.')
+            pid=row['patient_id']
+            if user['role']=='patient':
+                if user.get('patient_id')!=pid:raise HTTPException(404,'Review not found.')
+            else:
+                assigned=c.execute('SELECT 1 FROM patient_assignments WHERE doctor=? AND patient_id=?',(user['username'],pid)).fetchone()
+                if not assigned:raise HTTPException(404,'Review not found in this account scope.')
+            if row['status']!='follow_up_scheduled' or not row['follow_up_at']:
+                raise HTTPException(409,'Only a scheduled follow-up can be completed in this ledger.')
+            existing=c.execute('SELECT * FROM care_followup_completions WHERE review_id=?',(rid,)).fetchone()
+            if existing:raise HTTPException(409,'This follow-up already has a completion record.')
+            c.execute('INSERT INTO care_followup_completions(review_id,patient_id,doctor,scheduled_for,completed_at,note) VALUES (?,?,?,?,?,?)',
+                      (rid,pid,user['username'],row['follow_up_at'],at,note.strip()))
+            c.execute("UPDATE care_reviews SET status='completed',updated_at=? WHERE id=?",(at,rid))
+            c.execute('INSERT INTO care_review_events(review_id,created_at,event,actor,note) VALUES (?,?,?,?,?)',
+                      (rid,at,'follow-up completed',user['username'],note.strip()))
+            completion=dict(c.execute('SELECT * FROM care_followup_completions WHERE review_id=?',(rid,)).fetchone())
+            review=dict(c.execute('SELECT * FROM care_reviews WHERE id=?',(rid,)).fetchone())
+        return {'completion':completion,'review':review,'notice':'Follow-up completion recorded in the immutable demo ledger.'}
+    def followup_ledger(self,user,pid,page=1,page_size=20):
+        self.require_assigned(user,pid)
+        with self.store.connect() as c:
+            rows=[dict(r) for r in c.execute('SELECT * FROM care_followup_completions WHERE patient_id=? ORDER BY completed_at DESC LIMIT ? OFFSET ?',
+                                              (pid,page_size,(page-1)*page_size))]
+            total=c.execute('SELECT COUNT(*) AS n FROM care_followup_completions WHERE patient_id=?',(pid,)).fetchone()['n']
+        return {'items':rows,'total':total,'page':page,'page_size':page_size}
     # ---------- care plans ----------
     def get_plan(self,user,pid):
         self.require_assigned(user,pid)
