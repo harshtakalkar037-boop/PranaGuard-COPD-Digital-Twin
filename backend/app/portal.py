@@ -43,11 +43,25 @@ def current(request: Request, authorization: str | None = Header(default=None)):
     if not authorization or not authorization.startswith('Bearer '): raise HTTPException(401, 'Authentication required')
     token_hash = hashlib.sha256(authorization[7:].encode()).hexdigest()
     with store(request).connect() as c:
-        user = c.execute('SELECT u.id,u.username,u.role,u.must_change_password,u.temporary_password_expires_at,u.temporary_password_used_at FROM portal_sessions s JOIN portal_users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?', (token_hash,timestamp())).fetchone()
+        user = c.execute('SELECT u.id,u.username,u.role,u.must_change_password,u.temporary_password_expires_at,u.temporary_password_used_at,l.patient_id AS linked_patient_id FROM portal_sessions s JOIN portal_users u ON u.id=s.user_id LEFT JOIN patient_user_links l ON l.user_id=u.id WHERE s.token_hash=? AND s.expires_at>?', (token_hash,timestamp())).fetchone()
     if not user or (user['must_change_password'] and (not user['temporary_password_expires_at'] or user['temporary_password_expires_at']<=timestamp() or not user['temporary_password_used_at'])): raise HTTPException(401, 'Session expired or invalid')
     if user['must_change_password'] and request.url.path not in ('/api/portal/me','/api/portal/logout','/api/portal/password'):
         raise HTTPException(403, 'Password change required')
+    request.state.portal_session_hash=token_hash
+    request.state.portal_patient_id=user['linked_patient_id']
     return {key:user[key] for key in ('id','username','role','must_change_password')}
+
+def begin_authorized_write(c,request,user):
+    # Linearize session, account and subsequent record authorization with the
+    # protected write. SQLite serializes other database writers until commit.
+    c.execute('BEGIN IMMEDIATE')
+    row=c.execute('SELECT u.id,u.role,u.must_change_password FROM portal_sessions s JOIN portal_users u ON u.id=s.user_id WHERE s.token_hash=? AND s.user_id=? AND s.expires_at>?',
+                  (getattr(request.state,'portal_session_hash',None),user['id'],timestamp())).fetchone()
+    if not row or row['role']!=user['role']: raise HTTPException(401,'Session expired or invalid')
+    if row['must_change_password']: raise HTTPException(403,'Password change required')
+    if user['role']=='patient':
+        link=c.execute('SELECT patient_id FROM patient_user_links WHERE user_id=?',(user['id'],)).fetchone()
+        if (link['patient_id'] if link else None)!=request.state.portal_patient_id: raise HTTPException(409,'Patient link changed during request')
 
 def role(user, expected):
     if user['role'] != expected: raise HTTPException(403, 'Not permitted')
@@ -310,6 +324,7 @@ async def environment(pid:str,request:Request,user=Depends(current)):
 @router.post('/checkins',status_code=201)
 def checkin(body:Checkin,request:Request,user=Depends(current)):
     with store(request).connect() as c:
+        begin_authorized_write(c,request,user)
         pid=patient_id(c,user); d=body.model_dump(); cur=c.execute('INSERT INTO symptom_checkins(patient_id,created_at,breathlessness,cough,sputum_amount,sputum_colour,wheezing,fatigue,fever,comments,additional_symptoms) VALUES (?,?,?,?,?,?,?,?,?,?,?)',(pid,timestamp(),*d.values()))
         notify_doctors(c,pid,'New symptom check-in',f'{pid} submitted observations.',f'/doctor/dashboard?patient={quote(pid)}&view=Care%20Action%20Centre')
     return {'id':cur.lastrowid,'message':'Check-in saved'}
@@ -332,6 +347,9 @@ async def upload(request:Request, kind:Literal['photo','care_plan']=Form(), desc
     try:
         with path.open('xb') as f: os.chmod(path,0o600); f.write(data)
         with store(request).connect() as c:
+            begin_authorized_write(c,request,user)
+            if patient_id(c,user)!=pid: raise HTTPException(409,'Patient link changed during upload')
+            if sputum_entry_id and (kind!='photo' or not c.execute('SELECT 1 FROM sputum_entries WHERE id=? AND patient_id=?',(sputum_entry_id,pid)).fetchone()): raise HTTPException(404,'Diary entry not found')
             cur=c.execute('INSERT INTO patient_uploads(patient_id,kind,original_name,stored_name,mime,description,created_at,sputum_entry_id) VALUES (?,?,?,?,?,?,?,?)',(pid,kind,filename[:255],name,allowed[ext],description.strip(),timestamp(),sputum_entry_id))
             if sputum_entry_id: c.execute("UPDATE sputum_entries SET review_status='Pending Review' WHERE id=? AND patient_id=?",(sputum_entry_id,pid))
             notify_doctors(c,pid,'New patient upload',f'{pid} uploaded a {"photo" if kind=="photo" else "care plan"}.',f'/doctor/dashboard?patient={quote(pid)}&view='+('Sputum%20Monitoring' if sputum_entry_id else 'Care%20Action%20Centre'))
@@ -354,6 +372,7 @@ def download(upload_id:int,request:Request,user=Depends(current)):
 def review(pid:str,body:Review,request:Request,user=Depends(current)):
     role(user,'doctor')
     with store(request).connect() as c:
+        begin_authorized_write(c,request,user)
         access(c,user,pid)
         for table,ident in [('symptom_checkins',body.checkin_id),('patient_uploads',body.upload_id)]:
             if ident and not c.execute(f'SELECT 1 FROM {table} WHERE id=? AND patient_id=?',(ident,pid)).fetchone(): raise HTTPException(404,'Related record not found')
@@ -380,6 +399,7 @@ def notifications(request:Request,user=Depends(current)):
 @router.post('/notifications/{notification_id}/read')
 def read_notification(notification_id:int,request:Request,user=Depends(current)):
     with store(request).connect() as c:
+        begin_authorized_write(c,request,user)
         cur=c.execute('UPDATE portal_notifications AS n SET read_at=COALESCE(read_at,?) WHERE n.id=? AND n.user_id=? AND '+notification_scope(user),(timestamp(),notification_id,user['id'],user['id']))
         if not cur.rowcount: raise HTTPException(404,'Notification not found')
     return {'message':'Marked as read'}
@@ -479,6 +499,7 @@ def audit(c,user,pid,action,record_id):
 @router.post('/sputum',status_code=201)
 def add_sputum(body:SputumInput,request:Request,user=Depends(current)):
     with store(request).connect() as c:
+        begin_authorized_write(c,request,user)
         pid=patient_id(c,user); at=timestamp()
         cur=c.execute('INSERT INTO sputum_entries(patient_id,user_id,observed_at,colour,amount,consistency,cough,description,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)',(pid,user['id'],utc_time(body.observed_at),body.colour,body.amount,body.consistency,body.cough,body.description,at,at))
         notify_doctors(c,pid,'New sputum diary entry',f'{pid} submitted a diary entry.',f'/doctor/dashboard?patient={quote(pid)}&view=Sputum%20Monitoring')
@@ -487,6 +508,7 @@ def add_sputum(body:SputumInput,request:Request,user=Depends(current)):
 @router.put('/sputum/{entry_id}')
 def edit_sputum(entry_id:int,body:SputumInput,request:Request,user=Depends(current)):
     with store(request).connect() as c:
+        begin_authorized_write(c,request,user)
         pid=patient_id(c,user)
         old=c.execute('SELECT * FROM sputum_entries WHERE id=? AND patient_id=? AND user_id=?',(entry_id,pid,user['id'])).fetchone()
         if not old: raise HTTPException(404,'Entry not found')
@@ -511,6 +533,7 @@ def list_sputum(pid:str,request:Request,user=Depends(current)):
 def review_sputum(pid:str,entry_id:int,body:SputumReview,request:Request,user=Depends(current)):
     role(user,'doctor')
     with store(request).connect() as c:
+        begin_authorized_write(c,request,user)
         access(c,user,pid)
         if not c.execute('SELECT 1 FROM sputum_entries WHERE id=? AND patient_id=?',(entry_id,pid)).fetchone(): raise HTTPException(404,'Entry not found')
         cur=c.execute('INSERT INTO sputum_reviews(entry_id,patient_id,doctor_id,notes,follow_up,shared,created_at) VALUES (?,?,?,?,?,?,?)',(entry_id,pid,user['id'],body.notes,body.follow_up,int(body.shared),timestamp()))
@@ -532,6 +555,7 @@ def save_plan(pid:str,body:PlanInput,request:Request,user=Depends(current)):
     role(user,'doctor')
     if body.review_date and body.review_date<body.start_date: raise HTTPException(422,'Review date cannot be before start date')
     with store(request).connect() as c:
+        begin_authorized_write(c,request,user)
         access(c,user,pid)
         d=body.model_dump(mode='json')
         cols=['title','active','start_date','review_date','food_guidance','breakfast','lunch','dinner','snacks','hydration_target_ml','hydration_instructions','activities','activity_schedule','activity_restrictions','notes']
@@ -547,9 +571,11 @@ def add_daily(body:DailyInput,request:Request,user=Depends(current)):
     if body.kind!='activity' and (body.duration_minutes is not None or body.effort): raise HTTPException(422,'Duration and effort are only valid for activity')
     if body.kind=='meal' and body.item not in ('Breakfast','Lunch','Dinner','Snack'): raise HTTPException(422,'Choose a meal')
     with store(request).connect() as c:
+        begin_authorized_write(c,request,user)
         pid=patient_id(c,user)
         existing=c.execute('SELECT * FROM daily_care_logs WHERE user_id=? AND client_key=?',(user['id'],body.client_key)).fetchone()
         if existing:
+            if existing['patient_id']!=pid: raise HTTPException(409,'Submission key was already used for a different entry')
             actual=(existing['kind'],existing['occurred_at'],existing['item'],existing['status'],existing['amount_ml'],existing['duration_minutes'],existing['effort'],existing['comments'])
             expected=(body.kind,utc_time(body.occurred_at),body.item,body.status,body.amount_ml,body.duration_minutes,body.effort,body.comments)
             if actual!=expected: raise HTTPException(409,'Submission key was already used for a different entry')
@@ -592,6 +618,7 @@ def list_daily(pid:str,request:Request,kind:Literal['all','meal','hydration','ac
 def review_daily(pid:str,log_id:int,body:DailyReview,request:Request,user=Depends(current)):
     role(user,'doctor')
     with store(request).connect() as c:
+        begin_authorized_write(c,request,user)
         access(c,user,pid)
         if not c.execute('SELECT 1 FROM daily_care_logs WHERE id=? AND patient_id=?',(log_id,pid)).fetchone():raise HTTPException(404,'Activity not found')
         cur=c.execute('INSERT INTO daily_care_reviews(log_id,doctor_id,notes,shared,created_at) VALUES (?,?,?,?,?)',(log_id,user['id'],body.notes,int(body.shared),timestamp()))
@@ -606,7 +633,7 @@ def provision_demo(pid:str,request:Request,user=Depends(current)):
     if os.getenv('PRANAGUARD_SYNTHETIC_DEMO_PROVISIONING')!='1': raise HTTPException(403,'Synthetic demo provisioning is disabled')
     with store(request).connect() as c:
         # Keep assignment and synthetic checks in the same write transaction as provisioning.
-        c.execute('BEGIN IMMEDIATE')
+        begin_authorized_write(c,request,user)
         access(c,user,pid)
         row=c.execute('SELECT profile FROM patients WHERE patient_id=?',(pid,)).fetchone()
         if not row or json.loads(row['profile']).get('synthetic') is not True: raise HTTPException(403,'Only synthetic records are supported')
@@ -627,7 +654,7 @@ def complete_followup(pid:str,review_id:int,body:FollowupCompletion,request:Requ
     with store(request).connect() as c:
         # The assignment check and write share a lock, so a revoked assignment
         # cannot be changed between the check and completion record.
-        c.execute('BEGIN IMMEDIATE')
+        begin_authorized_write(c,request,user)
         access(c,user,pid)
         row=c.execute('SELECT follow_up_date,status FROM doctor_reviews WHERE id=? AND patient_id=?',(review_id,pid)).fetchone()
         if not row: raise HTTPException(404,'Review not found')
