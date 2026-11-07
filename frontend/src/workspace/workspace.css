@@ -1,0 +1,52 @@
+/* Care workspace additions — same PranaGuard palette (deep forest green, cream, teal). */
+.login-shell{display:flex;min-height:100vh;background:#f6f8f7}
+.login-hero{flex:1.1;background:#103b34;color:#e6efe9;padding:7vh 6vw;display:flex;flex-direction:column;gap:22px;justify-content:center}
+.login-brand{display:flex;gap:12px;align-items:center;font-size:21px;font-weight:700}
+.login-brand .brand-mark{background:#1b6b55;color:#eafff5;border-radius:10px;width:44px;height:44px;display:grid;place-items:center}
+.login-brand small{display:block;font-size:9px;letter-spacing:2px;color:#9fc2b4;font-weight:500}
+.login-hero h1{font-size:30px;letter-spacing:-.8px;color:#fff}
+.login-hero>p{color:#b9d2c6;font-size:13px;line-height:1.7;max-width:46ch}
+.login-points{display:grid;gap:12px;margin-top:8px}
+.login-points>div{display:flex;gap:10px;align-items:center;color:#cfe3d6;font-size:12px;background:#123f37;border:1px solid #1d5145;border-radius:10px;padding:12px 14px}
+.login-panel{flex:1;display:flex;flex-direction:column;justify-content:center;padding:6vh 4vw;max-width:520px;background:#fdfdfb;border-left:1px solid #e7ede8}
+.login-panel h2{margin-bottom:6px}
+.login-demo-list{display:grid;gap:10px;margin:10px 0 20px}
+.login-demo{text-align:left;border:1px solid #e0e8e1;border-radius:10px;padding:11px 14px;display:grid;gap:2px;background:#fff}
+.login-demo:hover{border-color:#2b9a82;background:#f5faf7}
+.login-demo strong{font-size:12px;color:#173c31}.login-demo span{font-size:10px;color:#6d8177}.login-demo em{font-style:normal;font-size:9px;color:#8ea599;font-family:ui-monospace,monospace}
+.login-panel form{display:grid;gap:4px}
+.login-panel .button{margin-top:12px}
+.nav-group-label{font-size:8.5px;letter-spacing:2px;color:#6f9583;padding:14px 14px 6px;text-transform:uppercase}
+.workspace-user .user-logout{color:#8fb3a3}
+.section-tabs{margin:4px 0 18px}
+.metric-grid.six{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.metric-grid.four{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.metric-number.metric-name{font-size:14px;line-height:1.4;font-weight:600}
+.care-grid{display:grid;grid-template-columns:minmax(300px,390px) minmax(0,1fr);gap:18px;align-items:start}
+.care-left{display:grid;gap:18px}
+.care-queue{display:grid;gap:10px}
+.care-card{text-align:left;border:1px solid #e4ebe6;border-radius:10px;padding:11px 13px;background:#fff;display:grid;gap:5px}
+.care-card:hover{border-color:#bcd6cc}
+.care-card.selected{border-color:#248373;box-shadow:0 0 0 2px #e2f1ec}
+.care-card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.care-card p{font-size:11px;color:#4d635a;margin:0}
+.care-card small{font-size:9.5px;color:#84968d}
+.care-note{font-size:12px;color:#3c5549;background:#f5f8f5;border-left:3px solid #248373;padding:10px 12px;border-radius:0 8px 8px 0;margin:8px 0 12px;white-space:pre-line}
+.care-timeline{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:0}
+.care-timeline li{display:flex;gap:10px;position:relative;padding:0 0 14px 2px}
+.care-timeline li:not(:last-child)::before{content:'';position:absolute;left:5px;top:14px;bottom:0;width:2px;background:#e0eae4}
+.care-timeline .status-dot{margin-top:5px;flex-shrink:0}
+.care-timeline strong{font-size:11.5px;display:block}
+.care-timeline small{font-size:9.5px;color:#84968d}
+.care-timeline p{font-size:10.5px;color:#5c7166;margin:3px 0 0}
+.baseline-mini{display:block;width:100%;max-width:150px;height:5px;border-radius:3px;background:#e8efe9;overflow:hidden}
+.baseline-mini span{display:block;height:100%;background:#248373;border-radius:3px}
+.baseline-mini.large{max-width:none;height:8px;margin:6px 0 12px}
+.muted-cell{color:#84968d}
+.diary-attachment{display:flex;gap:10px;align-items:center;margin-top:4px}
+.diary-attachment img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid #e0e8e1}
+.diary-review-input{flex:1 1 180px;font-size:11px}
+.snapshot-pre{max-height:280px;overflow:auto;white-space:pre-wrap;font-size:10.5px;line-height:1.5}
+th{white-space:nowrap}
+@media(max-width:1020px){.care-grid{grid-template-columns:1fr}.metric-grid.six{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:720px){.login-shell{flex-direction:column}.login-hero{padding:6vh 7vw}.login-panel{border-left:0;border-top:1px solid #e7ede8;max-width:none}.metric-grid.six,.metric-grid.four{grid-template-columns:repeat(2,1fr)}}

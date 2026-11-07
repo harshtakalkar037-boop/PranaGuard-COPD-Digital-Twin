@@ -1,0 +1,209 @@
+{
+  "seed": 20261105,
+  "patients": 120,
+  "days": 60,
+  "hours_per_patient": 1440,
+  "rows": 172800,
+  "synthetic_events": 261,
+  "eligible_rows": 138224,
+  "environment_sources": [
+    "cached_real_ambient"
+  ],
+  "generator": "Causal stochastic latent burden with probabilistic onsets; all physiology and labels synthetic.",
+  "sha256": "a8006021f4cd422e96e717d1f668bf17c287aaf7c58a5aa7d06dd2e8b3efe034",
+  "start": "2026-08-01T00:00:00Z",
+  "clinical_validity": "NONE; not a validated physiological disease model"
+}
+{
+  "created_at": "2026-11-05T14:52:29.451854+00:00",
+  "version": "pg48-research-v2-20261105",
+  "selected_candidate": "core_linear_C0.3",
+  "status": "GATE_NOT_PASSED",
+  "experimental_available": false,
+  "gate_checks": {
+    "auprc_10_percent_relative_improvement": false,
+    "auroc_not_worse": false,
+    "brier_not_worse_with_0_0001_tolerance": false,
+    "nonzero_recall_at_validation_selected_threshold": true,
+    "false_positive_rate_at_most_15_percent": true
+  },
+  "historical_benchmark": {
+    "warning": "Original test metrics were disclosed before this study. No candidate/threshold selection used these rows. This is a historical comparison, not a fresh holdout.",
+    "original": {
+      "auroc": 0.6143769386729512,
+      "auprc": 0.09675617680405191,
+      "brier": 0.05573064293960756,
+      "log_loss": 0.2345492710392779,
+      "threshold": 0.35,
+      "recall": 0.0,
+      "precision": 0.0,
+      "false_positive_rate": 0.0,
+      "confusion_matrix": [
+        [
+          4439,
+          0
+        ],
+        [
+          260,
+          0
+        ]
+      ],
+      "n": 4699,
+      "positive_rows": 260,
+      "prevalence": 0.055330921472653755,
+      "mean_probability": 0.11625656892038849
+    },
+    "revised": {
+      "auroc": 0.5946081064688858,
+      "auprc": 0.07004297768029509,
+      "brier": 0.0636768934306864,
+      "log_loss": 0.25733094631183845,
+      "threshold": 0.2698293804070354,
+      "recall": 0.08846153846153847,
+      "precision": 0.08013937282229965,
+      "false_positive_rate": 0.059472854246451906,
+      "confusion_matrix": [
+        [
+          4175,
+          264
+        ],
+        [
+          237,
+          23
+        ]
+      ],
+      "n": 4699,
+      "positive_rows": 260,
+      "prevalence": 0.055330921472653755,
+      "mean_probability": 0.1488696713192472
+    }
+  },
+  "development": {
+    "mean_validation_auprc": 0.2139733132943542,
+    "calibration": {
+      "slope": 1.2237310579565046,
+      "intercept": 1.172025450248666,
+      "direction_preserving": true,
+      "objective": "Summed calibration log-loss +0.5*(slope-1)^2; slope>=0."
+    },
+    "operating_point": {
+      "threshold": 0.2698293804070354,
+      "f1": 0.03007518796992481,
+      "recall": 0.030303030303030304,
+      "precision": 0.029850746268656716,
+      "false_positive_rate": 0.09863429438543247,
+      "confusion_matrix": [
+        [
+          594,
+          65
+        ],
+        [
+          64,
+          2
+        ]
+      ],
+      "validated_clinical_cutoff": false
+    },
+    "rows": {
+      "training": 14605,
+      "calibration": 652,
+      "threshold": 725
+    }
+  },
+  "frozen_model_sha256": "770d1fc36aae4a724e1d1aa96ad1a6930f8ccf3b9e89cdb96aa2fc8c7b9c9b2a",
+  "protocol_sha256": "4c734d2872eaf23b6bff21d4955abdee47d6af1a93b80502d2842ef37803140e",
+  "clinical_validation": false
+}
+FRESH AUDIT {
+  "original": {
+    "auroc": 0.553869776428474,
+    "auprc": 0.14847092044639626,
+    "brier": 0.08222009470822647,
+    "log_loss": 0.30473469683211446,
+    "threshold": 0.35,
+    "recall": 0.0,
+    "precision": 0.0,
+    "false_positive_rate": 0.0,
+    "confusion_matrix": [
+      [
+        21188,
+        0
+      ],
+      [
+        2090,
+        0
+      ]
+    ],
+    "n": 23278,
+    "positive_rows": 2090,
+    "prevalence": 0.0897843457341696,
+    "mean_probability": 0.11626542125666903
+  },
+  "revised": {
+    "auroc": 0.549440077573927,
+    "auprc": 0.10994607979886661,
+    "brier": 0.08766996626731692,
+    "log_loss": 0.32075206414631324,
+    "threshold": 0.2698293804070354,
+    "recall": 0.1,
+    "precision": 0.13423249839434812,
+    "false_positive_rate": 0.06362091750047197,
+    "confusion_matrix": [
+      [
+        19840,
+        1348
+      ],
+      [
+        1881,
+        209
+      ]
+    ],
+    "n": 23278,
+    "positive_rows": 2090,
+    "prevalence": 0.0897843457341696,
+    "mean_probability": 0.1475164091561659
+  },
+  "uncertainty": {
+    "method": "300 paired patient-cluster bootstrap resamples; descriptive synthetic intervals, not clinical validation",
+    "seed": 20261106,
+    "valid_resamples": 300,
+    "ci95": {
+      "old_auroc": [
+        0.4826077360323182,
+        0.6306385475996836
+      ],
+      "old_auprc": [
+        0.10238603639671756,
+        0.20974333081984742
+      ],
+      "old_brier": [
+        0.06639679369346481,
+        0.09924373649529374
+      ],
+      "revised_auroc": [
+        0.4740374056326358,
+        0.6324897608166647
+      ],
+      "revised_auprc": [
+        0.07485231526823928,
+        0.17551094286283242
+      ],
+      "revised_brier": [
+        0.0717605712822372,
+        0.10343682529828199
+      ],
+      "difference_auroc": [
+        -0.06942506605298525,
+        0.08214972005619803
+      ],
+      "difference_auprc": [
+        -0.08910614249773544,
+        0.014408174872800926
+      ],
+      "difference_brier": [
+        0.0007564604298798857,
+        0.009521315798424029
+      ]
+    }
+  }
+}

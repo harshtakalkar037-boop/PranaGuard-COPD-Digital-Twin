@@ -1,0 +1,126 @@
+{
+  "seed": 31001,
+  "patients": 320,
+  "days": 60,
+  "hours_per_patient": 1440,
+  "rows": 460800,
+  "synthetic_events": 728,
+  "eligible_rows": 367041,
+  "environment_sources": [
+    "cached_real_ambient"
+  ],
+  "generator": "Causal stochastic latent burden with probabilistic onsets; all physiology and labels synthetic.",
+  "sha256": "15860580dece4c0be316254755df23f54d6c064d0a8682bd5239afe9f26ff62c",
+  "start": "2026-08-01T00:00:00Z",
+  "clinical_validity": "NONE; not a validated physiological disease model"
+}
+{
+  "seed": 31002,
+  "patients": 320,
+  "days": 60,
+  "hours_per_patient": 1440,
+  "rows": 460800,
+  "synthetic_events": 734,
+  "eligible_rows": 365696,
+  "environment_sources": [
+    "cached_real_ambient"
+  ],
+  "generator": "Causal stochastic latent burden with probabilistic onsets; all physiology and labels synthetic.",
+  "sha256": "b13a3aff53569ecf57e8f866b9d5cd3f79bc5e169f56ed85733a6465dfe41fb3",
+  "start": "2026-08-01T00:00:00Z",
+  "clinical_validity": "NONE; not a validated physiological disease model"
+}
+{
+  "seed": 31003,
+  "patients": 160,
+  "days": 60,
+  "hours_per_patient": 1440,
+  "rows": 230400,
+  "synthetic_events": 357,
+  "eligible_rows": 183388,
+  "environment_sources": [
+    "cached_real_ambient"
+  ],
+  "generator": "Causal stochastic latent burden with probabilistic onsets; all physiology and labels synthetic.",
+  "sha256": "fe09359fc52a06775c531b95e4de7c7537dfe48ad62496d870bc46e7bccb8781",
+  "start": "2026-08-01T00:00:00Z",
+  "clinical_validity": "NONE; not a validated physiological disease model"
+}
+{"candidate": "tree_original35", "selection_auprc": 0.14119029932588872, "selection_auroc": 0.5720078457844064}
+{"candidate": "linear_core8", "selection_auprc": 0.14330845444277046, "selection_auroc": 0.6118061142067899}
+{"candidate": "tree_body15", "selection_auprc": 0.13748523145380048, "selection_auroc": 0.5779564915592008}
+{"candidate": "tree_context15", "selection_auprc": 0.14437518641088762, "selection_auroc": 0.5867737147107639}
+{"candidate": "tree_context31", "selection_auprc": 0.1291282424144046, "selection_auroc": 0.5642723807744968}
+{"candidate": "tree_body7", "selection_auprc": 0.14117529297819703, "selection_auroc": 0.5832269734201252}
+{
+  "seed": 31004,
+  "patients": 160,
+  "days": 60,
+  "hours_per_patient": 1440,
+  "rows": 230400,
+  "synthetic_events": 382,
+  "eligible_rows": 181760,
+  "environment_sources": [
+    "cached_real_ambient"
+  ],
+  "generator": "Causal stochastic latent burden with probabilistic onsets; all physiology and labels synthetic.",
+  "sha256": "a92c0c830fbae382946054953524f7d859744a746f498341bed100b6eca8014d",
+  "start": "2026-08-01T00:00:00Z",
+  "clinical_validity": "NONE; not a validated physiological disease model"
+}
+{
+  "seed": 31005,
+  "patients": 160,
+  "days": 60,
+  "hours_per_patient": 1440,
+  "rows": 230400,
+  "synthetic_events": 389,
+  "eligible_rows": 180986,
+  "environment_sources": [
+    "cached_real_ambient"
+  ],
+  "generator": "Causal stochastic latent burden with probabilistic onsets; all physiology and labels synthetic.",
+  "sha256": "f9b57bf6fed181d3e3dc9449078b9a19c5bcf1150190c7c85cd480034d827afb",
+  "start": "2026-08-01T00:00:00Z",
+  "clinical_validity": "NONE; not a validated physiological disease model"
+}
+{
+  "created_at": "2026-11-05T15:24:59.931163+00:00",
+  "version": "pg48-v3-multiseed",
+  "protocol_sha256": "9535446b679290721bcf70906d8ee00a239e187508c2ac46a3ca45d9a50f283e",
+  "model_sha256": "35cbe7b0deda11e0caaba55bb00ba3f519a5f28625900024e2f82b2f08c27d0a",
+  "generator_sha256": "f49ae916428c8607a74186305263742d5f130c0ebbe8a228b940ddb22ee79c02",
+  "source_files_sha256": {
+    "backend/app/model48_v3.py": "672992192a16b41330688410b5870f05d3320d1eba0647bf3247bd44540a1273",
+    "scripts/model48_v3_data.py": "3aa2c0025fcdfd19e708cfa338737c84361c44f9905063e3883a47c953493753",
+    "scripts/train_model48_v3.py": "89ccebae367521a23ac026132f5b7ebca5f3f271e094a7146020eb4b9125205c"
+  },
+  "selected_candidate": "tree_context15",
+  "calibration": {
+    "slope": 0.883314514754751,
+    "intercept": -0.15582407933051112,
+    "direction_preserving": true,
+    "objective": "Summed calibration log-loss +0.5*(slope-1)^2; slope>=0."
+  },
+  "operating_point": {
+    "threshold": 0.16079386929026823,
+    "f1": 0.23068181818181818,
+    "recall": 0.2230769230769231,
+    "precision": 0.2388235294117647,
+    "false_positive_rate": 0.0767497034400949,
+    "confusion_matrix": [
+      [
+        7783,
+        647
+      ],
+      [
+        707,
+        203
+      ]
+    ],
+    "validated_clinical_cutoff": false
+  },
+  "fresh_audit_not_generated": true,
+  "original_or_v2_test_used_for_selection": false,
+  "previous_v2_failure_disclosed": true
+}

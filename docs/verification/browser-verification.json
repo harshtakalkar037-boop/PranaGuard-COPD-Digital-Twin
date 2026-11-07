@@ -1,0 +1,111 @@
+{
+  "created_at": "2026-10-18T09:58:46.918312+00:00",
+  "base_url": "http://127.0.0.1:5173",
+  "checks": [
+    {
+      "name": "React loads backend cohort",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Actual cohort count 120 and synthetic provenance displayed",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Patient search",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Patient digital twin integrated",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Persisted historical version selection",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Snapshot JSON export",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Explainability endpoint and horizon switch",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Backend scenario response, persistence and state isolation",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Actual evaluation, diagnostics and ablations",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Timed replay start/pause with WebSocket refresh",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Replay raises actual model-generated false-positive alert",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Persisted alert acknowledgement",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Persisted clinician intervention log",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Alert resolution and intervention survive browser reload",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "System status and cache provenance",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Offline runtime: external browser HTTP requests blocked; no external requests attempted",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "No browser JavaScript errors or failed API responses",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "390px mobile layout and navigation without viewport overflow",
+      "status": "PASS",
+      "detail": ""
+    }
+  ],
+  "passed": 18,
+  "failed": 0,
+  "browser_errors": [],
+  "failed_api": [],
+  "external_requests": [],
+  "screenshots": [
+    "01_overview.png",
+    "02_patient_twin.png",
+    "03_explainability.png",
+    "04_what_if.png",
+    "05_model_validation.png",
+    "06_alerts_and_interventions.png",
+    "07_system_status.png",
+    "08_mobile_patient.png"
+  ]
+}

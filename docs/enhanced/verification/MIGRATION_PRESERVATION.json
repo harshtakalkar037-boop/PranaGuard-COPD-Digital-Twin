@@ -1,0 +1,59 @@
+{
+  "status": "PASS",
+  "original_tables_unchanged": true,
+  "before": {
+    "patients": {
+      "rows": 120,
+      "content_sha256": "2cec18e85cc7f88e466c9963cb8924d315d8e2560621efa7f7cb0ea4d01e257b"
+    },
+    "states": {
+      "rows": 3000,
+      "content_sha256": "dd7bac060a7c9eb0e81a31f5765f5c31ec487f42db3bfbdc0b8e2eef79c35e7d"
+    },
+    "alerts": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "interventions": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "scenarios": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "meta": {
+      "rows": 3,
+      "content_sha256": "5c1d8473c0092fbc7b7d626a56661663ab9aef329363aa0f4ef43390c4a9d3f6"
+    }
+  },
+  "after": {
+    "patients": {
+      "rows": 120,
+      "content_sha256": "2cec18e85cc7f88e466c9963cb8924d315d8e2560621efa7f7cb0ea4d01e257b"
+    },
+    "states": {
+      "rows": 3000,
+      "content_sha256": "dd7bac060a7c9eb0e81a31f5765f5c31ec487f42db3bfbdc0b8e2eef79c35e7d"
+    },
+    "alerts": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "interventions": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "scenarios": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "meta": {
+      "rows": 3,
+      "content_sha256": "5c1d8473c0092fbc7b7d626a56661663ab9aef329363aa0f4ef43390c4a9d3f6"
+    }
+  },
+  "integrity_check": "ok",
+  "foreign_key_violations": 0,
+  "original_workspace_db_unchanged": true
+}

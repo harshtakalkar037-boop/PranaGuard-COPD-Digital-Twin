@@ -1,0 +1,70 @@
+{
+  "seed": 31006,
+  "patients": 240,
+  "days": 60,
+  "hours_per_patient": 1440,
+  "rows": 345600,
+  "synthetic_events": 525,
+  "eligible_rows": 276417,
+  "environment_sources": [
+    "cached_real_ambient"
+  ],
+  "generator": "Causal stochastic latent burden with probabilistic onsets; all physiology and labels synthetic.",
+  "sha256": "d8bf42a363efd28eb2b6a8b11bd2cc5223bf4cee8e9fbac346ccf88ee30d2e1a",
+  "start": "2026-08-01T00:00:00Z",
+  "clinical_validity": "NONE; not a validated physiological disease model"
+}
+{
+  "status": "PASS",
+  "created_at": "2026-11-05T15:57:01.038637+00:00",
+  "original_protected_files": 26,
+  "prior_v2_protected_files": 16,
+  "frozen_prefit_source_files": 4,
+  "predictions": {
+    "fresh_audit": {
+      "rows": 45941,
+      "patients": 240,
+      "saved_metrics_reproduced": true,
+      "raw_model_inference_reproduced": true,
+      "maximum_probability_error": 9.71445146547012e-17
+    },
+    "historical_benchmark": {
+      "rows": 4699,
+      "patients": 24,
+      "saved_metrics_reproduced": true,
+      "raw_model_inference_reproduced": true,
+      "maximum_probability_error": 9.71445146547012e-17
+    }
+  },
+  "bootstrap_reproduced": true,
+  "original_database_tables": {
+    "patients": {
+      "rows": 120,
+      "content_sha256": "2cec18e85cc7f88e466c9963cb8924d315d8e2560621efa7f7cb0ea4d01e257b"
+    },
+    "states": {
+      "rows": 3000,
+      "content_sha256": "dd7bac060a7c9eb0e81a31f5765f5c31ec487f42db3bfbdc0b8e2eef79c35e7d"
+    },
+    "alerts": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "interventions": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "scenarios": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "meta": {
+      "rows": 3,
+      "content_sha256": "5c1d8473c0092fbc7b7d626a56661663ab9aef329363aa0f4ef43390c4a9d3f6"
+    }
+  },
+  "v3_status": "EXPERIMENTAL_GATE_PASS",
+  "prior_v2_still_rejected": true,
+  "no_training_cutoff_change_new_seed_or_reset": true,
+  "not_clinical_validation": true
+}

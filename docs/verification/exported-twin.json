@@ -1,0 +1,103 @@
+{
+  "patient_id": "PG-0071",
+  "synthetic": true,
+  "version": 25,
+  "hour": 1039,
+  "timestamp": "2026-09-13 07:00:00+00:00",
+  "model_version": "pg-synthetic-v1",
+  "profile": {
+    "patient_id": "PG-0071",
+    "display_name": "Synthetic twin 071",
+    "synthetic": true,
+    "city": "Delhi",
+    "age": 48,
+    "fev1_pct": 74.9,
+    "prior_exacerbations": 2,
+    "smoking_pack_years": 55.2,
+    "bmi": 31.2,
+    "sex": "Male",
+    "environment_source": "cached_real_ambient"
+  },
+  "current": {
+    "spo2": 93.1887,
+    "heart_rate": null,
+    "resp_rate": 21.2192,
+    "symptom_score": 2.0924,
+    "steps": 230.2151,
+    "sleep_hours": 6.5903,
+    "adherence": 0.7912,
+    "pm25": 27,
+    "pm10": 31.8,
+    "no2": 4.6,
+    "ozone": 184,
+    "temperature": 32.3,
+    "humidity": 60
+  },
+  "baseline": {
+    "spo2": 94.4059,
+    "heart_rate": 67.14115,
+    "resp_rate": 18.1466,
+    "symptom_score": 1.3347,
+    "steps": 278.11154999999997
+  },
+  "features": {
+    "age": 48,
+    "fev1_pct": 74.89,
+    "prior_exacerbations": 2,
+    "smoking_pack_years": 55.2,
+    "bmi": 31.2,
+    "spo2": 93.1887,
+    "heart_rate": null,
+    "resp_rate": 21.2192,
+    "symptom_score": 2.0924,
+    "adherence": 0.7912,
+    "steps": 230.2151,
+    "sleep_hours": 6.5903,
+    "spo2_mean6": 93.53396666666667,
+    "hr_mean6": 67.58977999999999,
+    "rr_mean6": 19.284233333333333,
+    "symptom_mean6": 2.0369666666666664,
+    "spo2_change6": -0.38290000000000646,
+    "hr_change6": null,
+    "adherence_mean24": 0.8333833333333333,
+    "pm25": 27,
+    "pm10": 31.8,
+    "no2": 4.6,
+    "ozone": 184,
+    "temperature": 32.3,
+    "humidity": 60,
+    "pm25_mean24": 29.412499999999998,
+    "pm25_change6": 1.6000000000000014,
+    "spo2_delta": -1.2172000000000054,
+    "hr_delta": null,
+    "rr_delta": 3.0726000000000013,
+    "symptom_delta": 0.7577,
+    "steps_ratio": 0.8277797164483102,
+    "spo2_baseline": 94.4059,
+    "hr_baseline": 67.14115,
+    "rr_baseline": 18.1466
+  },
+  "risks": {
+    "24": 0.015098282200342369,
+    "48": 0.10111926243216601,
+    "72": 0.29658079216723104
+  },
+  "risk_category": "elevated",
+  "prediction_supported": true,
+  "missing_fields": [
+    "heart_rate"
+  ],
+  "warnings": [
+    "Missing fields use training-set median imputation."
+  ],
+  "data_sources": {
+    "body": "synthetic hourly replay",
+    "environment": "cached_real_ambient",
+    "baseline": "median of first72h (pre-fit calibration)"
+  },
+  "freshness": {
+    "body_hours_behind_replay": 0,
+    "environment_hours_behind_replay": 0,
+    "mode": "historical cached replay, NOT live monitoring"
+  }
+}

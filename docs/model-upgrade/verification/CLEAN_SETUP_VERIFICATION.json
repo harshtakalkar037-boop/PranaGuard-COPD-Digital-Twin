@@ -1,0 +1,257 @@
+{
+  "status": "PASS",
+  "executed_at": "2026-11-05T15:09:11.812902+00:00",
+  "source": "Actual isolated ZIP-style source copy, not a Git clone of the unmodified base commit. Application file hashes recorded below.",
+  "base_commit": "95a4e2b00fcb2d9df7210c6b87ecba171a0c4e91",
+  "fresh_virtual_environment": true,
+  "pip_check": true,
+  "npm_ci": true,
+  "python": "Python 3.13.16",
+  "node": "v20.20.2",
+  "npm": "10.8.2",
+  "bootstrap_without_reset": true,
+  "asgi_startup_and_frozen_predictions": true,
+  "original_cohort_and_states_unchanged": true,
+  "offline_cities_verified": 4,
+  "backend_tests_passed": 101,
+  "frontend_tests_passed": 40,
+  "production_frontend_build": true,
+  "application_source_files": {
+    "backend/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend/app/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend/app/config.py": "9d1a068756cb2db5295ebea1599cf48a798795e553b3a72a552b5df2f53d77c5",
+    "backend/app/engine.py": "05055221fb76e762637f8f4d0ee8f3267858add200a811cd1bd91ff416158965",
+    "backend/app/features.py": "87f106efb9c4cc2447fe51adf2f2d9e74ba17f928a73677c42941dfad0b3b017",
+    "backend/app/main.py": "cea91b9e2ec58b25bc0abc6159641be9761ea5d503d866d26db1c39ed3e6ec44",
+    "backend/app/ml.py": "0aacc5430bfd3d1963e52eb0ab2c73dbda7282ff8d01a3f8e916a6faff642fb3",
+    "backend/app/model48.py": "10d718e71861773fc7c1bde24c1b5f4bbb31cb12da49b9fea4aeabe8f88d0b42",
+    "backend/app/model48_study.py": "784a8d564bd80eab5312d03223dc02caf73b0b782f1511886183d49d8830b8e3",
+    "backend/app/store.py": "61f7606306d1d9912a94301c616702de828d439cdd4384bc1dc99842718a9037",
+    "backend/app/validation.py": "5bbdfe9ce0ac04103f405e4114af027294ce41c21dee8e30c709297369789b2d",
+    "backend/app/enhanced/__init__.py": "ef98882f7bd87a609982de37d524e1b731ec52347cfee29071b976b409a2d863",
+    "backend/app/enhanced/devices.py": "976221b491af18e25479b1f93ba70170d71ecf0aea523e50c1e134c45541aa64",
+    "backend/app/enhanced/email.py": "c82f6429e8df3a8db215e6473e1682f69ce7ba7eecab4d452d859675d7559be2",
+    "backend/app/enhanced/environment.py": "7502d69814ad9eafa2bca224c4ee07fae6f8d18d55043541b121d468e0d0a790",
+    "backend/app/enhanced/notifications.py": "882eef996a00191128df4ce158f729945adeafdd70e4e650646d8a519d352b45",
+    "backend/app/enhanced/provenance.py": "8739f517374df7dcd0a78097124cb08af8ddba3be7703fb07357d8f99f9090b1",
+    "backend/app/enhanced/registry.py": "605ba380340672dbb072bc779781f6e7a405050b1239cc9777fe025f6b4660c7",
+    "backend/app/enhanced/routes.py": "17a57184dc3dd92fe8a5109ad66f94cfb0b92cdb653c53134c58817cdd6f520d",
+    "backend/app/enhanced/schemas.py": "49622e0d5135193d1837785c6674bfaaebb80035a0aca025ddd1c4c07ebebb24",
+    "backend/app/enhanced/services.py": "00831d1eb8253ddb7e05794e6f17f9eeb6b3f6fe5e3803cb96f948dc4fa1e79c",
+    "backend/app/enhanced/settings.py": "b0ff75c91491a63824b8e3e15bcaf19b32cf05f3727aeb5e9b5b1525608ed3c2",
+    "backend/app/migrations/001_enhanced_monitoring.sql": "badf498cb0e31f3529af15b7f99acb5bb3f690ce961a606a4fadea4292d5c912",
+    "backend/app/migrations/002_environment_backoff.sql": "2f946a8ce222ccabaa7db0594082aba1871c05bc45f390b79907e3506c43d57e",
+    "backend/tests/conftest.py": "6867abceccabc9104bae3436ef392499da95d0d248025f57c37a33c99ba6d610",
+    "backend/tests/test_api.py": "85048324b0a7f3aaf7cdfa8ca761a3d95331a7aa052954e3d9a980f506d08af3",
+    "backend/tests/test_enhanced.py": "aa1a838f93c36e7fee9e5e5a3c2c67f291a09597acc30248b6a19827d8504234",
+    "backend/tests/test_model48.py": "6adf780bdd2f97943d59c6031ca8bc7f5cb294125e844aad6b885678d7beafd0",
+    "frontend/index.html": "d1fe43ac4d683c382c88e74d890b284c32c0e398c16811f6f311660a94f6e0a6",
+    "frontend/package-lock.json": "f2d12cd651a08561ea5f6a8b639ccec260c3d0696aafd62025c407d14219c401",
+    "frontend/package.json": "edce406498c6fb7a1645af9a957e25f7b294d6aac9cbb0e4273c86aa4f81c0f3",
+    "frontend/postcss.config.cjs": "383c4a251d833e238c2706dfdac53ef829d576cb5a66a21649b37ad213705883",
+    "frontend/tailwind.config.cjs": "f797cc454372246efef928cbbe9a9418ff57138d4ffac97f28a1a29d75deb627",
+    "frontend/tsconfig.json": "401ce386b26e61506e433e0ff64eafd707a4209efb754f523a87254b22655927",
+    "frontend/vite.config.ts": "178a331c6512c3105d198dd147dd609fe035adf4af2a15910dc636ca2f6667c6",
+    "frontend/src/App.test.tsx": "2c2c38364a4b86776a74bcc10b8d8de197995b8a8ae76635ef97fe429943fc40",
+    "frontend/src/App.tsx": "94c30a386644c4b40c45d0bc5724231c40526671574e3b32ad8fe453bfeae5ed",
+    "frontend/src/api.ts": "0cd46fd229a24cff8d73973fb9c5cd524d70722ea7467abf7a47e7fb80974f5e",
+    "frontend/src/components.tsx": "d650034a0ee4cccd8bf1b11e699f51b8d80814fe0ce458f735b78000dc7a4180",
+    "frontend/src/hooks.ts": "d2d803de4a76609aa66905e7a7bd8399fb6cb035359336e3ae4a2351d7735173",
+    "frontend/src/main.tsx": "6531bcb6e7b4290d3307cf51dff9a0ae1ece9c9802a4e48fb0e8c13841b13a9d",
+    "frontend/src/styles.css": "bb0c274cfa0aa9dc01dea89dc191b2008bf0cade1c4b1cd4c3e99bc4759d08de",
+    "frontend/src/test-setup.ts": "4dd880f077940a1b7650dbb5b04d42b78bae2156531fc4f282f7da40aa95072d",
+    "frontend/src/types.ts": "cbe9e99360e695bc132b4f8111507ffa80bf2057bb045c05f206df90c57fa36c",
+    "frontend/src/vite-env.d.ts": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+    "frontend/src/__fixtures__/explanation.json": "7a08a1486385f0aa021dbeb4da4946dd22fcfeb4b4352bcdd63a348564a1527c",
+    "frontend/src/__fixtures__/history.json": "349be61d74f8a9915f1cc8adace87e00d4f12fc53a9e399b455323bda614c46e",
+    "frontend/src/__fixtures__/overview.json": "9802739649a4af2970d92a1fe7e689d9c2450dc49dc986eb90bf67e3178c090a",
+    "frontend/src/__fixtures__/scenario.json": "8cd5cbdd5c628fff867bde30177f33268d0c07acffc5d29a6f4240bea2b2c8fe",
+    "frontend/src/__fixtures__/status.json": "7af0216c83f922ec1bbb850cdbc26ca39d52c90e6319ea729f28e629926539db",
+    "frontend/src/__fixtures__/twin.json": "be67a94eb2b7687fa9729aa28174ff74cff677576ff0cb66d4d534f44a42fb3b",
+    "frontend/src/__fixtures__/validation.json": "9cabffdf55733865d84f3a4cb0e2f79c28c6ff50691180e92488b7dee762602d",
+    "frontend/src/enhanced/Devices.tsx": "2528fc699a11f7cbb8487287a6d1197f91fc58576d83a709bb7123a5beae970c",
+    "frontend/src/enhanced/Enhanced.test.tsx": "3cb48d5269515e2778d587bfaa186ba346b599efabbd24805f7545de06bbf94b",
+    "frontend/src/enhanced/Environment.tsx": "9c80175fe5bdd152b05288509e7aed95ff7728ac10d29b8c3a562e7b1c08e7ae",
+    "frontend/src/enhanced/Notifications.tsx": "dfce745a9f19c0bb315b5e4011bd8c7c5e5ca56e35b7d838ad2089f27d92325f",
+    "frontend/src/enhanced/Patients.tsx": "8f630d876954542c0641e05ed39ecdf4176bf251cfc608c2d49c41c6e77c314d",
+    "frontend/src/enhanced/Sources.tsx": "556a7acc9b172e63ae158f6ac56efb84b382a8863213becc7f79b2fe0400099b",
+    "frontend/src/enhanced/enhanced.css": "327b2a0bacd4ef1e26e1b5750cfc2164ac8a36789b43b496131a32b3161573bf",
+    "frontend/src/enhanced/shared.tsx": "10653f039696506032e582e54a43b82f7348012898213ca620e178ce186a7c09",
+    "frontend/src/enhanced/types.ts": "80d706dc1c166d1bc6044c28bb12eb4604ba7d24e3936f9e3062f9f9aafe7cfc",
+    "frontend/src/enhanced/__fixtures__/CAPTURE_METADATA.json": "2039b12a4403b7676e4ccb9c60dc54b9769595ca6930d009b8fe959fac37dcd8",
+    "frontend/src/enhanced/__fixtures__/cities.json": "9ae1222e057280b13c2ce7eeb311c74a513904ff75890471479101bf9c62d953",
+    "frontend/src/enhanced/__fixtures__/device-readings.json": "7683d3f87b5c789d4605a5a3829a8c8fac430b3ab9e24d218bf100d97a6ec93d",
+    "frontend/src/enhanced/__fixtures__/devices.json": "167393cb5c4c9b9a8f3e8512730506e7dff4f389e3689d427f4d3b330ee7ec61",
+    "frontend/src/enhanced/__fixtures__/email.json": "6d2da47a1294c27e7ba980ef06d24d64f8fc22405a212ce87ce5dd5b7a20f79c",
+    "frontend/src/enhanced/__fixtures__/environment.json": "ded1e926ef670b87513ee292db254c60c1fc602c7c33b9fd702819cbb56486f5",
+    "frontend/src/enhanced/__fixtures__/notification-detail.json": "523a23a198e0166308ed52fe9c12976a6404163ed3d1aec42483a791d79678f9",
+    "frontend/src/enhanced/__fixtures__/notifications.json": "cfe6b6440497b1fc29d7e87bd2d76edb207dc03cb80d27317070a6500361a5c3",
+    "frontend/src/enhanced/__fixtures__/profile.json": "1e70bf2a70a8289fa12636530cfbfff94295a24836f05b2947e9abd4ab5db853",
+    "frontend/src/enhanced/__fixtures__/provenance.json": "826d39ce8548143734aa2fe3bdfacfaa2ef150cd3d73ed833b8d5be3400bddc8",
+    "frontend/src/enhanced/__fixtures__/registry.json": "3e583f2cd6e5f9aaaaa38feaab0e02d06023e105f9b4a92f6256e86e7f02cde3",
+    "frontend/src/model48/Study.test.tsx": "a2941dbe054eab02bcda48ffa9f290b58f75058fa18864bedbaf1261ba0fcf42",
+    "frontend/src/model48/Study.tsx": "ff8d0a1078a24aabe1fd6747ae1ec49509be9552274b0296bf6281ea36fec700",
+    "frontend/src/model48/__fixtures__/study.json": "af4f21543b52feef95352b5334df19130f587e9538acdfdc3aeb33220e9d0584",
+    "scripts/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scripts/audit_model48.py": "bd93d84434647fabb03616092a1c4aa6a4be3fc49348bc3fc13da8b45929f7a4",
+    "scripts/bootstrap.py": "7f54fdae4b0c5e92686fb1fef5f69e0d437ce3fcaad034d8f6ded3dc8680ded4",
+    "scripts/browser_verify.py": "78f9152f6fe33cb764382018cfd253bde3abd0e63aa79bf4891dad44ad715100",
+    "scripts/browser_verify_enhanced.py": "689a4b866bf01545fd8f6162b5f4914fe918654cb6e764fc7e8ee3f3a572b093",
+    "scripts/browser_verify_model48.py": "a116d00e4cc61ace6cbb02db8ce0737d15750d6f56721c67caf48bedcefbf1d2",
+    "scripts/browser_verify_offline.py": "cec3a7b9520897cad1e90845802caecf118d787f5873903c40e248fa2a256799",
+    "scripts/build_artifacts.py": "bfe30096aa3430b1873cc36990406843d13d015651e78a4f9d200bc4858ece35",
+    "scripts/evaluate.py": "11213fbe6b0d3afafe20509bf2dac98cdef1d07bd4222074e9842f53e086e650",
+    "scripts/fetch_environment.py": "8547e3162e10af5a69f10da043667fa5794be9734419754af3b5af51c976dd32",
+    "scripts/generate_data.py": "f49ae916428c8607a74186305263742d5f130c0ebbe8a228b940ddb22ee79c02",
+    "scripts/replay.py": "b192fee4c73a9807902268ea1355539214bb811d6c89eb35444c3f8f4d814957",
+    "scripts/select_demo.py": "4de3cc65829fc55b77aef04404fe0d86b49beba7611bc3b9de322b74781038b0",
+    "scripts/train.py": "efe0f384b3d96f2a4ca71a45e5de1d9da051f0019513947179509fb1928f423a",
+    "scripts/train_model48.py": "b2c0755e3eb7e10bfbce145b230ef0edd92e32b2801ca52d097f9abd1317f21c",
+    "scripts/verify_artifacts.py": "cc1bc7c003986dfd360102ff3309c79628837ec82f0ac93d6222b0933520186d",
+    "scripts/verify_clean_setup.py": "07021ec06716fb2a1c3cbc6649e90d303578a0238d4ef74a82320c456d5f06f3",
+    "scripts/verify_enhanced_clean_setup.py": "4dd2f117fe222f6fad3686f11230e83e0f877a873f50dacb579cdb4f3a26ab91",
+    "scripts/verify_enhancement_integrity.py": "d2eb2a363c8e93ad6a2dd13917e623c4bff0c0a185407f08149f5fccc245f98d",
+    "scripts/verify_live_environment.py": "7cf2397acaa03cbcb4f2502f84e3a4f77fe1039f1b1171eb2ca44537c2a75bed",
+    "scripts/verify_model48_clean_setup.py": "58160fe2439e56b7fcdf8d3954a557fc082571d4265bdce5932f8f4522ec6daf",
+    "scripts/verify_model48_study.py": "076eedf9f95e828ab4027fddad0827f4e74924c9cafe51c72cab98efc378f868",
+    "scripts/verify_reproducibility.py": "cd17e5652988f97c22d5f18c5119e515ca7df1251d311f377b22f04bf480fcca",
+    "scripts/verify_submission.py": "cfdfb80378048686ca7b996cf75b32a7325fe7ffa6c04201991bd15e97f5d5ae",
+    "scripts/write_delivery_report.py": "6e77c23ecfb60124e09eb0e8231300e6f1183de628c5f43855d9f08d14fc0e93",
+    "scripts/write_documentation.py": "a633457041f70a265b1a8f95fe97a322fb2c7b152080dfaac5a7662289e0c2e0",
+    "requirements.txt": "1917e31359a70d694aa6f24830f1f57c296753615a87c59cfdc80ee80f69460f",
+    "pyproject.toml": "56380b8174fa6a47dfee3f2675b34718b9abd0f0ada04045c4647110fc43021c",
+    ".env.example": "9bf85421a465fa108d0e343b020869228432d818faf2c0d4586ef1e8ccbb2bd5",
+    "README.md": "3e5f2c0cf34e9d20abacbeb3081180e7cacf14a8ae0202f478d6d75a420bb1b2"
+  },
+  "application_source_count": 105,
+  "commands": [
+    {
+      "command": [
+        "/home/user/.venv/bin/python",
+        "-m",
+        "venv",
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv"
+      ],
+      "exit_code": 0,
+      "seconds": 2.313
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv/bin/python",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.002
+    },
+    {
+      "command": [
+        "node",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.079
+    },
+    {
+      "command": [
+        "npm",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.201
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv/bin/python",
+        "-m",
+        "pip",
+        "install",
+        "-r",
+        "requirements.txt"
+      ],
+      "exit_code": 0,
+      "seconds": 18.649
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv/bin/python",
+        "-m",
+        "pip",
+        "check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.264
+    },
+    {
+      "command": [
+        "npm",
+        "--prefix",
+        "frontend",
+        "ci",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "exit_code": 0,
+      "seconds": 3.146
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv/bin/python",
+        "-m",
+        "scripts.bootstrap"
+      ],
+      "exit_code": 0,
+      "seconds": 2.057
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv/bin/python",
+        "-c",
+        "import hashlib,json,sqlite3\nfrom fastapi.testclient import TestClient\nfrom backend.app.main import app\nfrom backend.app.config import ROOT,DB_PATH\nbaseline=json.loads((ROOT/'docs/enhanced/BASELINE_MANIFEST.json').read_text())\ndef verify():\n with sqlite3.connect('file:'+str(DB_PATH)+'?mode=ro',uri=True) as db:\n  for t,expected in baseline['database_before'].items():\n   rows=[tuple(r) for r in db.execute(f'SELECT * FROM {t} ORDER BY rowid')]\n   assert {'rows':len(rows),'content_sha256':hashlib.sha256(json.dumps(rows,sort_keys=True).encode()).hexdigest()}==expected\n  assert not db.execute('PRAGMA foreign_key_check').fetchall()\nverify()\nwith TestClient(app) as c:\n for url in ['/api/health','/api/overview','/api/patients/PG-0071','/api/validation','/api/model48/study','/api/enhanced/status','/api/enhanced/registry/patients','/api/enhanced/devices','/api/enhanced/notifications','/api/enhanced/email','/api/enhanced/provenance']:\n  r=c.get(url);assert r.status_code==200,(url,r.status_code);print(url,'200')\n assert c.get('/api/overview').json()['summary']['total']==120\n assert c.get('/api/enhanced/registry/patients').json()['total']==120\n twin=c.get('/api/patients/PG-0071').json();assert twin['synthetic'] and len(twin['risks'])==3\n for city in ['Pune','Mumbai','Delhi','Bengaluru']:\n  r=c.get('/api/enhanced/environment/'+city);assert r.status_code==200\n  data=r.json();assert not data['live_requests_enabled'];assert all(part['status']=='historical_fallback' for part in data['components'].values())\n assert c.get('/api/enhanced/email').json()['mode']=='disabled'\n assert c.get('/api/model48/study').json()['candidate_active'] is False\n assert c.get('/api/model48/study').json()['study']['status']=='GATE_NOT_PASSED'\nverify()\nprint('PASS: actual ASGI lifespan, bundled predictions, 120/3000 preserved, additive migrations, enhanced reads, 4-city offline fallback; no reset or external email.')\n"
+      ],
+      "exit_code": 0,
+      "seconds": 2.964
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv/bin/python",
+        "-m",
+        "pytest",
+        "--junitxml=/home/user/.cache/pranaguard-model-v2/PranaGuard-Enhanced-v2/docs/model-upgrade/verification/clean-backend-tests.xml"
+      ],
+      "exit_code": 0,
+      "seconds": 14.413
+    },
+    {
+      "command": [
+        "npm",
+        "--prefix",
+        "frontend",
+        "test",
+        "--",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile=/home/user/.cache/pranaguard-model-v2/PranaGuard-Enhanced-v2/docs/model-upgrade/verification/clean-frontend-tests.json"
+      ],
+      "exit_code": 0,
+      "seconds": 13.265
+    },
+    {
+      "command": [
+        "npm",
+        "--prefix",
+        "frontend",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "seconds": 11.478
+    }
+  ],
+  "total_seconds": 69.092,
+  "not_claimed": [
+    "Fresh external provider calls in this clean check",
+    "Physical hardware",
+    "External inbox delivery",
+    "Enhanced deployment"
+  ]
+}

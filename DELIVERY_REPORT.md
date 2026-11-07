@@ -1,0 +1,132 @@
+# PranaGuard — verified local delivery
+
+**NOT FULLY SUBMISSION-READY.** The application and local submission artifacts are implemented and verified; six external gates remain pending after the final local commit. No public project GitHub URL or actual YouTube upload is claimed.
+
+## Repository and live application
+- Complete local Git repository: `PranaGuard-COPD-Digital-Twin/`.
+- Public GitHub URL: **PENDING** — no authorized publishing access. Exact owner commands: [PUBLISHING.md](docs/PUBLISHING.md).
+- The running clinician dashboard is exposed through the workspace live preview (port5173); API is port8000. A workspace preview is not proof of public submission access.
+
+## What is implemented
+Seven React/TypeScript views; FastAPI REST/WebSocket integration; SQLite immutable state versions; first72h personal baselines; deterministic cohort replay; independent fitted/calibrated24/48/72h models; native TreeSHAP and driver deltas; persisted alerts, acknowledgements, resolutions and clinician actions; isolated and persisted backend scenario branches; JSON export; data freshness/missingness/provenance; actual evaluation and ablations.
+
+The bundled data contain120 visibly synthetic patients over60 days (172,800 hours), with263 stochastic artificial onsets and eight successfully retrieved, attributed ambient/weather caches for four cities. No real clinical records, live wearable feed, personal exposure measurement or clinical benefit is claimed.
+
+## Actual verification
+| Verification | Result |
+|---|---|
+| Backend pytest | **41 passed**,0 failed; one upstream Starlette/httpx deprecation warning |
+| Frontend Vitest / React Testing Library | **14 passed**,0 failed |
+| Actual Chromium integration | **18 passed**,0 failed; no browser errors or failed API requests; external HTTP blocked and none attempted |
+| Production frontend build | **PASS** — TypeScript and Vite, chart-vendor split |
+| Clean clone / fresh venv / npm ci | **PASS** — bundled bootstrap, API lifespan, both suites and build rerun |
+| Full generation/training reproduction | **PASS** — identical data bytes, zero metric or prediction differences across15 experiments |
+| Metric recomputation | **PASS** — saved primary test predictions independently recomputed |
+| Architecture / deck / report | **PASS** — actual files opened, PDF exports rendered, text/bounds/image checks and visual QA |
+
+Evidence: [backend](docs/verification/backend-tests.txt), [frontend](docs/verification/frontend-tests.txt), [browser](docs/verification/browser-verification.json), [clean setup](docs/verification/clean-setup.json), [reproducibility](docs/verification/reproducibility.json), [artifact verification](docs/verification/artifact-verification.json).
+
+## Actual model evaluation
+Synthetic held-out test:24 distinct patients,4,699 correlated eligible hourly windows.
+
+| Model | Horizon | AUROC | AUPRC | Brier |
+|---|---:|---:|---:|---:|
+| LightGBM | 24h | 0.6916 | 0.0882 | 0.0279 |
+| LightGBM | 48h | 0.6144 | 0.0968 | 0.0557 |
+| LightGBM | 72h | 0.3951 | 0.0593 | 0.0853 |
+| LogisticRegression | 24h | 0.6619 | 0.1993 | 0.0260 |
+| LogisticRegression | 48h | 0.6285 | 0.1841 | 0.0537 |
+| LogisticRegression | 72h | 0.6253 | 0.2281 | 0.0800 |
+
+**Important negative results:** the72h LightGBM AUROC is below chance, its AUPRC0.0593 is below prevalence0.0773, and its Platt slope is negative. LR is stronger at72h. No consistent ablation improvement is established. All primary horizons have zero sensitivity at.35. The72h audit detects0 of5 held-out onsets; median detected lead time is undefined. The demo alert is an actual retrospectively selected **false positive**, not a prospective detection success. Scenario paths are non-causal. No clinical validation or proven treatment effect exists.
+
+Full [evaluation/ablations](artifacts/evaluation.md), [model card](docs/MODEL_CARD.md), [methodology](docs/METHODOLOGY.md), [limitations](docs/LIMITATIONS.md).
+
+## Exact setup and run
+From the downloaded repository root:
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+cp .env.example .env
+npm --prefix frontend ci
+python -m scripts.bootstrap --reset
+# Terminal A:
+python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+# Terminal B:
+npm --prefix frontend run dev -- --host 0.0.0.0 --port 5173
+```
+Open `http://127.0.0.1:5173`; API docs: `http://127.0.0.1:8000/docs`. Use one backend worker. Dependencies need internet for first installation; bundled runtime is offline-ready. Full reproduction:
+```bash
+python -m scripts.generate_data
+python -m scripts.train
+python -m scripts.select_demo
+python -m scripts.evaluate
+python -m scripts.bootstrap --reset
+python -m pytest
+npm --prefix frontend test
+npm --prefix frontend run build
+python -m scripts.replay reset
+python -m scripts.replay step --hours 12
+```
+Stop the servers before regenerating data/models. The+12h scenario reaches PG-0071/hour1051, actual72h risk≈35.51%, synthetic label0.
+
+## Deliverable paths
+| Deliverable | Repository-relative path |
+|---|---|
+| Complete README | [README.md](README.md) |
+| Separate architecture PDF | [docs/architecture/PranaGuard_Architecture.pdf](docs/architecture/PranaGuard_Architecture.pdf) |
+| Separate editable architecture | [docs/architecture/PranaGuard_Architecture.pptx](docs/architecture/PranaGuard_Architecture.pptx) |
+| Editable16-slide presentation | [docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pptx](docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pptx) |
+| Actual presentation PDF export | [docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pdf](docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pdf) |
+| Technical report | [docs/TECHNICAL_REPORT.md](docs/TECHNICAL_REPORT.md), [PDF](docs/PranaGuard_Technical_Report.pdf) |
+| Timed20-minute narration + screen script | [docs/demo/DEMO_SCRIPT.md](docs/demo/DEMO_SCRIPT.md) |
+| Recording scenario / upload checklist | [RECORDING_GUIDE.md](docs/demo/RECORDING_GUIDE.md), [UPLOAD_CHECKLIST.md](docs/demo/UPLOAD_CHECKLIST.md) |
+| Actual video status | [VIDEO_STATUS.md](docs/demo/VIDEO_STATUS.md): **not recorded/uploaded** |
+| Public access verification | [docs/verification/PUBLIC_ACCESS.md](docs/verification/PUBLIC_ACCESS.md) |
+| Full gate / machine evidence | [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md), [JSON](docs/verification/submission-audit.json) |
+
+## Public access results
+Local relative links, Office/PDF content and actual workflows were verified. No public repository exists yet, so GitHub README/images/artifact access cannot be confirmed. No actual video exists yet, so Unlisted status, duration, audio and signed-out playback cannot be confirmed. No authenticated/local preview has been substituted for those checks.
+
+## Completed final gate
+**20 PASS · 0 FAIL · 6 PENDING.**
+
+| Mandatory item | Status |
+|---|---|
+| Public GitHub repository URL verified | **PENDING** |
+| Root README exists and is complete | **PASS** |
+| Team details included or explicitly marked pending | **PENDING** |
+| College/incubator information included or explicitly marked pending | **PENDING** |
+| Project title included | **PASS** |
+| Problem statement included | **PASS** |
+| Healthcare use case included | **PASS** |
+| Technical stack included | **PASS** |
+| AI/ML model/framework details included | **PASS** |
+| Actual 15–20 minute Unlisted YouTube video uploaded | **PENDING** |
+| Final video URL inserted into README | **PENDING** |
+| Open-source license details included | **PASS** |
+| Actual license file committed | **PASS** |
+| Architecture diagram exported as PDF | **PASS** |
+| Architecture diagram available in PPT/PPTX-compatible format | **PASS** |
+| Presentation exported as PDF | **PASS** |
+| Editable presentation available as PPTX | **PASS** |
+| Presentation covers project details and actual outcomes | **PASS** |
+| All referenced artifacts committed and linked | **PASS** |
+| Public links tested without additional permissions | **PENDING** |
+| React frontend tested | **PASS** |
+| FastAPI backend tested | **PASS** |
+| Model and twin workflows tested | **PASS** |
+| README setup instructions verified | **PASS** |
+| No Docker or Streamlit dependency | **PASS** |
+| No fabricated metrics or links | **PASS** |
+
+## Every outstanding human task
+1. Supply actual team/member names/roles and college/incubator details; update metadata, README and slide1.
+2. Publish the complete prepared repository as **public** under the actual authorized account, using the exact commands in docs/PUBLISHING.md. No project URL has been invented.
+3. Rehearse, record and review the actual15–20 minute demo with audible narration and legible live UI; upload to YouTube as **Unlisted**. The script is not a video.
+4. Insert the actual public repository/video URLs and actual video duration in metadata/README; update VIDEO_STATUS.md, then commit and push final artifacts.
+5. Test repository, all linked PDFs/PPTXs/images and actual video signed out. Verify playability, duration and Unlisted status manually; HTTP200 alone is insufficient.
+6. Run the public audit, commit/push its evidence and re-evaluate every gate before Unstop submission. Confirm current official challenge wording/deadline directly.
+
+The source DOCX was unavailable, and the user explicitly authorized implementation from the supplied message. That substitution is documented rather than falsely claiming the attachment was inspected.

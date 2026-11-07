@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "dataset_bytes_identical": true,
+  "sha256": "a9fddac47dfd28548feb336564928b7510b13d35d89a845727b12a54b3e54a5d",
+  "experiments": 15,
+  "max_metric_absolute_difference": 0.0,
+  "max_test_prediction_absolute_difference": 0.0,
+  "seed": 2026
+}

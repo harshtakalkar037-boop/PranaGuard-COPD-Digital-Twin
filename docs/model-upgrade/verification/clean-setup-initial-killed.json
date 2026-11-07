@@ -1,0 +1,103 @@
+{
+  "status": "FAIL",
+  "executed_at": "2026-11-05T15:06:40.376088+00:00",
+  "error": "Clean setup command failed; inspect clean-setup.txt: /home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv/bin/python -m pytest --junitxml=/home/user/.cache/pranaguard-model-v2/PranaGuard-Enhanced-v2/docs/model-upgrade/verification/clean-backend-tests.xml",
+  "commands": [
+    {
+      "command": [
+        "/home/user/.venv/bin/python",
+        "-m",
+        "venv",
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv"
+      ],
+      "exit_code": 0,
+      "seconds": 2.205
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv/bin/python",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.003
+    },
+    {
+      "command": [
+        "node",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.05
+    },
+    {
+      "command": [
+        "npm",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.245
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv/bin/python",
+        "-m",
+        "pip",
+        "install",
+        "-r",
+        "requirements.txt"
+      ],
+      "exit_code": 0,
+      "seconds": 20.311
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv/bin/python",
+        "-m",
+        "pip",
+        "check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.322
+    },
+    {
+      "command": [
+        "npm",
+        "--prefix",
+        "frontend",
+        "ci",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "exit_code": 0,
+      "seconds": 3.23
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv/bin/python",
+        "-m",
+        "scripts.bootstrap"
+      ],
+      "exit_code": 0,
+      "seconds": 2.616
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv/bin/python",
+        "-c",
+        "import hashlib,json,sqlite3\nfrom fastapi.testclient import TestClient\nfrom backend.app.main import app\nfrom backend.app.config import ROOT,DB_PATH\nbaseline=json.loads((ROOT/'docs/enhanced/BASELINE_MANIFEST.json').read_text())\ndef verify():\n with sqlite3.connect('file:'+str(DB_PATH)+'?mode=ro',uri=True) as db:\n  for t,expected in baseline['database_before'].items():\n   rows=[tuple(r) for r in db.execute(f'SELECT * FROM {t} ORDER BY rowid')]\n   assert {'rows':len(rows),'content_sha256':hashlib.sha256(json.dumps(rows,sort_keys=True).encode()).hexdigest()}==expected\n  assert not db.execute('PRAGMA foreign_key_check').fetchall()\nverify()\nwith TestClient(app) as c:\n for url in ['/api/health','/api/overview','/api/patients/PG-0071','/api/validation','/api/model48/study','/api/enhanced/status','/api/enhanced/registry/patients','/api/enhanced/devices','/api/enhanced/notifications','/api/enhanced/email','/api/enhanced/provenance']:\n  r=c.get(url);assert r.status_code==200,(url,r.status_code);print(url,'200')\n assert c.get('/api/overview').json()['summary']['total']==120\n assert c.get('/api/enhanced/registry/patients').json()['total']==120\n twin=c.get('/api/patients/PG-0071').json();assert twin['synthetic'] and len(twin['risks'])==3\n for city in ['Pune','Mumbai','Delhi','Bengaluru']:\n  r=c.get('/api/enhanced/environment/'+city);assert r.status_code==200\n  data=r.json();assert not data['live_requests_enabled'];assert all(part['status']=='historical_fallback' for part in data['components'].values())\n assert c.get('/api/enhanced/email').json()['mode']=='disabled'\n assert c.get('/api/model48/study').json()['candidate_active'] is False\n assert c.get('/api/model48/study').json()['study']['status']=='GATE_NOT_PASSED'\nverify()\nprint('PASS: actual ASGI lifespan, bundled predictions, 120/3000 preserved, additive migrations, enhanced reads, 4-city offline fallback; no reset or external email.')\n"
+      ],
+      "exit_code": 0,
+      "seconds": 2.822
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-model-v2/.cache/pranaguard-model48-clean-setup/.venv/bin/python",
+        "-m",
+        "pytest",
+        "--junitxml=/home/user/.cache/pranaguard-model-v2/PranaGuard-Enhanced-v2/docs/model-upgrade/verification/clean-backend-tests.xml"
+      ],
+      "exit_code": -9,
+      "seconds": 212.232
+    }
+  ]
+}

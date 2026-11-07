@@ -1,0 +1,121 @@
+{
+  "status": "PASS",
+  "created_at": "2026-10-18T10:03:29.880806+00:00",
+  "source": "actual local Git clone; no public URL assumed",
+  "tested_commit": "6ecd2b1d86b2ad508ee08a5b8f58c5ac5089333b",
+  "fresh_virtual_environment": true,
+  "npm_ci": true,
+  "bundled_offline_bootstrap": true,
+  "api_startup_lifespan_and_real_predictions": true,
+  "backend_tests_passed": 41,
+  "frontend_tests_passed": 14,
+  "production_frontend_build": true,
+  "commands": [
+    {
+      "command": [
+        "git",
+        "clone",
+        "--no-hardlinks",
+        "/home/user/PranaGuard-COPD-Digital-Twin",
+        "/home/user/.cache/pranaguard-clean-setup"
+      ],
+      "exit_code": 0,
+      "seconds": 0.07
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "seconds": 0.0
+    },
+    {
+      "command": [
+        "/home/user/.venv/bin/python",
+        "-m",
+        "venv",
+        "/home/user/.cache/pranaguard-clean-setup/.venv"
+      ],
+      "exit_code": 0,
+      "seconds": 2.53
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-clean-setup/.venv/bin/python",
+        "-m",
+        "pip",
+        "install",
+        "--disable-pip-version-check",
+        "-r",
+        "requirements.txt"
+      ],
+      "exit_code": 0,
+      "seconds": 23.43
+    },
+    {
+      "command": [
+        "npm",
+        "--prefix",
+        "frontend",
+        "ci",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "exit_code": 0,
+      "seconds": 3.86
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-clean-setup/.venv/bin/python",
+        "-m",
+        "scripts.bootstrap",
+        "--reset"
+      ],
+      "exit_code": 0,
+      "seconds": 4.59
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-clean-setup/.venv/bin/python",
+        "-c",
+        "from fastapi.testclient import TestClient\nfrom backend.app.main import app\nwith TestClient(app) as c:\n r=c.get('/api/overview');assert r.status_code==200;assert r.json()['summary']['total']==120\n s=c.get('/api/patients/PG-0071').json();assert s['synthetic'] and len(s['risks'])==3\n print('Clean-clone FastAPI lifespan + bundled model + SQLite + cohort/patient API: PASS')"
+      ],
+      "exit_code": 0,
+      "seconds": 3.21
+    },
+    {
+      "command": [
+        "/home/user/.cache/pranaguard-clean-setup/.venv/bin/python",
+        "-m",
+        "pytest"
+      ],
+      "exit_code": 0,
+      "seconds": 7.97
+    },
+    {
+      "command": [
+        "npm",
+        "--prefix",
+        "frontend",
+        "test",
+        "--",
+        "--reporter=verbose"
+      ],
+      "exit_code": 0,
+      "seconds": 7.37
+    },
+    {
+      "command": [
+        "npm",
+        "--prefix",
+        "frontend",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "seconds": 12.22
+    }
+  ]
+}

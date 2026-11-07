@@ -1,0 +1,67 @@
+{
+  "status": "PASS",
+  "executed_at": "2026-11-07T02:54:06.918438+00:00",
+  "checks": [
+    {
+      "name": "Login screen with documented demo identities",
+      "status": "PASS"
+    },
+    {
+      "name": "Backend rejects bad credentials",
+      "status": "PASS"
+    },
+    {
+      "name": "Sign-in opens workspace; original forest-green identity intact",
+      "status": "PASS"
+    },
+    {
+      "name": "Sidebar regrouped into 4 meaning groups",
+      "status": "PASS"
+    },
+    {
+      "name": "Unified doctor-scoped directory with server-side search",
+      "status": "PASS"
+    },
+    {
+      "name": "Care-plan editor saves through backend with feedback",
+      "status": "PASS"
+    },
+    {
+      "name": "Sputum diary entry persists and renders immediately",
+      "status": "PASS"
+    },
+    {
+      "name": "Care centre summary metrics from SQLite",
+      "status": "PASS"
+    },
+    {
+      "name": "Review created and shown in queue",
+      "status": "PASS"
+    },
+    {
+      "name": "Review survives full page reload (SQLite persistence)",
+      "status": "PASS"
+    },
+    {
+      "name": "Two-doctor assignment isolation in browser",
+      "status": "PASS"
+    },
+    {
+      "name": "Session persists across reload; sign-out returns to login",
+      "status": "PASS"
+    },
+    {
+      "name": "Research workspace preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "Mobile 390px layout has no horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "No JS/console errors, no failed requests, no external assets",
+      "status": "PASS"
+    }
+  ],
+  "note": "Disposable DB copy only; synthetic patients; no clinical validation."
+}

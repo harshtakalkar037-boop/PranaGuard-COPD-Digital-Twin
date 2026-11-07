@@ -1,0 +1,65 @@
+{
+  "status": "PASS",
+  "created_at": "2026-11-05T15:01:29.965114+00:00",
+  "passed": 13,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "Original cohort remains available",
+      "status": "PASS"
+    },
+    {
+      "name": "Original evaluation and negative72h result retained",
+      "status": "PASS"
+    },
+    {
+      "name": "Rejected candidate honestly labelled; no automatic deployment",
+      "status": "PASS"
+    },
+    {
+      "name": "Actual matched fresh-cohort metrics rendered",
+      "status": "PASS"
+    },
+    {
+      "name": "All predeclared acceptance failures exposed",
+      "status": "PASS"
+    },
+    {
+      "name": "All8 candidate validation scores and bootstrap uncertainty inspectable",
+      "status": "PASS"
+    },
+    {
+      "name": "Known historical comparison separated from fresh audit",
+      "status": "PASS"
+    },
+    {
+      "name": "No nonfunctional activation or clinical action controls",
+      "status": "PASS"
+    },
+    {
+      "name": "Original theme retained without desktop viewport overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "390px responsive study uses scrollable data tables, not viewport overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Patient probabilities and saved history unchanged by study viewing",
+      "status": "PASS"
+    },
+    {
+      "name": "Original48h native TreeSHAP and model version remain active",
+      "status": "PASS"
+    },
+    {
+      "name": "No JS/console/API errors or external browser assets",
+      "status": "PASS"
+    }
+  ],
+  "browser_errors": [],
+  "failed_requests": [],
+  "external_browser_requests": [],
+  "candidate_promoted": false,
+  "patient_history_and_predictions_preserved": true
+}

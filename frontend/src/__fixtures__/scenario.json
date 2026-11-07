@@ -1,0 +1,97 @@
+{
+  "patient_id": "PG-0071",
+  "state_version": 25,
+  "assumptions": {
+    "pm25_change_pct": -30.0,
+    "adherence": 0.95,
+    "activity_multiplier": 1.0
+  },
+  "trajectory": [
+    {
+      "hours": 0,
+      "baseline_24": 0.015098282200342369,
+      "scenario_24": 0.015098282200342369,
+      "baseline_48": 0.10111926243216601,
+      "scenario_48": 0.10111926243216601,
+      "baseline_72": 0.29658079216723104,
+      "scenario_72": 0.29658079216723104
+    },
+    {
+      "hours": 6,
+      "baseline_24": 0.015339835379301099,
+      "scenario_24": 0.015218560405054711,
+      "baseline_48": 0.10103354832222533,
+      "scenario_48": 0.09988826480636541,
+      "baseline_72": 0.3045769342975211,
+      "scenario_72": 0.31685504413985516
+    },
+    {
+      "hours": 12,
+      "baseline_24": 0.015339835379301099,
+      "scenario_24": 0.013432019584426205,
+      "baseline_48": 0.10117825137246243,
+      "scenario_48": 0.09980351123351619,
+      "baseline_72": 0.30277292508557874,
+      "scenario_72": 0.31685504413985516
+    },
+    {
+      "hours": 24,
+      "baseline_24": 0.015213125867987077,
+      "scenario_24": 0.012066265430002106,
+      "baseline_48": 0.10127985406028382,
+      "scenario_48": 0.09989753210550663,
+      "baseline_72": 0.2808752554005302,
+      "scenario_72": 0.31685504413985516
+    },
+    {
+      "hours": 36,
+      "baseline_24": 0.015213125867987077,
+      "scenario_24": 0.012066265430002106,
+      "baseline_48": 0.10127985406028382,
+      "scenario_48": 0.09989753210550663,
+      "baseline_72": 0.2808752554005302,
+      "scenario_72": 0.31685504413985516
+    },
+    {
+      "hours": 48,
+      "baseline_24": 0.015213125867987077,
+      "scenario_24": 0.012066265430002106,
+      "baseline_48": 0.10127985406028382,
+      "scenario_48": 0.09989753210550663,
+      "baseline_72": 0.2808752554005302,
+      "scenario_72": 0.31685504413985516
+    },
+    {
+      "hours": 60,
+      "baseline_24": 0.015213125867987077,
+      "scenario_24": 0.012066265430002106,
+      "baseline_48": 0.10127985406028382,
+      "scenario_48": 0.09989753210550663,
+      "baseline_72": 0.2808752554005302,
+      "scenario_72": 0.31685504413985516
+    },
+    {
+      "hours": 72,
+      "baseline_24": 0.015213125867987077,
+      "scenario_24": 0.012066265430002106,
+      "baseline_48": 0.10127985406028382,
+      "scenario_48": 0.09989753210550663,
+      "baseline_72": 0.2808752554005302,
+      "scenario_72": 0.31685504413985516
+    }
+  ],
+  "baseline_risks": {
+    "24": 0.015213125867987077,
+    "48": 0.10127985406028382,
+    "72": 0.2808752554005302
+  },
+  "scenario_risks": {
+    "24": 0.012066265430002106,
+    "48": 0.09989753210550663,
+    "72": 0.31685504413985516
+  },
+  "method": "Conditional feature-path sensitivity with observed physiology held constant and causal trailing windows recomputed. Independent calibrated horizon models at each projected time.",
+  "warning": "NOT causal, NOT a treatment recommendation. No proven effect of adherence, exposure reduction or activity. Forecasts at projected times extend beyond the original horizon. No future observed records used.",
+  "original_state_preserved": true,
+  "scenario_id": 1
+}
