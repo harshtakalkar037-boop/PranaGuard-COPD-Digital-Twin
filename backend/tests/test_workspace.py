@@ -246,3 +246,32 @@ def test_followup_completion_ledger_is_scoped_and_idempotent(client, engine):
     ledger=client.get('/api/workspace/patients/PG-0071/follow-up-ledger',headers=doctor).json()
     assert ledger['total']==1 and ledger['items'][0]['review_id']==rid
     assert client.get('/api/workspace/patients/PG-0071/follow-up-ledger',headers=auth(client,'dr-nova','prana-nova-demo')).status_code==403
+
+
+def test_enhanced_registration_is_assigned_and_remains_mutable_in_unified_mode(client, monkeypatch):
+    monkeypatch.setenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH','1')
+    doctor=auth(client)
+    created=client.post('/api/enhanced/registry/patients',headers=doctor,json={
+        'request_id':'UNIFIED-ASSIGN-0001',
+        'fictional_identity_confirmed':True,
+        'demo_alias':'Mira Integration',
+        'age':62,
+        'city':'Pune',
+    })
+    assert created.status_code==200,created.text
+    pid=created.json()['patient_id']
+    directory=client.get('/api/workspace/patients?q='+pid,headers=doctor).json()
+    assert directory['total']==1 and directory['items'][0]['patient_id']==pid
+    observation=client.post(f'/api/enhanced/registry/patients/{pid}/observations',headers=doctor,json={
+        'fictional_data_confirmed':True,'symptom_score':6,'adherence':0.8,'note':'Synthetic follow-up observation'
+    })
+    assert observation.status_code==200,observation.text
+    second=client.post('/api/enhanced/registry/patients',headers=doctor,json={
+        'request_id':'UNIFIED-ASSIGN-0002',
+        'fictional_identity_confirmed':True,
+        'demo_alias':'Mira Integration Two',
+        'age':63,
+        'city':'Mumbai',
+    })
+    assert second.status_code==200,second.text
+    assert client.get('/api/overview',headers=doctor).json()['summary']['total']==120
