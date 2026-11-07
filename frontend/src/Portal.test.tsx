@@ -1,6 +1,7 @@
 import {render,screen,renderHook,waitFor,act} from '@testing-library/react';
 import {describe,it,expect,vi,afterEach} from 'vitest';
-import Portal, {usePortal} from './Portal';
+import Portal, {CompleteFollowup,usePortal} from './Portal';
+import userEvent from '@testing-library/user-event';
 
 afterEach(()=>vi.unstubAllGlobals());
 
@@ -35,5 +36,25 @@ describe('portal request isolation',()=>{
   const {result,rerender}=renderHook(({path}:{path:string|null})=>usePortal<{patient:string}>(path,0),{initialProps:{path:'/patients/one' as string|null}});
   rerender({path:null});expect(result.current.data).toBeNull();
   await act(async()=>resolve({ok:true,json:async()=>({patient:'one'})}));expect(result.current.data).toBeNull();
+ });
+});
+
+
+describe('follow-up completion',()=>{
+ it('requires a private completion note and sends the selected review to the backend',async()=>{
+  const fetcher=vi.fn().mockResolvedValue({ok:true,json:async()=>({message:'saved'})});vi.stubGlobal('fetch',fetcher);const refresh=vi.fn();
+  render(<CompleteFollowup pid="PG-0001" reviewId={42} refresh={refresh}/>);
+  await userEvent.click(screen.getByText('Complete dated follow-up'));
+  expect(screen.getByRole('button',{name:'Record follow-up completion'})).toBeDisabled();
+  await userEvent.type(screen.getByLabelText('Completion note'),'Recorded follow-up');
+  await userEvent.click(screen.getByRole('button',{name:'Record follow-up completion'}));
+  await waitFor(()=>expect(refresh).toHaveBeenCalledOnce());
+  expect(fetcher).toHaveBeenCalledWith('/api/portal/patients/PG-0001/reviews/42/complete-followup',expect.objectContaining({method:'POST',body:JSON.stringify({notes:'Recorded follow-up'})}));
+ });
+ it('preserves the note and shows a server error if completion fails',async()=>{
+  vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:false,status:409,json:async()=>({detail:'Follow-up is already completed'})}));const refresh=vi.fn();
+  render(<CompleteFollowup pid="PG-0001" reviewId={42} refresh={refresh}/>);
+  await userEvent.click(screen.getByText('Complete dated follow-up'));await userEvent.type(screen.getByLabelText('Completion note'),'Unsent note');await userEvent.click(screen.getByRole('button',{name:'Record follow-up completion'}));
+  expect(await screen.findByRole('alert')).toHaveTextContent('Follow-up is already completed');expect(refresh).not.toHaveBeenCalled();expect(screen.getByLabelText('Completion note')).toHaveValue('Unsent note');
  });
 });

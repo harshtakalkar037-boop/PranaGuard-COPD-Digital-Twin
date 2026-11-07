@@ -29,11 +29,11 @@ def main():
             doctor=c.execute("SELECT id FROM portal_users WHERE username=? AND role='doctor'",(args.doctor_username,)).fetchone()
             if not doctor: parser.error('Doctor account not found')
             profiles=json.loads((DATA/'patients.json').read_text())
-            ids=[p['patient_id'] for p in profiles if p.get('synthetic')]
+            ids=[p['patient_id'] for p in profiles if p.get('synthetic') is True]
             if not ids or len(ids)!=len(profiles) or len(set(ids))!=len(ids): parser.error('Original cohort is not entirely synthetic or has duplicate IDs')
             for pid in ids:
                 record=c.execute('SELECT profile FROM patients WHERE patient_id=?',(pid,)).fetchone()
-                if not record or not json.loads(record['profile']).get('synthetic'): parser.error('Existing database cohort does not match the synthetic source')
+                if not record or json.loads(record['profile']).get('synthetic') is not True: parser.error('Existing database cohort does not match the synthetic source')
             for pid in ids:
                 c.execute('INSERT OR IGNORE INTO doctor_patient_assignments(doctor_id,patient_id) VALUES (?,?)',(doctor['id'],pid))
             c.execute("INSERT INTO portal_admin_audit(action,username,created_at) VALUES ('assign_synthetic_cohort',?,?)",(args.doctor_username,timestamp()))
@@ -50,8 +50,8 @@ def main():
             doctor=c.execute("SELECT id FROM portal_users WHERE username=? AND role='doctor'",(args.doctor_username,)).fetchone()
             record=c.execute('SELECT profile FROM patients WHERE patient_id=?',(args.patient_id,)).fetchone()
             if not doctor or not record: parser.error('Doctor account or existing patient record not found')
+            if json.loads(record['profile']).get('synthetic') is not True: parser.error('Only synthetic records may be assigned or linked through this command')
             if args.command=='assign-synthetic':
-                if not json.loads(record['profile']).get('synthetic'): parser.error('Only synthetic records may be assigned through this command')
                 c.execute('INSERT OR IGNORE INTO doctor_patient_assignments(doctor_id,patient_id) VALUES (?,?)',(doctor['id'],args.patient_id))
                 c.execute("INSERT INTO portal_admin_audit(action,username,patient_id,created_at) VALUES ('assign_synthetic',?,?,?)",(args.doctor_username,args.patient_id,timestamp()))
                 print('Existing synthetic record assigned. No patient account was created.')

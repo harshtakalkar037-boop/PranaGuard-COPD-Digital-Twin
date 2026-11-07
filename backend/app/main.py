@@ -51,7 +51,7 @@ def bootstrap_demo_portal(engine):
         raise RuntimeError("Invalid doctor password hash")
     for item in patients:
         profile = engine.profiles.get(item["patient_id"])
-        if not profile or not profile.get("synthetic"):
+        if not profile or profile.get("synthetic") is not True:
             raise RuntimeError("Demo bootstrap may link only existing synthetic patient records")
         if not item["password_hash"].startswith("scrypt$"):
             raise RuntimeError("Invalid patient password hash")
@@ -64,6 +64,9 @@ def bootstrap_demo_portal(engine):
         if not d or d["role"] != "doctor":
             raise RuntimeError("Demo doctor username is already used by a different account")
         for item in patients:
+            stored = c.execute('SELECT profile FROM patients WHERE patient_id=?', (item['patient_id'],)).fetchone()
+            if not stored or json.loads(stored['profile']).get('synthetic') is not True:
+                raise RuntimeError('Demo bootstrap requires existing synthetic records')
             c.execute(
                 "INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?) ON CONFLICT(username) DO NOTHING",
                 (item["username"], item["password_hash"], "patient", now()),
@@ -85,7 +88,7 @@ def bootstrap_demo_portal(engine):
         if cfg.get("assign_cohort") is True:
             for pid, profile in engine.profiles.items():
                 stored = c.execute('SELECT profile FROM patients WHERE patient_id=?', (pid,)).fetchone()
-                if not profile.get('synthetic') or not stored or not json.loads(stored['profile']).get('synthetic'):
+                if profile.get('synthetic') is not True or not stored or json.loads(stored['profile']).get('synthetic') is not True:
                     raise RuntimeError('Cohort assignment requires matching existing synthetic records')
                 c.execute('INSERT OR IGNORE INTO doctor_patient_assignments(doctor_id,patient_id) VALUES (?,?)', (d['id'], pid))
 
@@ -196,7 +199,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
                             raise HTTPException(403, 'Unscoped workspace operations require a single-doctor synthetic database')
                         rows = c.execute('SELECT patient_id,profile FROM patients').fetchall()
                         assigned = {r['patient_id'] for r in c.execute('SELECT patient_id FROM doctor_patient_assignments WHERE doctor_id=?', (user['id'],))}
-                        if not rows or any(not json.loads(r['profile']).get('synthetic') or r['patient_id'] not in assigned for r in rows):
+                        if not rows or any(json.loads(r['profile']).get('synthetic') is not True or r['patient_id'] not in assigned for r in rows):
                             raise HTTPException(403, 'Research workspace requires assignment to every synthetic record')
             except HTTPException as exc:
                 return JSONResponse(status_code=exc.status_code, content={'detail':exc.detail})
@@ -270,7 +273,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
             sql='SELECT a.*,p.profile FROM alerts a JOIN patients p ON p.patient_id=a.patient_id WHERE a.id=?'
             args=[alert_id]
             if doctor_id is not None:
-                sql+=" AND json_extract(p.profile,'$.synthetic')=1 AND EXISTS (SELECT 1 FROM doctor_patient_assignments d WHERE d.doctor_id=? AND d.patient_id=a.patient_id)"
+                sql+=" AND json_type(p.profile,'$.synthetic')='true' AND EXISTS (SELECT 1 FROM doctor_patient_assignments d WHERE d.doctor_id=? AND d.patient_id=a.patient_id)"
                 args.append(doctor_id)
             row=c.execute(sql,args).fetchone()
             if not row:raise HTTPException(404,'Alert not found')

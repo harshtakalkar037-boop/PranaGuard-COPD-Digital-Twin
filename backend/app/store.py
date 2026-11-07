@@ -79,11 +79,11 @@ class Store:
                 if not ids:return []
                 filters.append('a.patient_id IN ('+','.join('?' for _ in ids)+')');args.extend(ids)
             elif pid:
-                if doctor_id is not None and not c.execute("SELECT 1 FROM patients p JOIN doctor_patient_assignments d ON d.patient_id=p.patient_id WHERE d.doctor_id=? AND p.patient_id=? AND json_extract(p.profile,'$.synthetic')=1",(doctor_id,pid)).fetchone():
+                if doctor_id is not None and not c.execute("SELECT 1 FROM patients p JOIN doctor_patient_assignments d ON d.patient_id=p.patient_id WHERE d.doctor_id=? AND p.patient_id=? AND json_type(p.profile,'$.synthetic')='true'",(doctor_id,pid)).fetchone():
                     raise KeyError('Record not found')
                 filters.append('a.patient_id=?');args.append(pid)
             if doctor_id is not None:
-                filters.append("json_extract(p.profile,'$.synthetic')=1 AND EXISTS (SELECT 1 FROM doctor_patient_assignments d WHERE d.doctor_id=? AND d.patient_id=a.patient_id)")
+                filters.append("json_type(p.profile,'$.synthetic')='true' AND EXISTS (SELECT 1 FROM doctor_patient_assignments d WHERE d.doctor_id=? AND d.patient_id=a.patient_id)")
                 args.append(doctor_id)
             if filters:query+=' WHERE '+' AND '.join(filters)
             rows=c.execute(query+' ORDER BY a.id DESC LIMIT 500',args).fetchall()

@@ -27,7 +27,7 @@ class Notifications:
             query='SELECT a.* FROM alerts a'
             args=()
             if doctor_id is not None:
-                query+=" JOIN patients p ON p.patient_id=a.patient_id WHERE json_extract(p.profile,'$.synthetic')=1 AND EXISTS (SELECT 1 FROM doctor_patient_assignments d WHERE d.doctor_id=? AND d.patient_id=a.patient_id)"
+                query+=" JOIN patients p ON p.patient_id=a.patient_id WHERE json_type(p.profile,'$.synthetic')='true' AND EXISTS (SELECT 1 FROM doctor_patient_assignments d WHERE d.doctor_id=? AND d.patient_id=a.patient_id)"
                 args=(doctor_id,)
             for a in c.execute(query+' ORDER BY a.id',args).fetchall():
                 nid=self.create(category='patient_monitoring',title=f"Experimental replay alert · {a['patient_id']}",
@@ -56,13 +56,13 @@ class Notifications:
         if doctor_id is None:return '1=1',[]
         patient="""EXISTS (SELECT 1 FROM patients p JOIN doctor_patient_assignments d
                   ON d.patient_id=p.patient_id WHERE p.patient_id=n.patient_id
-                  AND d.doctor_id=? AND json_extract(p.profile,'$.synthetic')=1)
+                  AND d.doctor_id=? AND json_type(p.profile,'$.synthetic')='true')
                   AND (n.legacy_alert_id IS NULL OR EXISTS
                   (SELECT 1 FROM alerts a WHERE a.id=n.legacy_alert_id AND a.patient_id=n.patient_id))"""
         system="""n.patient_id IS NULL AND n.legacy_alert_id IS NULL
                   AND (SELECT COUNT(*) FROM portal_users WHERE role='doctor')=1
                   AND EXISTS (SELECT 1 FROM patients)
-                  AND NOT EXISTS (SELECT 1 FROM patients p WHERE json_extract(p.profile,'$.synthetic') IS NOT 1
+                  AND NOT EXISTS (SELECT 1 FROM patients p WHERE json_type(p.profile,'$.synthetic') IS NOT 'true'
                   OR NOT EXISTS (SELECT 1 FROM doctor_patient_assignments d WHERE d.doctor_id=? AND d.patient_id=p.patient_id))"""
         return f'(({patient}) OR ({system}))',[doctor_id,doctor_id]
 
@@ -72,7 +72,7 @@ class Notifications:
             if value:where.append('n.'+key+'=?');args.append(value)
         if unread_only:where.append('n.read_at IS NULL')
         with self.store.connect() as c:
-            if patient_id and doctor_id is not None and not c.execute("SELECT 1 FROM patients p JOIN doctor_patient_assignments d ON d.patient_id=p.patient_id WHERE p.patient_id=? AND d.doctor_id=? AND json_extract(p.profile,'$.synthetic')=1",(patient_id,doctor_id)).fetchone():
+            if patient_id and doctor_id is not None and not c.execute("SELECT 1 FROM patients p JOIN doctor_patient_assignments d ON d.patient_id=p.patient_id WHERE p.patient_id=? AND d.doctor_id=? AND json_type(p.profile,'$.synthetic')='true'",(patient_id,doctor_id)).fetchone():
                 raise HTTPException(404,'Record not found')
             rows=c.execute('SELECT n.* FROM notifications n WHERE '+' AND '.join(where)+' ORDER BY n.id DESC LIMIT ?',[*args,limit]).fetchall()
             counts=dict(c.execute("SELECT SUM(CASE WHEN n.read_at IS NULL THEN 1 ELSE 0 END) AS unread,COUNT(*) AS total,SUM(CASE WHEN n.status NOT IN ('resolved','closed') THEN 1 ELSE 0 END) AS open FROM notifications n WHERE "+scope,scope_args).fetchone())

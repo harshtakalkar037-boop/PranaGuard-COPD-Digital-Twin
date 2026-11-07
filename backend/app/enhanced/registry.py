@@ -27,7 +27,7 @@ class Registry:
             if old:
                 # An idempotency key belongs to the creator's assigned record;
                 # never reveal a different doctor's ID or whether the payload matched.
-                if doctor_id is not None and not c.execute("SELECT 1 FROM doctor_patient_assignments a JOIN patients p ON p.patient_id=a.patient_id WHERE a.doctor_id=? AND a.patient_id=? AND json_extract(p.profile,'$.synthetic')=1",(doctor_id,old['patient_id'])).fetchone():
+                if doctor_id is not None and not c.execute("SELECT 1 FROM doctor_patient_assignments a JOIN patients p ON p.patient_id=a.patient_id WHERE a.doctor_id=? AND a.patient_id=? AND json_type(p.profile,'$.synthetic')='true'",(doctor_id,old['patient_id'])).fetchone():
                     raise HTTPException(404,'Record not found')
                 if old['payload_hash']!=digest:raise HTTPException(409,'Registration request ID was reused with different content.')
                 return {'patient_id':old['patient_id'],'duplicate':True,'prediction_supported':False,'notice':'Existing fictional registration returned; no duplicate patient created.'}
@@ -65,7 +65,7 @@ class Registry:
     def list(self,q='',city=None,status=None,risk=None,sex=None,doctor_id=None):
         with self.store.connect() as c:
             # None is reserved for the explicitly unsafe isolated legacy mode.
-            scope='' if doctor_id is None else " WHERE EXISTS (SELECT 1 FROM doctor_patient_assignments a WHERE a.doctor_id=? AND a.patient_id=p.patient_id) AND json_extract(p.profile,'$.synthetic')=1"
+            scope='' if doctor_id is None else " WHERE EXISTS (SELECT 1 FROM doctor_patient_assignments a WHERE a.doctor_id=? AND a.patient_id=p.patient_id) AND json_type(p.profile,'$.synthetic')='true'"
             params=() if doctor_id is None else (doctor_id,)
             rows=c.execute('SELECT p.*,r.created_at,r.details FROM patients p LEFT JOIN registrations r USING(patient_id)'+scope+' ORDER BY p.patient_id',params).fetchall()
             model={r['patient_id']:json.loads(r['state']) for r in c.execute('SELECT s.patient_id,s.state FROM states s JOIN (SELECT patient_id,MAX(version) AS v FROM states GROUP BY patient_id) x ON x.patient_id=s.patient_id AND x.v=s.version JOIN patients p ON p.patient_id=s.patient_id'+scope,params)}

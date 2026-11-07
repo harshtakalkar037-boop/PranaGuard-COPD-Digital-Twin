@@ -76,7 +76,7 @@ def test_upload_permissions_and_validation(portal,tmp_path,monkeypatch):
 def test_repeatable_migration(portal):
     s=Store(portal.app.state.engine.store.path);s.apply_migrations()
     with s.connect() as c:
-        assert [r[0] for r in c.execute('SELECT version FROM schema_migrations ORDER BY version')]==[1,2,3,4,5,6]
+        assert [r[0] for r in c.execute('SELECT version FROM schema_migrations ORDER BY version')]==[1,2,3,4,5,6,7]
         assert not c.execute('PRAGMA foreign_key_check').fetchall()
 
 def test_scoped_research_tools(portal):
@@ -382,7 +382,7 @@ def test_every_protected_http_route_rejects_missing_expired_and_revoked_sessions
             method=method.upper()
             if (method,path) in public:continue
             concrete=path
-            for name,value in {'pid':'PG-0002','upload_id':'1','notification_id':'1','entry_id':'1','log_id':'1','did':'not-a-device','city':'Pune','nid':'1','alert_id':'1'}.items():
+            for name,value in {'pid':'PG-0002','upload_id':'1','notification_id':'1','review_id':'1','entry_id':'1','log_id':'1','did':'not-a-device','city':'Pune','nid':'1','alert_id':'1'}.items():
                 concrete=concrete.replace('{'+name+'}',value)
             assert '{' not in concrete,(method,path)
             routes.append((method,concrete))
@@ -819,3 +819,116 @@ def test_partial_cohort_isolation_empty_synthetic_and_aggregates(tmp_path):
             db.execute("UPDATE patients SET profile=? WHERE patient_id='PG-0001'",(json.dumps(profile),))
         assert c.get('/api/overview',headers=a).json()['patients']==[]
         assert c.get('/api/patients/PG-0001',headers=a).status_code==404
+
+
+def test_followup_completion_is_scoped_audited_and_preserves_review(portal):
+    doc=auth(portal,'doc');patient=auth(portal,'alice')
+    with portal.app.state.engine.store.connect() as c:
+        c.execute("INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,'doctor',?)",('scope_followup_doc',hash_password(PASSWORD),timestamp()))
+        other_id=c.execute("SELECT id FROM portal_users WHERE username='scope_followup_doc'").fetchone()[0]
+        c.execute('INSERT INTO doctor_patient_assignments VALUES (?,?)',(other_id,'PG-0002'))
+    other=auth(portal,'scope_followup_doc')
+    review={'status':'Follow-up Required','notes':'Original review remains intact','follow_up':'Check back','follow_up_date':'2000-01-01','shared':True}
+    created=portal.post('/api/portal/patients/PG-0001/reviews',headers=doc,json=review)
+    assert created.status_code==201
+    rid=created.json()['id'];path=f'/api/portal/patients/PG-0001/reviews/{rid}/complete-followup'
+    before=portal.get('/api/portal/doctor-summary',headers=doc).json()['followups_due']
+    assert any(i['kind']=='followup' and i['id']==rid for i in portal.get('/api/portal/care-queue',headers=doc).json()['items'])
+    assert portal.post(path,headers=patient,json={'notes':'done'}).status_code==403
+    assert portal.post(path,headers=other,json={'notes':'done'}).status_code==404
+    assert portal.post(path.replace('PG-0001','PG-0002'),headers=other,json={'notes':'done'}).status_code==404
+    assert portal.post(path,headers=doc,json={'notes':'  '}).status_code==422
+    missing=portal.post('/api/portal/patients/PG-0001/reviews',headers=doc,json={'status':'Reviewed','notes':'No dated follow-up'}).json()['id']
+    done=portal.post('/api/portal/patients/PG-0001/reviews',headers=doc,json={'status':'Completed','notes':'Already complete','follow_up_date':'2000-01-01'}).json()['id']
+    for closed_id in (missing,done):
+        assert portal.post(f'/api/portal/patients/PG-0001/reviews/{closed_id}/complete-followup',headers=doc,json={'notes':'done'}).status_code==409
+    result=portal.post(path,headers=doc,json={'notes':'Documented completion'})
+    assert result.status_code==201,result.text
+    assert portal.post(path,headers=doc,json={'notes':'again'}).status_code==409
+    assert portal.get('/api/portal/doctor-summary',headers=doc).json()['followups_due']==before-1
+    assert not any(i['kind']=='followup' and i['id']==rid for i in portal.get('/api/portal/care-queue',headers=doc).json()['items'])
+    doctor_review=next(r for r in portal.get('/api/portal/patients/PG-0001',headers=doc).json()['reviews'] if r['id']==rid)
+    assert doctor_review['notes']==review['notes'] and doctor_review['status']==review['status']
+    assert doctor_review['followup_completion_notes']=='Documented completion'
+    patient_review=next(r for r in portal.get('/api/portal/patients/PG-0001',headers=patient).json()['reviews'] if r['id']==rid)
+    assert 'followup_completion_notes' not in patient_review
+    with portal.app.state.engine.store.connect() as c:
+        assert c.execute("SELECT COUNT(*) FROM portal_audit WHERE action='followup_completed' AND record_id=?",(rid,)).fetchone()[0]==1
+
+
+def test_provisioning_rejects_truthy_non_boolean_synthetic_marker(portal,monkeypatch):
+    import json
+    doc=auth(portal,'doc');monkeypatch.setenv('PRANAGUARD_SYNTHETIC_DEMO_PROVISIONING','1')
+    engine=portal.app.state.engine
+    with engine.store.connect() as c:
+        doc_id=c.execute("SELECT id FROM portal_users WHERE username='doc'").fetchone()[0]
+        c.execute('INSERT OR IGNORE INTO doctor_patient_assignments VALUES (?,?)',(doc_id,'PG-0004'))
+        original=c.execute("SELECT profile FROM patients WHERE patient_id='PG-0004'").fetchone()[0]
+        altered=json.loads(original);altered['synthetic']='true'
+        c.execute("UPDATE patients SET profile=? WHERE patient_id='PG-0004'",(json.dumps(altered),))
+    try:
+        assert portal.post('/api/portal/patients/PG-0004/provision-demo',headers=doc).status_code==404
+        with engine.store.connect() as c:assert not c.execute("SELECT 1 FROM portal_users WHERE username='PG-0004'").fetchone()
+    finally:
+        with engine.store.connect() as c:c.execute("UPDATE patients SET profile=? WHERE patient_id='PG-0004'",(original,))
+
+
+def test_portal_notification_revocation_and_strict_synthetic_filter(portal):
+    import json
+    doc=auth(portal,'doc');patient=auth(portal,'alice');engine=portal.app.state.engine
+    with engine.store.connect() as c:
+        doc_id=c.execute("SELECT id FROM portal_users WHERE username='doc'").fetchone()[0]
+        note_id=c.execute("INSERT INTO portal_notifications(user_id,patient_id,title,description,link,created_at) VALUES (?,?,'Scope test','Private','',?)",(doc_id,'PG-0001',timestamp())).lastrowid
+        original=c.execute("SELECT profile FROM patients WHERE patient_id='PG-0001'").fetchone()[0]
+    def visible():return [n['id'] for n in portal.get('/api/portal/notifications',headers=doc).json()['notifications']]
+    assert note_id in visible()
+    try:
+        with engine.store.connect() as c:c.execute('DELETE FROM doctor_patient_assignments WHERE doctor_id=? AND patient_id=?',(doc_id,'PG-0001'))
+        assert note_id not in visible()
+        assert portal.post(f'/api/portal/notifications/{note_id}/read',headers=doc).status_code==404
+        with engine.store.connect() as c:
+            c.execute('INSERT INTO doctor_patient_assignments VALUES (?,?)',(doc_id,'PG-0001'))
+            profile=json.loads(original);profile['synthetic']=1
+            c.execute("UPDATE patients SET profile=? WHERE patient_id='PG-0001'",(json.dumps(profile),))
+        assert note_id not in visible()
+        assert portal.get('/api/portal/patients/PG-0001',headers=doc).status_code==404
+        assert portal.get('/api/portal/patients/PG-0001',headers=patient).status_code==404
+        assert 'PG-0001' not in [p['patient_id'] for p in portal.get('/api/portal/patients',headers=doc).json()['patients']]
+        assert all(i['patient_id']!='PG-0001' for i in portal.get('/api/portal/care-queue',headers=doc).json()['items'])
+        assert all(p['patient_id']!='PG-0001' for p in portal.get('/api/enhanced/registry/patients',headers=doc).json()['patients'])
+    finally:
+        with engine.store.connect() as c:
+            c.execute("UPDATE patients SET profile=? WHERE patient_id='PG-0001'",(original,))
+            c.execute('INSERT OR IGNORE INTO doctor_patient_assignments VALUES (?,?)',(doc_id,'PG-0001'))
+    assert note_id in visible()
+
+
+def test_upgrade_from_six_preserves_review_and_applies_followup_completion(tmp_path):
+    db=tmp_path/'v6.sqlite';s=Store(db)
+    with s.connect() as c:
+        c.execute('DROP TABLE followup_completions')
+        c.execute('DELETE FROM schema_migrations WHERE version=7')
+        c.execute('INSERT INTO patients VALUES (?,?)',('PG-UPGRADE','{"synthetic":true}'))
+        c.execute("INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,'doctor',?)",('upgrade_doc',hash_password(PASSWORD),timestamp()))
+        uid=c.execute("SELECT id FROM portal_users WHERE username='upgrade_doc'").fetchone()[0]
+        c.execute("INSERT INTO doctor_reviews(patient_id,doctor_id,status,notes,follow_up,follow_up_date,shared,created_at) VALUES (?,?,'Follow-up Required','keep review','keep follow-up','2000-01-01',0,?)",('PG-UPGRADE',uid,timestamp()))
+    Store(db).apply_migrations()
+    with s.connect() as c:
+        row=c.execute('SELECT notes,follow_up FROM doctor_reviews WHERE patient_id=?',('PG-UPGRADE',)).fetchone()
+        assert tuple(row)==('keep review','keep follow-up')
+        assert c.execute('SELECT COUNT(*) FROM followup_completions').fetchone()[0]==0
+        assert c.execute('SELECT COUNT(*) FROM schema_migrations WHERE version=7').fetchone()[0]==1
+        assert not c.execute('PRAGMA foreign_key_check').fetchall()
+
+
+def test_concurrent_followup_completion_is_single_and_audited(portal):
+    from concurrent.futures import ThreadPoolExecutor
+    doctor=auth(portal,'doc')
+    review=portal.post('/api/portal/patients/PG-0001/reviews',headers=doctor,json={'status':'Follow-up Required','notes':'Concurrent test','follow_up_date':'2000-01-01'}).json()
+    path=f"/api/portal/patients/PG-0001/reviews/{review['id']}/complete-followup"
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        statuses=list(pool.map(lambda _:portal.post(path,headers=doctor,json={'notes':'Recorded once'}).status_code,range(2)))
+    assert sorted(statuses)==[201,409]
+    with portal.app.state.engine.store.connect() as c:
+        assert c.execute('SELECT COUNT(*) FROM followup_completions WHERE review_id=?',(review['id'],)).fetchone()[0]==1
+        assert c.execute("SELECT COUNT(*) FROM portal_audit WHERE action='followup_completed' AND record_id=?",(review['id'],)).fetchone()[0]==1

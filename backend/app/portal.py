@@ -52,15 +52,15 @@ def role(user, expected):
 
 def patient_id(c, user):
     role(user, 'patient')
-    row = c.execute('SELECT patient_id FROM patient_user_links WHERE user_id=?',(user['id'],)).fetchone()
+    row = c.execute("SELECT l.patient_id FROM patient_user_links l JOIN patients p ON p.patient_id=l.patient_id WHERE l.user_id=? AND json_type(p.profile,'$.synthetic')='true'",(user['id'],)).fetchone()
     if not row: raise HTTPException(409, 'Account not linked. Ask an administrator to link your record.')
     return row['patient_id']
 
 def access(c, user, pid):
     if user['role']=='patient':
-        allowed = c.execute('SELECT 1 FROM patient_user_links WHERE user_id=? AND patient_id=?',(user['id'],pid)).fetchone()
+        allowed = c.execute("SELECT 1 FROM patient_user_links l JOIN patients p ON p.patient_id=l.patient_id WHERE l.user_id=? AND l.patient_id=? AND json_type(p.profile,'$.synthetic')='true'",(user['id'],pid)).fetchone()
     else:
-        allowed = c.execute('SELECT 1 FROM doctor_patient_assignments WHERE doctor_id=? AND patient_id=?',(user['id'],pid)).fetchone()
+        allowed = c.execute("SELECT 1 FROM doctor_patient_assignments a JOIN patients p ON p.patient_id=a.patient_id WHERE a.doctor_id=? AND a.patient_id=? AND json_type(p.profile,'$.synthetic')='true'",(user['id'],pid)).fetchone()
     if not allowed: raise HTTPException(404, 'Record not found')
 
 def notify(c, user_id, pid, title, description, link):
@@ -160,7 +160,7 @@ def me(request:Request,user=Depends(current)):
 @router.get('/patients')
 def patients(request:Request,user=Depends(current)):
     role(user,'doctor')
-    with store(request).connect() as c: ids=[r['patient_id'] for r in c.execute('SELECT patient_id FROM doctor_patient_assignments WHERE doctor_id=? ORDER BY patient_id',(user['id'],))]
+    with store(request).connect() as c: ids=[r['patient_id'] for r in c.execute("SELECT a.patient_id FROM doctor_patient_assignments a JOIN patients p ON p.patient_id=a.patient_id WHERE a.doctor_id=? AND json_type(p.profile,'$.synthetic')='true' ORDER BY a.patient_id",(user['id'],))]
     result=[]
     for pid in ids:
         try:
@@ -177,7 +177,10 @@ def details(pid:str,request:Request,user=Depends(current)):
         profile=json.loads(row['profile']) if row else None
         checkins=[dict(r) for r in c.execute('SELECT * FROM symptom_checkins WHERE patient_id=? ORDER BY id DESC LIMIT 100',(pid,))]
         uploads=[dict(r) for r in c.execute('SELECT id,patient_id,kind,original_name,mime,description,created_at,review_status FROM patient_uploads WHERE patient_id=? ORDER BY id DESC LIMIT 100',(pid,))]
-        reviews=[dict(r) for r in c.execute('SELECT * FROM doctor_reviews WHERE patient_id=? '+('AND shared=1 ' if user['role']=='patient' else '')+'ORDER BY id DESC LIMIT 100',(pid,))]
+        if user['role']=='doctor':
+            reviews=[dict(r) for r in c.execute('SELECT r.*,f.completed_at AS followup_completed_at,f.notes AS followup_completion_notes FROM doctor_reviews r LEFT JOIN followup_completions f ON f.review_id=r.id WHERE r.patient_id=? ORDER BY r.id DESC LIMIT 100',(pid,))]
+        else:
+            reviews=[dict(r) for r in c.execute('SELECT * FROM doctor_reviews WHERE patient_id=? AND shared=1 ORDER BY id DESC LIMIT 100',(pid,))]
     try:
         twin=request.app.state.engine.patient(pid)
         history=request.app.state.engine.history(pid) if user['role']=='doctor' else None
@@ -259,14 +262,21 @@ def review(pid:str,body:Review,request:Request,user=Depends(current)):
             if linked: notify(c,linked['user_id'],pid,'A doctor shared an update','Your doctor has shared a review or follow-up.','/patient/dashboard?view=My%20Health')
     return {'id':cur.lastrowid,'message':'Review saved; documentation only'}
 
+def notification_scope(user):
+    # NULL patient_id is reserved for account-level notifications.
+    link = 'doctor_patient_assignments' if user['role']=='doctor' else 'patient_user_links'
+    owner = 'doctor_id' if user['role']=='doctor' else 'user_id'
+    return f"(n.patient_id IS NULL OR EXISTS (SELECT 1 FROM {link} a JOIN patients p ON p.patient_id=a.patient_id WHERE a.{owner}=? AND a.patient_id=n.patient_id AND json_type(p.profile,'$.synthetic')='true'))"
+
 @router.get('/notifications')
 def notifications(request:Request,user=Depends(current)):
-    with store(request).connect() as c: return {'notifications':[dict(r) for r in c.execute('SELECT * FROM portal_notifications WHERE user_id=? ORDER BY id DESC LIMIT 200',(user['id'],))]}
+    with store(request).connect() as c:
+        return {'notifications':[dict(r) for r in c.execute('SELECT n.* FROM portal_notifications n WHERE n.user_id=? AND '+notification_scope(user)+' ORDER BY n.id DESC LIMIT 200',(user['id'],user['id']))]}
 
 @router.post('/notifications/{notification_id}/read')
 def read_notification(notification_id:int,request:Request,user=Depends(current)):
     with store(request).connect() as c:
-        cur=c.execute('UPDATE portal_notifications SET read_at=COALESCE(read_at,?) WHERE id=? AND user_id=?',(timestamp(),notification_id,user['id']))
+        cur=c.execute('UPDATE portal_notifications AS n SET read_at=COALESCE(read_at,?) WHERE n.id=? AND n.user_id=? AND '+notification_scope(user),(timestamp(),notification_id,user['id'],user['id']))
         if not cur.rowcount: raise HTTPException(404,'Notification not found')
     return {'message':'Marked as read'}
 
@@ -476,9 +486,11 @@ def provision_demo(pid:str,request:Request,user=Depends(current)):
     role(user,'doctor')
     if os.getenv('PRANAGUARD_SYNTHETIC_DEMO_PROVISIONING')!='1': raise HTTPException(403,'Synthetic demo provisioning is disabled')
     with store(request).connect() as c:
+        # Keep assignment and synthetic checks in the same write transaction as provisioning.
+        c.execute('BEGIN IMMEDIATE')
         access(c,user,pid)
         row=c.execute('SELECT profile FROM patients WHERE patient_id=?',(pid,)).fetchone()
-        if not row or not json.loads(row['profile']).get('synthetic'): raise HTTPException(403,'Only synthetic records are supported')
+        if not row or json.loads(row['profile']).get('synthetic') is not True: raise HTTPException(403,'Only synthetic records are supported')
         temporary=secrets.token_urlsafe(18);expires_at=temporary_password_expiration()
         try:
             cur=c.execute("INSERT INTO portal_users(username,password_hash,role,created_at,must_change_password,temporary_password_expires_at) VALUES (?,?,'patient',?,1,?)",(pid,hash_password(temporary),timestamp(),expires_at))
@@ -486,6 +498,26 @@ def provision_demo(pid:str,request:Request,user=Depends(current)):
         except sqlite3.IntegrityError: raise HTTPException(409,'Account or link already exists')
         audit(c,user,pid,'synthetic_account_provisioned',cur.lastrowid)
     return {'login_id':pid,'patient_id':pid,'assigned_doctor':user['username'],'status':'Password change required','temporary_password':temporary,'temporary_password_expires_at':expires_at}
+
+class FollowupCompletion(Strict):
+    notes: str = Field(min_length=1,max_length=2000)
+
+@router.post('/patients/{pid}/reviews/{review_id}/complete-followup',status_code=201)
+def complete_followup(pid:str,review_id:int,body:FollowupCompletion,request:Request,user=Depends(current)):
+    role(user,'doctor')
+    with store(request).connect() as c:
+        # The assignment check and write share a lock, so a revoked assignment
+        # cannot be changed between the check and completion record.
+        c.execute('BEGIN IMMEDIATE')
+        access(c,user,pid)
+        row=c.execute('SELECT follow_up_date,status FROM doctor_reviews WHERE id=? AND patient_id=?',(review_id,pid)).fetchone()
+        if not row: raise HTTPException(404,'Review not found')
+        if not row['follow_up_date'] or row['status']=='Completed': raise HTTPException(409,'Review has no open dated follow-up')
+        try:
+            c.execute('INSERT INTO followup_completions(review_id,doctor_id,notes,completed_at) VALUES (?,?,?,?)',(review_id,user['id'],body.notes,timestamp()))
+        except sqlite3.IntegrityError: raise HTTPException(409,'Follow-up is already completed')
+        audit(c,user,pid,'followup_completed',review_id)
+    return {'message':'Follow-up completion recorded; original review preserved.'}
 
 @router.get('/care-queue')
 def care_queue(request:Request,user=Depends(current)):
@@ -495,24 +527,25 @@ def care_queue(request:Request,user=Depends(current)):
         rows=c.execute("""
             SELECT 'checkin' AS kind,s.id,s.patient_id,s.created_at AS timestamp,s.review_status AS status
               FROM symptom_checkins s JOIN doctor_patient_assignments a ON a.patient_id=s.patient_id
-             WHERE a.doctor_id=? AND s.review_status='Pending Review'
+             WHERE a.doctor_id=? AND EXISTS (SELECT 1 FROM patients p WHERE p.patient_id=s.patient_id AND json_type(p.profile,'$.synthetic')='true') AND s.review_status='Pending Review'
             UNION ALL
             SELECT 'sputum',s.id,s.patient_id,s.created_at,s.review_status
               FROM sputum_entries s JOIN doctor_patient_assignments a ON a.patient_id=s.patient_id
-             WHERE a.doctor_id=? AND s.review_status='Pending Review'
+             WHERE a.doctor_id=? AND EXISTS (SELECT 1 FROM patients p WHERE p.patient_id=s.patient_id AND json_type(p.profile,'$.synthetic')='true') AND s.review_status='Pending Review'
             UNION ALL
             SELECT 'upload',u.id,u.patient_id,u.created_at,u.review_status
               FROM patient_uploads u JOIN doctor_patient_assignments a ON a.patient_id=u.patient_id
-             WHERE a.doctor_id=? AND u.review_status='Pending Review'
+             WHERE a.doctor_id=? AND EXISTS (SELECT 1 FROM patients p WHERE p.patient_id=u.patient_id AND json_type(p.profile,'$.synthetic')='true') AND u.review_status='Pending Review'
             UNION ALL
             SELECT 'daily',d.id,d.patient_id,d.created_at,d.review_status
               FROM daily_care_logs d JOIN doctor_patient_assignments a ON a.patient_id=d.patient_id
-             WHERE a.doctor_id=? AND d.review_status='Pending Review'
+             WHERE a.doctor_id=? AND EXISTS (SELECT 1 FROM patients p WHERE p.patient_id=d.patient_id AND json_type(p.profile,'$.synthetic')='true') AND d.review_status='Pending Review'
             UNION ALL
             SELECT 'followup',r.id,r.patient_id,r.follow_up_date,r.status
               FROM doctor_reviews r JOIN doctor_patient_assignments a ON a.patient_id=r.patient_id
-             WHERE a.doctor_id=? AND r.follow_up_date IS NOT NULL
+             WHERE a.doctor_id=? AND EXISTS (SELECT 1 FROM patients p WHERE p.patient_id=r.patient_id AND json_type(p.profile,'$.synthetic')='true') AND r.follow_up_date IS NOT NULL
                AND r.follow_up_date<=date('now') AND r.status!='Completed'
+               AND NOT EXISTS (SELECT 1 FROM followup_completions f WHERE f.review_id=r.id)
              ORDER BY timestamp DESC LIMIT 200
         """,(user['id'],)*5).fetchall()
     return {'items':[dict(row) for row in rows], 'limit':200,
@@ -522,8 +555,8 @@ def care_queue(request:Request,user=Depends(current)):
 def doctor_summary(request:Request,user=Depends(current)):
     role(user,'doctor')
     with store(request).connect() as c:
-        ids=[r['patient_id'] for r in c.execute('SELECT patient_id FROM doctor_patient_assignments WHERE doctor_id=?',(user['id'],))]
+        ids=[r['patient_id'] for r in c.execute("SELECT a.patient_id FROM doctor_patient_assignments a JOIN patients p ON p.patient_id=a.patient_id WHERE a.doctor_id=? AND json_type(p.profile,'$.synthetic')='true'",(user['id'],))]
         if not ids:return {'assigned':0,'pending_checkins':0,'pending_sputum':0,'pending_uploads':0,'followups_due':0}
         marks=','.join('?' for _ in ids)
         def count(table,where): return c.execute(f'SELECT COUNT(*) FROM {table} WHERE patient_id IN ({marks}) AND {where}',ids).fetchone()[0]
-        return {'assigned':len(ids),'pending_checkins':count('symptom_checkins',"review_status='Pending Review'"),'pending_sputum':count('sputum_entries',"review_status='Pending Review'"),'pending_uploads':count('patient_uploads',"review_status='Pending Review'"),'followups_due':count('doctor_reviews',"follow_up_date IS NOT NULL AND follow_up_date<=date('now') AND status!='Completed'")}
+        return {'assigned':len(ids),'pending_checkins':count('symptom_checkins',"review_status='Pending Review'"),'pending_sputum':count('sputum_entries',"review_status='Pending Review'"),'pending_uploads':count('patient_uploads',"review_status='Pending Review'"),'followups_due':count('doctor_reviews',"follow_up_date IS NOT NULL AND follow_up_date<=date('now') AND status!='Completed' AND NOT EXISTS (SELECT 1 FROM followup_completions f WHERE f.review_id=doctor_reviews.id)")}
