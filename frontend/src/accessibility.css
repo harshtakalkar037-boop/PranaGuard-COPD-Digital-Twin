@@ -156,3 +156,6 @@
 .pg-enhanced .main-shell .pgx .portal-card small,
 .pg-enhanced .main-shell .pgx-inline-metrics span{color:#405b48}
 .pg-enhanced .main-shell .pgx-inline-metrics span{font-size:11px}
+/* Populated care queues and review histories need readable state and date labels. */
+.portal-content .care-queue-list time{color:#405b48;font-size:11px}
+.portal-content .portal-item .badge{color:#285b43;font-size:11px}

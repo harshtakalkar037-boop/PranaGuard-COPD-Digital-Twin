@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone, date
 from pathlib import Path
 from typing import Literal
 from urllib.parse import quote
-from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Request, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Query, Request, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, ConfigDict, Field
 from backend.app.config import ROOT
@@ -546,14 +546,14 @@ def complete_followup(pid:str,review_id:int,body:FollowupCompletion,request:Requ
     return {'message':'Follow-up completion recorded; original review preserved.'}
 
 @router.get('/care-queue')
-def care_queue(request:Request,user=Depends(current)):
+def care_queue(request:Request,limit:int=Query(default=200,ge=1,le=200),offset:int=Query(default=0,ge=0,le=9007199254740991),kind:Literal['all','checkin','sputum','upload','daily','followup']='all',order:Literal['newest','oldest']='newest',user=Depends(current)):
     """Workflow state only; ordering is not a clinical urgency score."""
     role(user,'doctor')
-    with store(request).connect() as c:
-        rows=c.execute("""
+    query="""
+        WITH queue AS (
             SELECT 'checkin' AS kind,s.id,s.patient_id,s.created_at AS timestamp,s.review_status AS status
               FROM symptom_checkins s JOIN doctor_patient_assignments a ON a.patient_id=s.patient_id
-             WHERE a.doctor_id=? AND EXISTS (SELECT 1 FROM patients p WHERE p.patient_id=s.patient_id AND json_type(p.profile,'$.synthetic')='true') AND s.review_status='Pending Review'
+             WHERE a.doctor_id=? AND EXISTS (SELECT 1 FROM patients p WHERE p.patient_id=s.patient_id AND json_type(p.profile,'$.synthetic')='true') AND s.review_status IN ('Pending Review','Under Review','Follow-up Required')
             UNION ALL
             SELECT 'sputum',s.id,s.patient_id,s.created_at,s.review_status
               FROM sputum_entries s JOIN doctor_patient_assignments a ON a.patient_id=s.patient_id
@@ -561,7 +561,7 @@ def care_queue(request:Request,user=Depends(current)):
             UNION ALL
             SELECT 'upload',u.id,u.patient_id,u.created_at,u.review_status
               FROM patient_uploads u JOIN doctor_patient_assignments a ON a.patient_id=u.patient_id
-             WHERE a.doctor_id=? AND EXISTS (SELECT 1 FROM patients p WHERE p.patient_id=u.patient_id AND json_type(p.profile,'$.synthetic')='true') AND u.review_status='Pending Review'
+             WHERE a.doctor_id=? AND EXISTS (SELECT 1 FROM patients p WHERE p.patient_id=u.patient_id AND json_type(p.profile,'$.synthetic')='true') AND u.review_status IN ('Pending Review','Under Review','Follow-up Required')
             UNION ALL
             SELECT 'daily',d.id,d.patient_id,d.created_at,d.review_status
               FROM daily_care_logs d JOIN doctor_patient_assignments a ON a.patient_id=d.patient_id
@@ -572,10 +572,18 @@ def care_queue(request:Request,user=Depends(current)):
              WHERE a.doctor_id=? AND EXISTS (SELECT 1 FROM patients p WHERE p.patient_id=r.patient_id AND json_type(p.profile,'$.synthetic')='true') AND r.follow_up_date IS NOT NULL
                AND r.follow_up_date<=date('now') AND r.status!='Completed'
                AND NOT EXISTS (SELECT 1 FROM followup_completions f WHERE f.review_id=r.id)
-             ORDER BY timestamp DESC LIMIT 200
-        """,(user['id'],)*5).fetchall()
-    return {'items':[dict(row) for row in rows], 'limit':200,
-            'notice':'Workflow states only; not a measure of clinical urgency.'}
+        )
+    """
+    where='' if kind=='all' else ' WHERE kind=?'
+    params=(user['id'],)*5+(() if kind=='all' else (kind,))
+    direction='DESC' if order=='newest' else 'ASC'
+    with store(request).connect() as c:
+        # The count and page use one read snapshot and the same scoped filter.
+        c.execute('BEGIN')
+        total=c.execute(query+' SELECT COUNT(*) FROM queue'+where,params).fetchone()[0]
+        rows=c.execute(query+' SELECT * FROM queue'+where+f' ORDER BY timestamp {direction},kind ASC,id {direction} LIMIT ? OFFSET ?',(*params,limit,offset)).fetchall()
+    return {'items':[dict(row) for row in rows], 'limit':limit,'offset':offset,'total':total,'has_more':offset+len(rows)<total,
+            'notice':'Workflow states only; not a measure of clinical urgency. Items may shift between pages as records change.'}
 
 @router.get('/doctor-summary')
 def doctor_summary(request:Request,user=Depends(current)):

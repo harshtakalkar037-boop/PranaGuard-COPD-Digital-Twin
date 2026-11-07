@@ -985,3 +985,38 @@ def test_upgrade_from_seven_adds_login_throttle_without_losing_review(tmp_path):
         assert c.execute('SELECT COUNT(*) FROM portal_login_failures').fetchone()[0]==0
         assert c.execute('SELECT COUNT(*) FROM schema_migrations WHERE version=8').fetchone()[0]==1
         assert not c.execute('PRAGMA foreign_key_check').fetchall()
+
+
+def test_review_queue_paginates_open_states_without_cross_doctor_leaks(tmp_path):
+    with TestClient(create_app(tmp_path/'queue.sqlite',background_tasks=False,legacy_demo=False)) as client:
+        with client.app.state.engine.store.connect() as c:
+            for name in ('queue_doctor_a','queue_doctor_b','queue_empty'):
+                c.execute("INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,'doctor',?)",(name,hash_password(PASSWORD),timestamp()))
+            doctors={r['username']:r['id'] for r in c.execute("SELECT id,username FROM portal_users WHERE role='doctor'")}
+            c.execute('INSERT INTO doctor_patient_assignments VALUES (?,?)',(doctors['queue_doctor_a'],'PG-0001'))
+            c.execute('INSERT INTO doctor_patient_assignments VALUES (?,?)',(doctors['queue_doctor_b'],'PG-0002'))
+            sql="""INSERT INTO symptom_checkins(patient_id,created_at,breathlessness,cough,sputum_amount,sputum_colour,wheezing,fatigue,fever,comments,review_status)
+                   VALUES (?,?,'mild','none','usual','clear','no','mild','no','disposable queue test',?)"""
+            for state in ['Pending Review']*220+['Under Review','Follow-up Required','Reviewed','Completed']:
+                c.execute(sql,('PG-0001','2020-01-01T00:00:00+00:00',state))
+            for _ in range(15):c.execute(sql,('PG-0002','2020-01-01T00:00:00+00:00','Pending Review'))
+        a=auth(client,'queue_doctor_a');b=auth(client,'queue_doctor_b');empty=auth(client,'queue_empty')
+        def page(headers,**params):
+            response=client.get('/api/portal/care-queue',headers=headers,params=params)
+            assert response.status_code==200,response.text
+            return response.json()
+        first=page(a,kind='checkin',limit=100,offset=0);second=page(a,kind='checkin',limit=100,offset=100);third=page(a,kind='checkin',limit=100,offset=200)
+        assert first['total']==second['total']==third['total']==222
+        assert [len(p['items']) for p in (first,second,third)]==[100,100,22]
+        assert first['has_more'] and second['has_more'] and not third['has_more']
+        combined=first['items']+second['items']+third['items'];ids=[i['id'] for i in combined]
+        assert ids==sorted(ids,reverse=True) and len(ids)==len(set(ids))
+        assert {i['status'] for i in combined}=={'Pending Review','Under Review','Follow-up Required'}
+        assert {i['patient_id'] for i in combined}=={'PG-0001'}
+        ascending=page(a,kind='checkin',limit=2,order='oldest')['items']
+        assert [i['id'] for i in ascending]==sorted(ids)[:2]
+        assert page(b,kind='checkin')['total']==15 and all(i['patient_id']=='PG-0002' for i in page(b,kind='checkin')['items'])
+        assert page(empty)['total']==0
+        assert page(a,kind='upload')['total']==0
+        for params in ({'limit':201},{'limit':0},{'offset':-1},{'kind':'invalid'},{'order':'priority'}):
+            assert client.get('/api/portal/care-queue',headers=a,params=params).status_code==422

@@ -1,6 +1,6 @@
 import {render,screen,renderHook,waitFor,act} from '@testing-library/react';
 import {describe,it,expect,vi,afterEach} from 'vitest';
-import Portal, {CompleteFollowup,usePortal} from './Portal';
+import Portal, {CareQueue,CompleteFollowup,usePortal} from './Portal';
 import userEvent from '@testing-library/user-event';
 
 afterEach(()=>vi.unstubAllGlobals());
@@ -56,5 +56,26 @@ describe('follow-up completion',()=>{
   render(<CompleteFollowup pid="PG-0001" reviewId={42} refresh={refresh}/>);
   await userEvent.click(screen.getByText('Complete dated follow-up'));await userEvent.type(screen.getByLabelText('Completion note'),'Unsent note');await userEvent.click(screen.getByRole('button',{name:'Record follow-up completion'}));
   expect(await screen.findByRole('alert')).toHaveTextContent('Follow-up is already completed');expect(refresh).not.toHaveBeenCalled();expect(screen.getByLabelText('Completion note')).toHaveValue('Unsent note');
+ });
+});
+
+
+describe('assigned care queue',()=>{
+ it('requests pages and filters from the server and selects a queue patient',async()=>{
+  const fetcher=vi.fn(async(input:string)=>{
+   const url=new URL(input,'http://localhost');const offset=Number(url.searchParams.get('offset'));const kind=url.searchParams.get('kind');
+   const total=kind==='upload'?0:26;const items=kind==='upload'?[]:Array.from({length:offset?1:25},(_,i)=>({kind:'checkin',id:offset+i+1,patient_id:'PG-0001',timestamp:'2020-01-01T00:00:00Z',status:'Under Review'}));
+   return new Response(JSON.stringify({items,limit:25,offset,total,has_more:offset+items.length<total,notice:'not urgency'}));
+  });vi.stubGlobal('fetch',fetcher);const select=vi.fn();render(<CareQueue revision={0} selected="" select={select}/>);
+  expect(await screen.findByText('Showing 1–25 of 26 items')).toBeVisible();expect(screen.getByRole('button',{name:'Previous queue page'})).toBeDisabled();
+  await userEvent.click(screen.getByRole('button',{name:'Next queue page'}));await screen.findByText('Showing 26–26 of 26 items');expect(screen.getByRole('button',{name:'Next queue page'})).toBeDisabled();
+  await userEvent.click(screen.getByRole('button',{name:/Symptom check-in.*PG-0001/}));expect(select).toHaveBeenCalledWith('PG-0001');
+  await userEvent.selectOptions(screen.getByLabelText('Queue item type'),'upload');await screen.findByText('No open items or due follow-ups.');
+  expect(fetcher.mock.calls.some(([url])=>String(url).includes('kind=upload')&&String(url).includes('offset=0'))).toBe(true);
+  await userEvent.selectOptions(screen.getByLabelText('Queue order'),'oldest');await waitFor(()=>expect(fetcher.mock.calls.some(([url])=>String(url).includes('order=oldest'))).toBe(true));
+ });
+ it('shows permission failures rather than an empty queue',async()=>{
+  vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({detail:'Denied'}),{status:403})));
+  render(<CareQueue revision={0} selected="" select={()=>{}}/>);expect(await screen.findByRole('alert')).toHaveTextContent('Permission denied');expect(screen.queryByText('No open items or due follow-ups.')).not.toBeInTheDocument();
  });
 });
