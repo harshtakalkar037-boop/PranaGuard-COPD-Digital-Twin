@@ -47,7 +47,7 @@ def test_migration_is_additive_idempotent_and_checksum_guard(tmp_path):
     s=Store(db);Store(db)
     with s.connect() as c:
         assert c.execute('SELECT COUNT(*) FROM patients').fetchone()[0]==1
-        assert c.execute('SELECT COUNT(*) FROM schema_migrations').fetchone()[0]==7
+        assert c.execute('SELECT COUNT(*) FROM schema_migrations').fetchone()[0]==8
         assert not c.execute('PRAGMA foreign_key_check').fetchall()
         c.execute("UPDATE schema_migrations SET sha256='tampered'")
     with pytest.raises(RuntimeError,match='checksum'):Store(db)

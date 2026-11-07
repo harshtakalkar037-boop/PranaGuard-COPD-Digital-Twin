@@ -13,7 +13,7 @@ export async function requestJson<T>(url:string,options:RequestInit={},sentToken
     let detail='';
     try{const body=await response.json();detail=typeof body.detail==='string'?body.detail:Array.isArray(body.detail)?body.detail.map((d:{loc?:string[];msg?:string})=>`${d.loc?.slice(1).join('.')||'request'}: ${d.msg||'Invalid value'}`).join('; '):'';}catch{/* an HTTP error can have a non-JSON body */}
     if(response.status===401)handleExpiredSession(sentToken,detail);
-    const prefix:Record<number,string>={401:'Authentication required',403:'Permission denied',404:'Record not found',422:'Invalid request'};
+    const prefix:Record<number,string>={401:'Authentication required',403:'Permission denied',404:'Record not found',422:'Invalid request',429:'Too many sign-in attempts'};
     const title=prefix[response.status]||(response.status>=500?'Server error':`Request failed (${response.status})`);
     throw new Error(`${title} (HTTP ${response.status})${detail?`: ${detail}`:'.'}`);
   }

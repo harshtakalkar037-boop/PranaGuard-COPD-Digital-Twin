@@ -64,7 +64,7 @@ describe('backend-fed dashboard',()=>{
  it('executes replay controls through POST, not fake local counters',async()=>{await ready();await userEvent.click(screen.getByRole('button',{name:'1h'}));await waitFor(()=>expect(fetchMock.mock.calls.some(c=>String(c[0]).includes('/replay/step')&&JSON.parse(c[1]!.body as string).hours===1)).toBe(true));});
 });
 describe('API error handling',()=>{
- it.each([[401,'Authentication required'],[403,'Permission denied'],[404,'Record not found'],[422,'Invalid request'],[500,'Server error']])('distinguishes HTTP %i errors',async(status,label)=>{
+ it.each([[401,'Authentication required'],[403,'Permission denied'],[404,'Record not found'],[422,'Invalid request'],[429,'Too many sign-in attempts'],[500,'Server error']])('distinguishes HTTP %i errors',async(status,label)=>{
   fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({detail:'Example'}),{status}));await expect(api('/test')).rejects.toThrow(label);
  });
  it('distinguishes network failure and invalid JSON',async()=>{

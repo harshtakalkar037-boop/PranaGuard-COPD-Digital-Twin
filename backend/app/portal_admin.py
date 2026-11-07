@@ -5,7 +5,7 @@ import json
 import re
 import secrets
 from backend.app.config import DB_PATH, DATA
-from backend.app.portal import hash_password, timestamp, temporary_password_expiration
+from backend.app.portal import hash_password, timestamp, temporary_password_expiration, login_identifier
 from backend.app.store import Store
 
 def main():
@@ -44,6 +44,7 @@ def main():
             password=secrets.token_urlsafe(24)
             c.execute('UPDATE portal_users SET password_hash=?,must_change_password=1,temporary_password_expires_at=?,temporary_password_used_at=NULL WHERE id=?',(hash_password(password),temporary_password_expiration(),user['id']))
             c.execute('DELETE FROM portal_sessions WHERE user_id=?',(user['id'],))
+            c.execute('DELETE FROM portal_login_failures WHERE username_hash=?',(login_identifier(args.username),))
             c.execute("INSERT INTO portal_admin_audit(action,username,created_at) VALUES ('password_reset',?,?)",(args.username,timestamp()))
             print('One-time temporary password (deliver securely):',password)
         else:

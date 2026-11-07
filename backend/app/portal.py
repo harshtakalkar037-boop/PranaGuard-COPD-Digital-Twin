@@ -18,6 +18,8 @@ from backend.app.config import ROOT
 router = APIRouter(prefix='/api/portal', tags=['Research portals'])
 MAX_FILE = 10 * 1024 * 1024
 TEMPORARY_PASSWORD_HOURS = 24
+LOGIN_FAILURE_LIMIT = 5
+LOGIN_FAILURE_WINDOW_MINUTES = 15
 
 def temporary_password_expiration():
     return (datetime.now(timezone.utc)+timedelta(hours=TEMPORARY_PASSWORD_HOURS)).isoformat()
@@ -108,26 +110,50 @@ def register(body: Credentials, request: Request):
     except sqlite3.IntegrityError: raise HTTPException(409,'Account cannot be created')
     return {'message':'Account created. An administrator must link your record.'}
 
+def login_identifier(username):
+    # Usernames use SQLite NOCASE and the schema accepts ASCII only.
+    return hashlib.sha256(username.lower().encode()).hexdigest()
+
+def blocked_login(c,key,now):
+    row=c.execute('SELECT failure_count,window_expires_at FROM portal_login_failures WHERE username_hash=? AND window_expires_at>?',(key,now)).fetchone()
+    if row and row['failure_count']>=LOGIN_FAILURE_LIMIT:
+        retry=max(1,int((datetime.fromisoformat(row['window_expires_at'])-datetime.fromisoformat(now)).total_seconds())+1)
+        raise HTTPException(429,'Too many sign-in attempts. Try again later.',headers={'Retry-After':str(retry)})
+
 @router.post('/login')
 def login(body: LoginCredentials, request: Request):
+    key=login_identifier(body.username)
     with store(request).connect() as c:
+        blocked_login(c,key,timestamp())
         row=c.execute('SELECT * FROM portal_users WHERE username=?',(body.username,)).fetchone()
-        # Perform a hash even for missing usernames.
-        valid=verify_password(body.password,row['password_hash'] if row else 'scrypt$00000000000000000000000000000000$'+'00'*32)
-        if not row or not valid: raise HTTPException(401,'Invalid credentials')
-        now=timestamp(); token=secrets.token_urlsafe(32)
-        expires=(datetime.now(timezone.utc)+timedelta(hours=8)).isoformat()
-        if row['must_change_password']:
-            # Consume atomically so concurrent login attempts cannot reuse the
-            # secret. Pre-migration credentials with no deadline fail closed.
-            used=c.execute('UPDATE portal_users SET temporary_password_used_at=? WHERE id=? AND password_hash=? AND must_change_password=1 AND temporary_password_used_at IS NULL AND temporary_password_expires_at>?',(now,row['id'],row['password_hash'],now))
-            if used.rowcount!=1: raise HTTPException(401,'Invalid credentials')
-            expires=min(expires,row['temporary_password_expires_at'])
-        c.execute('DELETE FROM portal_sessions WHERE expires_at<=?',(now,))
-        # Also prevent an in-flight login with the old hash surviving a reset.
-        created=c.execute('INSERT INTO portal_sessions(token_hash,user_id,expires_at) SELECT ?,id,? FROM portal_users WHERE id=? AND password_hash=?',(hashlib.sha256(token.encode()).hexdigest(),expires,row['id'],row['password_hash']))
-        if created.rowcount!=1: raise HTTPException(401,'Invalid credentials')
-    return {'token':token,'role':row['role'],'username':row['username'],'must_change_password':bool(row['must_change_password'])}
+    # Hash even for missing usernames, and do not hold the SQLite write lock
+    # during scrypt. Recheck both the throttle and account state under the lock.
+    valid=verify_password(body.password,row['password_hash'] if row else 'scrypt$00000000000000000000000000000000$'+'00'*32)
+    failed=False
+    with store(request).connect() as c:
+        c.execute('BEGIN IMMEDIATE')
+        now=timestamp()
+        c.execute('DELETE FROM portal_login_failures WHERE window_expires_at<=?',(now,))
+        blocked_login(c,key,now)
+        fresh=c.execute('SELECT * FROM portal_users WHERE username=?',(body.username,)).fetchone()
+        if not row or not valid or not fresh or fresh['id']!=row['id'] or fresh['password_hash']!=row['password_hash']:
+            failed=True
+        elif fresh['must_change_password']:
+            # Consume once, under the same lock as the throttle and session insert.
+            used=c.execute('UPDATE portal_users SET temporary_password_used_at=? WHERE id=? AND password_hash=? AND must_change_password=1 AND temporary_password_used_at IS NULL AND temporary_password_expires_at>?',(now,fresh['id'],fresh['password_hash'],now))
+            failed=used.rowcount!=1
+        if failed:
+            expires=(datetime.now(timezone.utc)+timedelta(minutes=LOGIN_FAILURE_WINDOW_MINUTES)).isoformat()
+            c.execute('INSERT INTO portal_login_failures(username_hash,failure_count,window_expires_at) VALUES (?,1,?) ON CONFLICT(username_hash) DO UPDATE SET failure_count=failure_count+1',(key,expires))
+        else:
+            token=secrets.token_urlsafe(32)
+            expires=(datetime.now(timezone.utc)+timedelta(hours=8)).isoformat()
+            if fresh['must_change_password']:expires=min(expires,fresh['temporary_password_expires_at'])
+            c.execute('DELETE FROM portal_sessions WHERE expires_at<=?',(now,))
+            c.execute('INSERT INTO portal_sessions(token_hash,user_id,expires_at) VALUES (?,?,?)',(hashlib.sha256(token.encode()).hexdigest(),fresh['id'],expires))
+            c.execute('DELETE FROM portal_login_failures WHERE username_hash=?',(key,))
+    if failed: raise HTTPException(401,'Invalid credentials')
+    return {'token':token,'role':fresh['role'],'username':fresh['username'],'must_change_password':bool(fresh['must_change_password'])}
 
 @router.post('/password')
 def change_password(body:PasswordChange,request:Request,user=Depends(current),authorization:str=Header()):

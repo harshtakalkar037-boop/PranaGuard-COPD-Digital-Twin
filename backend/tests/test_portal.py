@@ -76,7 +76,7 @@ def test_upload_permissions_and_validation(portal,tmp_path,monkeypatch):
 def test_repeatable_migration(portal):
     s=Store(portal.app.state.engine.store.path);s.apply_migrations()
     with s.connect() as c:
-        assert [r[0] for r in c.execute('SELECT version FROM schema_migrations ORDER BY version')]==[1,2,3,4,5,6,7]
+        assert [r[0] for r in c.execute('SELECT version FROM schema_migrations ORDER BY version')]==[1,2,3,4,5,6,7,8]
         assert not c.execute('PRAGMA foreign_key_check').fetchall()
 
 def test_scoped_research_tools(portal):
@@ -175,6 +175,8 @@ def test_local_admin_reset_revokes_sessions(portal,monkeypatch,capsys):
     with portal.app.state.engine.store.connect() as c:
         c.execute("INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?)",('reset_test',hash_password(PASSWORD),'patient',timestamp()))
     old=auth(portal,'reset_test')
+    for _ in range(5):assert portal.post('/api/portal/login',json={'username':'reset_test','password':'incorrect'}).status_code==401
+    assert portal.post('/api/portal/login',json={'username':'reset_test','password':PASSWORD}).status_code==429
     monkeypatch.setattr(portal_admin,'DB_PATH',portal.app.state.engine.store.path)
     monkeypatch.setattr(sys,'argv',['portal_admin','reset-password','reset_test'])
     portal_admin.main()
@@ -932,3 +934,54 @@ def test_concurrent_followup_completion_is_single_and_audited(portal):
     with portal.app.state.engine.store.connect() as c:
         assert c.execute('SELECT COUNT(*) FROM followup_completions WHERE review_id=?',(review['id'],)).fetchone()[0]==1
         assert c.execute("SELECT COUNT(*) FROM portal_audit WHERE action='followup_completed' AND record_id=?",(review['id'],)).fetchone()[0]==1
+
+
+def test_login_throttle_is_persistent_case_insensitive_and_fail_closed(portal):
+    from backend.app.portal import login_identifier
+    from backend.app.store import Store
+    name='rate_test_user'
+    with portal.app.state.engine.store.connect() as c:
+        c.execute("INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,'patient',?)",(name,hash_password(PASSWORD),timestamp()))
+    def login(username,password):return portal.post('/api/portal/login',json={'username':username,'password':password})
+    for _ in range(2):assert login(name,'wrong-password').status_code==401
+    assert login(name,PASSWORD).status_code==200  # successful authentication clears failures
+    for _ in range(5):assert login(name.upper(),'wrong-password').status_code==401
+    denied=login(name,PASSWORD)
+    assert denied.status_code==429 and int(denied.headers['retry-after'])>0
+    with portal.app.state.engine.store.connect() as c:
+        row=c.execute('SELECT * FROM portal_login_failures WHERE username_hash=?',(login_identifier(name),)).fetchone()
+        assert row['failure_count']==5 and name not in row['username_hash']
+    Store(portal.app.state.engine.store.path)  # idempotent restart preserves the active window
+    assert login(name,PASSWORD).status_code==429
+    with portal.app.state.engine.store.connect() as c:
+        c.execute('UPDATE portal_login_failures SET window_expires_at=? WHERE username_hash=?',('2000-01-01T00:00:00+00:00',login_identifier(name)))
+    assert login(name,PASSWORD).status_code==200
+    with portal.app.state.engine.store.connect() as c:
+        assert not c.execute('SELECT 1 FROM portal_login_failures WHERE username_hash=?',(login_identifier(name),)).fetchone()
+
+
+def test_login_throttle_treats_unknown_accounts_identically_and_serializes_attempts(portal):
+    from concurrent.futures import ThreadPoolExecutor
+    name='unknown_throttle_account'
+    def fail(_):return portal.post('/api/portal/login',json={'username':name,'password':'wrong-password'}).status_code
+    with ThreadPoolExecutor(max_workers=8) as pool:statuses=list(pool.map(fail,range(8)))
+    assert sorted(statuses)==[401]*5+[429]*3
+    with portal.app.state.engine.store.connect() as c:
+        assert c.execute('SELECT MAX(failure_count) FROM portal_login_failures').fetchone()[0]==5
+
+
+def test_upgrade_from_seven_adds_login_throttle_without_losing_review(tmp_path):
+    db=tmp_path/'v7.sqlite';s=Store(db)
+    with s.connect() as c:
+        c.execute('DROP TABLE portal_login_failures')
+        c.execute('DELETE FROM schema_migrations WHERE version=8')
+        c.execute('INSERT INTO patients VALUES (?,?)',('PG-UPGRADE-8','{"synthetic":true}'))
+        c.execute("INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,'doctor',?)",('upgrade_eight',hash_password(PASSWORD),timestamp()))
+        uid=c.execute("SELECT id FROM portal_users WHERE username='upgrade_eight'").fetchone()[0]
+        c.execute("INSERT INTO doctor_reviews(patient_id,doctor_id,status,notes,follow_up,shared,created_at) VALUES (?,?,'Reviewed','preserve review','',0,?)",('PG-UPGRADE-8',uid,timestamp()))
+    Store(db).apply_migrations()
+    with s.connect() as c:
+        assert c.execute('SELECT notes FROM doctor_reviews WHERE patient_id=?',('PG-UPGRADE-8',)).fetchone()[0]=='preserve review'
+        assert c.execute('SELECT COUNT(*) FROM portal_login_failures').fetchone()[0]==0
+        assert c.execute('SELECT COUNT(*) FROM schema_migrations WHERE version=8').fetchone()[0]==1
+        assert not c.execute('PRAGMA foreign_key_check').fetchall()
