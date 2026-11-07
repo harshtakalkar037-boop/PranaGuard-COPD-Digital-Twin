@@ -1,5 +1,5 @@
 const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
-const API_BASE = API_ORIGIN ? `${API_ORIGIN}/api` : '/api';
+export const API_BASE = API_ORIGIN ? `${API_ORIGIN}/api` : '/api';
 
 export class ApiError extends Error{
   status:number;
