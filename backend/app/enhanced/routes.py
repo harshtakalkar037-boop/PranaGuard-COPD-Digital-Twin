@@ -40,21 +40,21 @@ def make_router(authorize,hub):
     @r.get('/devices')
     def devices(patient_id:str|None=None,s=Depends(services)):return s.devices.list(patient_id)
     @r.post('/devices',dependencies=write)
-    async def associate(body:AssociateDevice,s=Depends(services)):
-        result=await asyncio.to_thread(s.devices.associate,body);await changed();return result
+    async def associate(body:AssociateDevice,request:Request,s=Depends(services)):
+        result=await asyncio.to_thread(s.devices.associate,body,mutation_authorizer(request));await changed();return result
     @r.post('/devices/{did}/start',dependencies=write)
-    async def start(did:str,body:SimulationControl,s=Depends(services)):
-        result=await asyncio.to_thread(s.devices.start,did,body.interval_seconds);await changed();return result
+    async def start(did:str,body:SimulationControl,request:Request,s=Depends(services)):
+        result=await asyncio.to_thread(s.devices.start,did,body.interval_seconds,mutation_authorizer(request));await changed();return result
     @r.post('/devices/{did}/stop',dependencies=write)
-    async def stop(did:str,body:EmptyBody,s=Depends(services)):
-        result=await asyncio.to_thread(s.devices.stop,did);await changed();return result
+    async def stop(did:str,body:EmptyBody,request:Request,s=Depends(services)):
+        result=await asyncio.to_thread(s.devices.stop,did,mutation_authorizer(request));await changed();return result
     @r.get('/devices/{did}/readings')
     def readings(did:str,limit:int=Query(default=100,ge=1,le=1000),s=Depends(services)):
         s.devices.require(did)
         with s.store.connect() as c:return {'readings':[dict(row) for row in c.execute('SELECT * FROM device_readings WHERE device_id=? ORDER BY id DESC LIMIT ?',(did,limit))]}
     @r.post('/ingestion',dependencies=write)
-    async def ingestion(body:Ingestion,x_device_token:str|None=Header(default=None),s=Depends(services)):
-        result=await asyncio.to_thread(s.devices.ingest,body,x_device_token)
+    async def ingestion(body:Ingestion,request:Request,x_device_token:str|None=Header(default=None),s=Depends(services)):
+        result=await asyncio.to_thread(s.devices.ingest,body,x_device_token,mutation_authorizer(request))
         if not result['duplicate']:await changed(patient_id=body.patient_id)
         return result
     @r.get('/environment/cities')
