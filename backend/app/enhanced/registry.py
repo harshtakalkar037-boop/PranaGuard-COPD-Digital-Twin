@@ -1,6 +1,7 @@
 """Fictional registrations and read-only views of the original historical cohort."""
 import hashlib,json,uuid
 from datetime import timedelta
+from contextlib import nullcontext
 from fastapi import HTTPException
 from backend.app.enhanced.settings import stamp,parse_stamp,utcnow,METRICS
 
@@ -14,16 +15,18 @@ def fingerprint(body):return hashlib.sha256(json.dumps(body,sort_keys=True,separ
 
 class Registry:
     def __init__(self,engine,notifications):self.engine=engine;self.store=engine.store;self.notifications=notifications
-    def require(self,pid):
-        with self.store.connect() as c:
+    def require(self,pid,conn=None):
+        with (nullcontext(conn) if conn is not None else self.store.connect()) as c:
             row=c.execute('SELECT profile FROM patients WHERE patient_id=?',(pid,)).fetchone()
             if not row:raise HTTPException(404,'Synthetic patient not found.')
             return json.loads(row['profile'])
 
-    def register(self,body,doctor_id=None):
+    def register(self,body,doctor_id=None,authorize=None):
         data=body.model_dump(mode='json');digest=fingerprint(data)
         with self.store.connect() as c:
-            c.execute('BEGIN IMMEDIATE');old=c.execute('SELECT * FROM registrations WHERE request_id=?',(body.request_id,)).fetchone()
+            c.execute('BEGIN IMMEDIATE')
+            if authorize is not None: authorize(c)
+            old=c.execute('SELECT * FROM registrations WHERE request_id=?',(body.request_id,)).fetchone()
             if old:
                 # An idempotency key belongs to the creator's assigned record;
                 # never reveal a different doctor's ID or whether the payload matched.
@@ -35,7 +38,7 @@ class Registry:
             profile={'patient_id':pid,'display_name':'Fictional demo · '+body.demo_alias,'synthetic':True,'city':body.city,'age':body.age,'sex':body.sex,'fev1_pct':body.fev1_pct,'bmi':body.bmi,'prior_exacerbations':body.prior_exacerbations,'smoking_pack_years':body.smoking_pack_years,'environment_source':'Independent city context only; not model input','source_type':'manual_demo'}
             c.execute('INSERT INTO patients VALUES (?,?)',(pid,json.dumps(profile)))
             c.execute('INSERT INTO registrations VALUES (?,?,?,?,?,?)',(pid,body.request_id,digest,at,json.dumps(data),'manual_demo'))
-            # Portal-mode registration occurs only for a fully assigned doctor.
+            # Secure-mode registration is assigned to its registering doctor.
             # Keep creation, assignment and audit in the same SQLite transaction.
             if doctor_id is not None:
                 c.execute('INSERT INTO doctor_patient_assignments(doctor_id,patient_id) VALUES (?,?)',(doctor_id,pid))
@@ -96,19 +99,25 @@ class Registry:
         details=json.loads(reg['details']) if reg else {'copd_history':'Synthetic cohort attributes from the frozen generator; not a diagnosed clinical record.','diagnosis_info':'No individual diagnosis document was supplied.','medications':'No manually recorded demo plan.','clinician_alias':'Not assigned','source_type':'synthetic_cohort'}
         return {'profile':profile,'details':details,'registered_at':reg['created_at'] if reg else None,'origin':'original_synthetic_cohort' if historical else 'manual_demo_registration','baseline':self.baseline(pid),'model_state':self.engine.patient(pid) if historical else None,'model_history':self.engine.history(pid,72) if historical else None,'devices':devices,'readings':readings,'monitoring_versions':monitoring,'latest_monitoring':monitoring[0] if monitoring else None,'observations':observations,'reviews':self.store.interventions(pid),'archived_reviews_and_alerts':archives,'notifications':self.notifications.list(patient_id=pid,doctor_id=doctor_id)['notifications'],'model_boundary':'Device/manual monitoring and current city environment are separate context. They do not mutate historical twin risks, TreeSHAP or frozen feature frames.','metrics':METRICS}
 
-    def observation(self,pid,body):
-        self.require(pid);at=stamp()
+    def observation(self,pid,body,authorize=None):
+        at=stamp()
         with self.store.connect() as c:
+            c.execute('BEGIN IMMEDIATE')
+            if authorize is not None: authorize(c)
+            self.require(pid,conn=c)
             cur=c.execute('INSERT INTO demo_observations(patient_id,created_at,symptom_score,adherence,note) VALUES (?,?,?,?,?)',(pid,at,body.symptom_score,body.adherence,body.note));oid=cur.lastrowid
             if body.symptom_score>=7 or body.adherence<.5:
                 self.notifications.create(category='patient_monitoring',title='Manual demo monitoring rule',reason='Fictional symptom score≥7 or adherence<50% matched an unvalidated demonstration rule. This is not a diagnosis, urgency assessment or model prediction.',source='Manual fictional observation',source_type='manual_demo',patient_id=pid,dedupe_key=f'observation:{oid}',metadata={'observation_id':oid},conn=c)
         return {'id':oid,'created_at':at,'source_type':'manual_demo','prediction_updated':False}
 
-    def review(self,pid,body):
-        self.require(pid);at=stamp();historical=pid in self.engine.profiles
-        with self.store.connect() as c:
+    def review(self,pid,body,authorize=None):
+        at=stamp();historical=pid in self.engine.profiles
+        with self.engine.lock, self.store.connect() as c:
+            c.execute('BEGIN IMMEDIATE')
+            if authorize is not None: authorize(c)
+            self.require(pid,conn=c)
             current=c.execute('SELECT MAX(id) AS v FROM monitoring_states WHERE patient_id=?',(pid,)).fetchone()['v'] or 0
-            version=self.engine.patient(pid)['version'] if historical else current
+            version=self.engine.patient(pid,conn=c)['version'] if historical else current
             cur=c.execute('INSERT INTO interventions(patient_id,kind,note,created_at,state_version) VALUES (?,?,?,?,?)',(pid,body.kind,body.note,at,version));iid=cur.lastrowid
             c.execute('INSERT INTO enhanced_audit(created_at,category,patient_id,source,detail) VALUES (?,?,?,?,?)',(at,'review_created',pid,'manual_demo_review',json.dumps({'intervention_id':iid,'version_kind':'historical_model' if historical else 'monitoring_only','state_version':version})))
         return {'id':iid,'state_version':version,'notice':'Demo review saved to existing intervention ledger. No clinical action or model change was performed.'}

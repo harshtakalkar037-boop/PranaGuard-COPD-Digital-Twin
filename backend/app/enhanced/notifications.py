@@ -78,19 +78,21 @@ class Notifications:
             counts=dict(c.execute("SELECT SUM(CASE WHEN n.read_at IS NULL THEN 1 ELSE 0 END) AS unread,COUNT(*) AS total,SUM(CASE WHEN n.status NOT IN ('resolved','closed') THEN 1 ELSE 0 END) AS open FROM notifications n WHERE "+scope,scope_args).fetchone())
         return {'notifications':[self.serialize(r) for r in rows],'counts':{k:v or 0 for k,v in counts.items()},'demo_only':True,'limit':limit}
 
-    def detail(self,nid,doctor_id=None):
+    def detail(self,nid,doctor_id=None,conn=None):
         scope,args=self.scope(doctor_id)
-        with self.store.connect() as c:
+        with (nullcontext(conn) if conn is not None else self.store.connect()) as c:
             row=c.execute('SELECT n.* FROM notifications n WHERE n.id=? AND '+scope,[nid,*args]).fetchone()
             if not row:raise HTTPException(404,'Notification not found.')
             result=self.serialize(row)
             result['history']=[dict(r) for r in c.execute('SELECT * FROM notification_history WHERE notification_id=? ORDER BY id',(nid,))]
         return result
 
-    def update(self,nid,body,doctor_id=None):
+    def update(self,nid,body,doctor_id=None,authorize=None):
         scope,args=self.scope(doctor_id)
         with self.store.connect() as c:
-            c.execute('BEGIN IMMEDIATE');row=c.execute('SELECT n.* FROM notifications n WHERE n.id=? AND '+scope,[nid,*args]).fetchone()
+            c.execute('BEGIN IMMEDIATE')
+            if authorize is not None: authorize(c)
+            row=c.execute('SELECT n.* FROM notifications n WHERE n.id=? AND '+scope,[nid,*args]).fetchone()
             if not row:raise HTTPException(404,'Notification not found.')
             old=row['status'];target=body.status or old;at=stamp()
             if target!=old:
@@ -104,7 +106,8 @@ class Notifications:
             if target!=old or body.read is not None or body.note:
                 action='review' if target!=old else 'mark_read' if body.read is True else 'mark_unread' if body.read is False else 'note'
                 c.execute('INSERT INTO notification_history(notification_id,created_at,from_status,to_status,action,note) VALUES (?,?,?,?,?,?)',(nid,at,old,target,action,body.note or 'Read state updated in synthetic demo.'))
-        return self.detail(nid,doctor_id)
+            result=self.detail(nid,doctor_id,conn=c)
+        return result
 
     def test(self):
         import uuid

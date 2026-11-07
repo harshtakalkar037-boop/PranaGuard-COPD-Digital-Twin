@@ -10,7 +10,7 @@ from backend.app.config import DB_PATH
 from backend.app.engine import TwinEngine, now
 from backend.app.enhanced.services import Services
 from backend.app.enhanced.routes import make_router
-from backend.app.portal import router as portal_router, current, require_full_historical_assignment, authorize_patient
+from backend.app.portal import router as portal_router, current, require_full_historical_assignment, authorize_patient, begin_authorized_write
 
 class StrictModel(BaseModel):model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
 class Step(StrictModel):hours:int=Field(default=1,ge=1,le=72)
@@ -288,8 +288,10 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
     async def update_alert(alert_id:int,body:AlertUpdate,request:Request,e:TwinEngine=Depends(engine)):
         doctor_id=getattr(request.state,'research_doctor_id',None)
         with e.store.connect() as c:
-            # Check assignment and update under the same SQLite write lock.
-            c.execute('BEGIN IMMEDIATE')
+            # Check session and assignment under the same SQLite write lock.
+            user=getattr(request.state,'research_user',None)
+            if user is None: c.execute('BEGIN IMMEDIATE')  # isolated legacy demo
+            else: begin_authorized_write(c,request,user)
             sql='SELECT a.*,p.profile FROM alerts a JOIN patients p ON p.patient_id=a.patient_id WHERE a.id=?'
             args=[alert_id]
             if doctor_id is not None:

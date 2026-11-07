@@ -5,12 +5,20 @@ from fastapi import APIRouter,Depends,Header,Query,Request
 from backend.app.enhanced.schemas import Registration,AssociateDevice,SimulationControl,Ingestion,Observation,NotificationUpdate,Review,EmptyBody
 from backend.app.enhanced.settings import CITIES
 from backend.app.enhanced.provenance import provenance
+from backend.app.portal import validate_session, access
 
 def make_router(authorize,hub):
     r=APIRouter(prefix='/api/enhanced',tags=['Enhanced synthetic demonstration'])
     def services(request:Request):return request.app.state.enhanced
     write=[Depends(authorize)]
     async def changed(kind='enhanced_updated',**kwargs):await hub.broadcast({'type':kind,**kwargs})
+    def mutation_authorizer(request,pid=None):
+        user=getattr(request.state,'research_user',None)
+        if user is None:return None  # explicitly isolated legacy demo only
+        def check(c):
+            validate_session(c,request,user)
+            if pid is not None: access(c,user,pid)
+        return check
     @r.get('/status')
     def status(s=Depends(services)):return s.status()
     @r.get('/registry/patients')
@@ -19,16 +27,16 @@ def make_router(authorize,hub):
     @r.post('/registry/patients',dependencies=write)
     async def register(body:Registration,request:Request,s=Depends(services)):
         doctor_id=getattr(request.state,'research_doctor_id',None)
-        result=await asyncio.to_thread(s.registry.register,body,doctor_id);await changed();return result
+        result=await asyncio.to_thread(s.registry.register,body,doctor_id,mutation_authorizer(request));await changed();return result
     @r.get('/registry/patients/{pid}')
     async def patient(pid:str,request:Request,s=Depends(services)):
         result=await asyncio.to_thread(s.registry.detail,pid,getattr(request.state,'research_doctor_id',None));result['environment']=await s.environment.get(result['profile']['city']);return result
     @r.post('/registry/patients/{pid}/observations',dependencies=write)
-    async def observation(pid:str,body:Observation,s=Depends(services)):
-        result=await asyncio.to_thread(s.registry.observation,pid,body);await changed();return result
+    async def observation(pid:str,body:Observation,request:Request,s=Depends(services)):
+        result=await asyncio.to_thread(s.registry.observation,pid,body,mutation_authorizer(request,pid));await changed();return result
     @r.post('/registry/patients/{pid}/reviews',dependencies=write)
-    async def review(pid:str,body:Review,s=Depends(services)):
-        result=await asyncio.to_thread(s.registry.review,pid,body);await changed();return result
+    async def review(pid:str,body:Review,request:Request,s=Depends(services)):
+        result=await asyncio.to_thread(s.registry.review,pid,body,mutation_authorizer(request,pid));await changed();return result
     @r.get('/devices')
     def devices(patient_id:str|None=None,s=Depends(services)):return s.devices.list(patient_id)
     @r.post('/devices',dependencies=write)
@@ -68,7 +76,7 @@ def make_router(authorize,hub):
     def notification(nid:int,request:Request,s=Depends(services)):return s.notifications.detail(nid,doctor_id=getattr(request.state,'research_doctor_id',None))
     @r.patch('/notifications/{nid}',dependencies=write)
     async def update_notification(nid:int,body:NotificationUpdate,request:Request,s=Depends(services)):
-        result=await asyncio.to_thread(s.notifications.update,nid,body,getattr(request.state,'research_doctor_id',None));await changed();return result
+        result=await asyncio.to_thread(s.notifications.update,nid,body,getattr(request.state,'research_doctor_id',None),mutation_authorizer(request));await changed();return result
     @r.get('/email')
     def email(s=Depends(services)):return s.email.history()
     @r.post('/email/test',dependencies=write)
