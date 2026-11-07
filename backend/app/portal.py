@@ -51,15 +51,23 @@ def current(request: Request, authorization: str | None = Header(default=None)):
     request.state.portal_patient_id=user['linked_patient_id']
     return {key:user[key] for key in ('id','username','role','must_change_password')}
 
-def validate_session(c,request,user):
+def validate_session(c,request,user,allow_password_change=False):
     # Caller establishes a read snapshot or write transaction before this check.
-    row=c.execute('SELECT u.id,u.role,u.must_change_password FROM portal_sessions s JOIN portal_users u ON u.id=s.user_id WHERE s.token_hash=? AND s.user_id=? AND s.expires_at>?',
+    row=c.execute('SELECT u.id,u.username,u.role,u.must_change_password,u.temporary_password_expires_at,u.temporary_password_used_at FROM portal_sessions s JOIN portal_users u ON u.id=s.user_id WHERE s.token_hash=? AND s.user_id=? AND s.expires_at>?',
                   (getattr(request.state,'portal_session_hash',None),user['id'],timestamp())).fetchone()
     if not row or row['role']!=user['role']: raise HTTPException(401,'Session expired or invalid')
-    if row['must_change_password']: raise HTTPException(403,'Password change required')
+    if row['must_change_password']:
+        if not allow_password_change: raise HTTPException(403,'Password change required')
+        if not row['temporary_password_expires_at'] or row['temporary_password_expires_at']<=timestamp() or not row['temporary_password_used_at']: raise HTTPException(401,'Session expired or invalid')
     if user['role']=='patient':
         link=c.execute('SELECT patient_id FROM patient_user_links WHERE user_id=?',(user['id'],)).fetchone()
         if (link['patient_id'] if link else None)!=request.state.portal_patient_id: raise HTTPException(409,'Patient link changed during request')
+    return row
+
+def begin_authorized_read(c,request,user,allow_password_change=False):
+    # Authorization and all subsequent reads share this SQLite snapshot.
+    c.execute('BEGIN')
+    return validate_session(c,request,user,allow_password_change=allow_password_change)
 
 def begin_authorized_write(c,request,user):
     # SQLite serializes other database writers until this transaction commits.
@@ -197,24 +205,28 @@ def logout(request:Request, user=Depends(current), authorization:str=Header()):
 @router.get('/me')
 def me(request:Request,user=Depends(current)):
     with store(request).connect() as c:
+        row=begin_authorized_read(c,request,user,allow_password_change=True)
         link=c.execute('SELECT patient_id FROM patient_user_links WHERE user_id=?',(user['id'],)).fetchone() if user['role']=='patient' else None
-    return {**user,'patient_id':link['patient_id'] if link else None}
+    return {**{key:row[key] for key in ('id','username','role','must_change_password')},'patient_id':link['patient_id'] if link else None}
 
 @router.get('/patients')
 def patients(request:Request,user=Depends(current)):
     role(user,'doctor')
-    with store(request).connect() as c: ids=[r['patient_id'] for r in c.execute("SELECT a.patient_id FROM doctor_patient_assignments a JOIN patients p ON p.patient_id=a.patient_id WHERE a.doctor_id=? AND json_type(p.profile,'$.synthetic')='true' ORDER BY a.patient_id",(user['id'],))]
-    result=[]
-    for pid in ids:
-        try:
-            s=request.app.state.engine.patient(pid)
-            result.append({'patient_id':pid,'profile':s['profile'],'risks':s['risks'],'prediction_supported':s['prediction_supported']})
-        except KeyError: result.append({'patient_id':pid,'profile':{},'risks':None,'prediction_supported':False})
+    with store(request).connect() as c:
+        begin_authorized_read(c,request,user)
+        ids=[r['patient_id'] for r in c.execute("SELECT a.patient_id FROM doctor_patient_assignments a JOIN patients p ON p.patient_id=a.patient_id WHERE a.doctor_id=? AND json_type(p.profile,'$.synthetic')='true' ORDER BY a.patient_id",(user['id'],))]
+        result=[]
+        for pid in ids:
+            try:
+                s=request.app.state.engine.patient(pid,conn=c)
+                result.append({'patient_id':pid,'profile':s['profile'],'risks':s['risks'],'prediction_supported':s['prediction_supported']})
+            except KeyError: result.append({'patient_id':pid,'profile':{},'risks':None,'prediction_supported':False})
     return {'patients':result}
 
 @router.get('/patients/{pid}')
 def details(pid:str,request:Request,user=Depends(current)):
     with store(request).connect() as c:
+        begin_authorized_read(c,request,user)
         access(c,user,pid)
         row=c.execute('SELECT profile FROM patients WHERE patient_id=?',(pid,)).fetchone()
         profile=json.loads(row['profile']) if row else None
@@ -224,10 +236,10 @@ def details(pid:str,request:Request,user=Depends(current)):
             reviews=[dict(r) for r in c.execute('SELECT r.*,f.completed_at AS followup_completed_at,f.notes AS followup_completion_notes FROM doctor_reviews r LEFT JOIN followup_completions f ON f.review_id=r.id WHERE r.patient_id=? ORDER BY r.id DESC LIMIT 100',(pid,))]
         else:
             reviews=[dict(r) for r in c.execute('SELECT * FROM doctor_reviews WHERE patient_id=? AND shared=1 ORDER BY id DESC LIMIT 100',(pid,))]
-    try:
-        twin=request.app.state.engine.patient(pid)
-        history=request.app.state.engine.history(pid) if user['role']=='doctor' else None
-    except KeyError: twin=None;history=None
+        try:
+            twin=request.app.state.engine.patient(pid,conn=c)
+            history=request.app.state.engine.history(pid,conn=c) if user['role']=='doctor' else None
+        except KeyError: twin=None;history=None
     if user['role']=='patient' and twin: twin={'profile':twin['profile'],'timestamp':twin['timestamp'],'synthetic':True}
     return {'profile':profile,'twin':twin,'history':history,'checkins':checkins,'uploads':uploads,'reviews':reviews}
 
@@ -237,7 +249,7 @@ def queue_item(pid:str,kind:Literal['checkin','upload','sputum','daily','followu
     role(user,'doctor')
     if record_id<1: raise HTTPException(422,'Invalid record ID')
     with store(request).connect() as c:
-        c.execute('BEGIN')
+        begin_authorized_read(c,request,user)
         access(c,user,pid)
         queries={
             'checkin':'SELECT * FROM symptom_checkins WHERE patient_id=? AND id=?',
@@ -286,7 +298,7 @@ def patient_history(pid:str,kind:Literal['checkins','uploads','reviews','sputum'
     }
     table,alias,columns,time_col=tables[kind]
     with store(request).connect() as c:
-        c.execute('BEGIN')
+        begin_authorized_read(c,request,user)
         access(c,user,pid)
         joins=''
         if kind=='reviews' and user['role']=='doctor':
@@ -309,20 +321,27 @@ def patient_history(pid:str,kind:Literal['checkins','uploads','reviews','sputum'
                 item['reviews']=[dict(r) for r in c.execute('SELECT notes,shared,created_at FROM daily_care_reviews WHERE log_id=? '+('AND shared=1 ' if user['role']=='patient' else '')+'ORDER BY id DESC',(item['id'],))]
     return {'items':items,'limit':limit,'offset':offset,'total':total,'has_more':offset+len(items)<total}
 
-@router.get('/patients/{pid}/environment')
-async def environment(pid:str,request:Request,user=Depends(current)):
-    with store(request).connect() as c:
-        access(c,user,pid)
-        row=c.execute('SELECT profile FROM patients WHERE patient_id=?',(pid,)).fetchone()
+def patient_city(c,request,user,pid):
+    access(c,user,pid)
+    row=c.execute('SELECT profile FROM patients WHERE patient_id=?',(pid,)).fetchone()
     if not row: raise HTTPException(404,'Record not found')
-    # Historical cohort uses its original engine profile; newly registered
-    # synthetic records have only a persisted profile and no historical twin.
     if pid in request.app.state.engine.profiles:
         city=request.app.state.engine.profiles[pid]['city']
     else:
         city=json.loads(row['profile']).get('city')
     if not city: raise HTTPException(422,'City context unavailable for this record')
-    return await request.app.state.enhanced.environment.get(city)
+    return city
+
+@router.get('/patients/{pid}/environment')
+async def environment(pid:str,request:Request,user=Depends(current)):
+    with store(request).connect() as c:
+        begin_authorized_read(c,request,user)
+        city=patient_city(c,request,user,pid)
+    result=await request.app.state.enhanced.environment.get(city)
+    with store(request).connect() as c:
+        begin_authorized_read(c,request,user)
+        if patient_city(c,request,user,pid)!=city: raise HTTPException(409,'Patient city changed during request')
+    return result
 
 @router.post('/checkins',status_code=201)
 def checkin(body:Checkin,request:Request,user=Depends(current)):
@@ -363,6 +382,7 @@ async def upload(request:Request, kind:Literal['photo','care_plan']=Form(), desc
 @router.get('/uploads/{upload_id}')
 def download(upload_id:int,request:Request,user=Depends(current)):
     with store(request).connect() as c:
+        begin_authorized_read(c,request,user)
         row=c.execute('SELECT * FROM patient_uploads WHERE id=?',(upload_id,)).fetchone()
         if not row: raise HTTPException(404,'File not found')
         access(c,user,row['patient_id'])
@@ -397,6 +417,7 @@ def notification_scope(user):
 @router.get('/notifications')
 def notifications(request:Request,user=Depends(current)):
     with store(request).connect() as c:
+        begin_authorized_read(c,request,user)
         return {'notifications':[dict(r) for r in c.execute('SELECT n.* FROM portal_notifications n WHERE n.user_id=? AND '+notification_scope(user)+' ORDER BY n.id DESC LIMIT 200',(user['id'],user['id']))]}
 
 @router.post('/notifications/{notification_id}/read')
@@ -423,7 +444,7 @@ def require_full_historical_assignment(c,engine,doctor_id):
 def validation(request:Request,user=Depends(current)):
     role(user,'doctor')
     with store(request).connect() as c:
-        c.execute('BEGIN')
+        begin_authorized_read(c,request,user)
         require_full_historical_assignment(c,request.app.state.engine,user['id'])
     evaluation=request.app.state.engine.evaluation
     # Do not expose the protocol's patient ID lists to unassigned users.
@@ -529,6 +550,7 @@ def edit_sputum(entry_id:int,body:SputumInput,request:Request,user=Depends(curre
 @router.get('/patients/{pid}/sputum')
 def list_sputum(pid:str,request:Request,user=Depends(current)):
     with store(request).connect() as c:
+        begin_authorized_read(c,request,user)
         access(c,user,pid)
         entries=[dict(r) for r in c.execute('SELECT * FROM sputum_entries WHERE patient_id=? ORDER BY observed_at DESC,id DESC LIMIT 500',(pid,))]
         for entry in entries:
@@ -554,6 +576,7 @@ def review_sputum(pid:str,entry_id:int,body:SputumReview,request:Request,user=De
 @router.get('/patients/{pid}/care-plan')
 def get_plan(pid:str,request:Request,user=Depends(current)):
     with store(request).connect() as c:
+        begin_authorized_read(c,request,user)
         access(c,user,pid)
         plans=[dict(r) for r in c.execute('SELECT * FROM care_plan_versions WHERE patient_id=? ORDER BY id DESC LIMIT 100',(pid,))]
     return {'current':plans[0] if plans and plans[0]['active'] else None,'history':plans if user['role']=='doctor' else []}
@@ -598,7 +621,7 @@ def daily_summary(pid:str,request:Request,start:datetime,end:datetime,user=Depen
     start_utc=utc_time(start);end_utc=utc_time(end)
     if end<=start or end-start>timedelta(hours=27): raise HTTPException(422,'Invalid daily interval')
     with store(request).connect() as c:
-        c.execute('BEGIN')
+        begin_authorized_read(c,request,user)
         access(c,user,pid)
         row=c.execute("""SELECT
             COALESCE(SUM(CASE WHEN kind='meal' THEN 1 ELSE 0 END),0) AS meals_recorded,
@@ -611,6 +634,7 @@ def daily_summary(pid:str,request:Request,start:datetime,end:datetime,user=Depen
 def list_daily(pid:str,request:Request,kind:Literal['all','meal','hydration','activity']='all',start:date|None=None,end:date|None=None,review_status:Literal['all','Pending Review','Reviewed']='all',user=Depends(current)):
     if start and end and start>end: raise HTTPException(422,'Invalid date range')
     with store(request).connect() as c:
+        begin_authorized_read(c,request,user)
         access(c,user,pid)
         sql='SELECT id,patient_id,kind,occurred_at,created_at,item,status,amount_ml,duration_minutes,effort,comments,review_status FROM daily_care_logs WHERE patient_id=?';args=[pid]
         if kind!='all':sql+=' AND kind=?';args.append(kind)
@@ -707,7 +731,7 @@ def care_queue(request:Request,limit:int=Query(default=200,ge=1,le=200),offset:i
     direction='DESC' if order=='newest' else 'ASC'
     with store(request).connect() as c:
         # The count and page use one read snapshot and the same scoped filter.
-        c.execute('BEGIN')
+        begin_authorized_read(c,request,user)
         total=c.execute(query+' SELECT COUNT(*) FROM queue'+where,params).fetchone()[0]
         rows=c.execute(query+' SELECT * FROM queue'+where+f' ORDER BY timestamp {direction},kind ASC,id {direction} LIMIT ? OFFSET ?',(*params,limit,offset)).fetchall()
     return {'items':[dict(row) for row in rows], 'limit':limit,'offset':offset,'total':total,'has_more':offset+len(rows)<total,
@@ -717,6 +741,7 @@ def care_queue(request:Request,limit:int=Query(default=200,ge=1,le=200),offset:i
 def doctor_summary(request:Request,user=Depends(current)):
     role(user,'doctor')
     with store(request).connect() as c:
+        begin_authorized_read(c,request,user)
         ids=[r['patient_id'] for r in c.execute("SELECT a.patient_id FROM doctor_patient_assignments a JOIN patients p ON p.patient_id=a.patient_id WHERE a.doctor_id=? AND json_type(p.profile,'$.synthetic')='true'",(user['id'],))]
         if not ids:return {'assigned':0,'pending_checkins':0,'pending_sputum':0,'pending_uploads':0,'followups_due':0}
         marks=','.join('?' for _ in ids)
