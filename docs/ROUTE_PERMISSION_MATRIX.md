@@ -9,7 +9,7 @@ L is intentionally over-restrictive: a second doctor blocks unscoped research fe
 | Method | Route | Server-side requirement |
 |---|---|---|
 | POST | `/api/portal/register` | Public patient-only self-registration; account unlinked |
-| POST | `/api/portal/login` | Public credential check; issue session or consume temporary credential |
+| POST | `/api/portal/login` | Public credential check with persistent per-username failure throttle; issue session or consume temporary credential |
 | POST | `/api/portal/password` | S: own account; current password; revoke all sessions |
 | POST | `/api/portal/logout` | S: revoke own token |
 | GET | `/api/portal/me` | S: own account/link |
