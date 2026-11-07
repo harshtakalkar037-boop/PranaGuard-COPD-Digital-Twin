@@ -1,5 +1,5 @@
 """Care workspace: demo auth, doctor scoping/isolation, review workflow, plans, sputum, activity."""
-import base64,json
+import base64,json,hashlib
 import pytest
 
 def login(client,username,password):return client.post('/api/workspace/login',json={'username':username,'password':password})
@@ -181,3 +181,17 @@ def test_legacy_research_api_uses_workspace_scope_when_enabled(client, monkeypat
     )
     assert preflight.status_code == 200
     assert 'authorization' in preflight.headers.get('access-control-allow-headers', '').lower()
+
+
+def test_workspace_login_throttle_persists_and_expires(client, engine):
+    for attempt in range(4):
+        assert login(client, 'dr-atlas', 'wrong-password').status_code == 401
+    assert login(client, 'dr-atlas', 'wrong-password').status_code == 429
+    assert login(client, 'dr-atlas', 'prana-atlas-demo').status_code == 429
+    assert login(client, 'dr-nova', 'prana-nova-demo').status_code == 200
+
+    username_hash=hashlib.sha256(b'dr-atlas').hexdigest()
+    with engine.store.connect() as c:
+        c.execute('UPDATE care_login_failures SET window_expires_at=? WHERE username_hash=?',
+                  ('2000-01-01T00:00:00+00:00', username_hash))
+    assert login(client, 'dr-atlas', 'prana-atlas-demo').status_code == 200
