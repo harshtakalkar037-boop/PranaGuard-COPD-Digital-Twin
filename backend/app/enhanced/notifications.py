@@ -58,9 +58,11 @@ class Notifications:
             result['history']=[dict(r) for r in c.execute('SELECT * FROM notification_history WHERE notification_id=? ORDER BY id',(nid,))]
         return result
 
-    def update(self,nid,body):
+    def update(self,nid,body,authorize=None):
         with self.store.connect() as c:
-            c.execute('BEGIN IMMEDIATE');row=c.execute('SELECT * FROM notifications WHERE id=?',(nid,)).fetchone()
+            c.execute('BEGIN IMMEDIATE')
+            if authorize is not None:authorize(c)
+            row=c.execute('SELECT * FROM notifications WHERE id=?',(nid,)).fetchone()
             if not row:raise HTTPException(404,'Notification not found.')
             old=row['status'];target=body.status or old;at=stamp()
             if target!=old:
