@@ -1,7 +1,7 @@
 """Typed REST extension; original REST/WebSocket routes are retained."""
 import asyncio
 from typing import Literal
-from fastapi import APIRouter,Depends,Header,Query,Request
+from fastapi import APIRouter,Depends,Header,Query,Request,HTTPException
 from backend.app.enhanced.schemas import Registration,AssociateDevice,SimulationControl,Ingestion,Observation,NotificationUpdate,Review,EmptyBody
 from backend.app.enhanced.settings import CITIES
 from backend.app.enhanced.provenance import provenance
@@ -12,7 +12,7 @@ def make_router(authorize,hub):
     def services(request:Request):return request.app.state.enhanced
     write=[Depends(authorize)]
     async def changed(kind='enhanced_updated',**kwargs):await hub.broadcast({'type':kind,**kwargs})
-    def mutation_authorizer(request,pid=None):
+    def session_authorizer(request,pid=None):
         user=getattr(request.state,'research_user',None)
         if user is None:return None  # explicitly isolated legacy demo only
         def check(c):
@@ -23,20 +23,27 @@ def make_router(authorize,hub):
     def status(s=Depends(services)):return s.status()
     @r.get('/registry/patients')
     def patients(request:Request,q:str=Query(default='',max_length=100),city:str|None=None,status:Literal['historical_twin','baseline_not_started','collecting_baseline','baseline_collected_no_model']|None=None,risk:Literal['low','elevated','high','unavailable']|None=None,sex:Literal['Female','Male','Other','Not specified']|None=None,s=Depends(services)):
-        return s.registry.list(q,city,status,risk,sex,doctor_id=getattr(request.state,'research_doctor_id',None))
+        return s.registry.list(q,city,status,risk,sex,doctor_id=getattr(request.state,'research_doctor_id',None),authorize=session_authorizer(request))
     @r.post('/registry/patients',dependencies=write)
     async def register(body:Registration,request:Request,s=Depends(services)):
         doctor_id=getattr(request.state,'research_doctor_id',None)
-        result=await asyncio.to_thread(s.registry.register,body,doctor_id,mutation_authorizer(request));await changed();return result
+        result=await asyncio.to_thread(s.registry.register,body,doctor_id,session_authorizer(request));await changed();return result
     @r.get('/registry/patients/{pid}')
     async def patient(pid:str,request:Request,s=Depends(services)):
-        result=await asyncio.to_thread(s.registry.detail,pid,getattr(request.state,'research_doctor_id',None));result['environment']=await s.environment.get(result['profile']['city']);return result
+        check=session_authorizer(request,pid)
+        result=await asyncio.to_thread(s.registry.detail,pid,getattr(request.state,'research_doctor_id',None),check)
+        city=result['profile']['city'];result['environment']=await s.environment.get(city)
+        if check is not None:
+            with s.store.connect() as c:
+                c.execute('BEGIN');check(c)
+                if s.registry.require(pid,conn=c).get('city')!=city:raise HTTPException(409,'Patient city changed during request')
+        return result
     @r.post('/registry/patients/{pid}/observations',dependencies=write)
     async def observation(pid:str,body:Observation,request:Request,s=Depends(services)):
-        result=await asyncio.to_thread(s.registry.observation,pid,body,mutation_authorizer(request,pid));await changed();return result
+        result=await asyncio.to_thread(s.registry.observation,pid,body,session_authorizer(request,pid));await changed();return result
     @r.post('/registry/patients/{pid}/reviews',dependencies=write)
     async def review(pid:str,body:Review,request:Request,s=Depends(services)):
-        result=await asyncio.to_thread(s.registry.review,pid,body,mutation_authorizer(request,pid));await changed();return result
+        result=await asyncio.to_thread(s.registry.review,pid,body,session_authorizer(request,pid));await changed();return result
     @r.get('/devices')
     def devices(patient_id:str|None=None,s=Depends(services)):return s.devices.list(patient_id)
     @r.post('/devices',dependencies=write)
@@ -76,7 +83,7 @@ def make_router(authorize,hub):
     def notification(nid:int,request:Request,s=Depends(services)):return s.notifications.detail(nid,doctor_id=getattr(request.state,'research_doctor_id',None))
     @r.patch('/notifications/{nid}',dependencies=write)
     async def update_notification(nid:int,body:NotificationUpdate,request:Request,s=Depends(services)):
-        result=await asyncio.to_thread(s.notifications.update,nid,body,getattr(request.state,'research_doctor_id',None),mutation_authorizer(request));await changed();return result
+        result=await asyncio.to_thread(s.notifications.update,nid,body,getattr(request.state,'research_doctor_id',None),session_authorizer(request));await changed();return result
     @r.get('/email')
     def email(s=Depends(services)):return s.email.history()
     @r.post('/email/test',dependencies=write)

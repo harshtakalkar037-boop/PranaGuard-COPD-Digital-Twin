@@ -17,8 +17,12 @@ try{
  const alerts=await (await page.request.get(base+'/api/alerts?patient_id=PG-0001',{headers})).json();const alert=alerts.alerts.find(a=>a.status==='new');check(alert,'No seeded alert for assigned patient');
  const alertUpdate=await page.request.patch(`${base}/api/alerts/${alert.id}`,{headers,data:{status:'acknowledged',note:'Synthetic browser alert review'}});check(alertUpdate.ok(),'Assigned alert update failed');
  const otherLogin=await page.request.post(base+'/api/portal/login',{data:{username:other,password}});check(otherLogin.ok(),'Second doctor login failed');const foreign={Authorization:`Bearer ${(await otherLogin.json()).token}`};
+ const assignedList=await page.request.get(base+'/api/enhanced/registry/patients',{headers});check(assignedList.ok()&&(await assignedList.json()).patients.some(p=>p.patient_id===pid),'Assigned registry record missing');
+ const assignedDetail=await page.request.get(`${base}/api/enhanced/registry/patients/${pid}`,{headers});check(assignedDetail.ok()&&(await assignedDetail.json()).profile.patient_id===pid,'Assigned registry detail missing');
+ const foreignList=await page.request.get(base+'/api/enhanced/registry/patients',{headers:foreign});check(foreignList.ok()&&!(await foreignList.json()).patients.some(p=>p.patient_id===pid),'Foreign registry record exposed in list');
+ check((await page.request.get(`${base}/api/enhanced/registry/patients/${pid}`,{headers:foreign})).status()===404,'Foreign registry detail exposed');
  for(const [path,data] of [[`/api/enhanced/registry/patients/${pid}/observations`,{fictional_data_confirmed:true,symptom_score:8,adherence:.4,note:'not assigned'}],[`/api/enhanced/registry/patients/${pid}/reviews`,{kind:'contact',note:'not assigned'}],['/api/enhanced/registry/patients',payload]])check((await page.request.post(base+path,{headers:foreign,data})).status()===404,`Foreign write allowed: ${path}`);
  check((await page.request.patch(`${base}/api/enhanced/notifications/${notice.id}`,{headers:foreign,data:{read:true}})).status()===404,'Foreign notification write allowed');
  check((await page.request.patch(`${base}/api/alerts/${alert.id}`,{headers:foreign,data:{status:'resolved'}})).status()===404,'Foreign alert write allowed');
- check(!errors.length,`Browser errors: ${errors.join('; ')}`);console.log('PASS: fictional registry, observation, review, alert and notification writes; persistence and second-doctor denial.');
+ check(!errors.length,`Browser errors: ${errors.join('; ')}`);console.log('PASS: fictional registry reads, observation, review, alert and notification writes; persistence and second-doctor denial.');
 }finally{await browser.close()}

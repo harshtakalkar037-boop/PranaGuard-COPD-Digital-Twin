@@ -20,10 +20,11 @@ class Notifications:
                 c.execute('INSERT INTO notification_history(notification_id,created_at,to_status,action,note,actor) VALUES (?,?,?,?,?,?)',(nid,at,'active','created',reason,'demo_service'))
             return nid
 
-    def sync_legacy(self,doctor_id=None):
+    def sync_legacy(self,doctor_id=None,authorize=None):
         """Bridge persisted source alerts, never replace or silently delete them."""
         with self.store.connect() as c:
-            if doctor_id is not None:c.execute('BEGIN IMMEDIATE')
+            if doctor_id is not None or authorize is not None:c.execute('BEGIN IMMEDIATE')
+            if authorize is not None:authorize(c)
             query='SELECT a.* FROM alerts a'
             args=()
             if doctor_id is not None:
@@ -66,12 +67,13 @@ class Notifications:
                   OR NOT EXISTS (SELECT 1 FROM doctor_patient_assignments d WHERE d.doctor_id=? AND d.patient_id=p.patient_id))"""
         return f'(({patient}) OR ({system}))',[doctor_id,doctor_id]
 
-    def list(self,patient_id=None,category=None,status=None,unread_only=False,limit=200,doctor_id=None):
-        self.sync_legacy(doctor_id);scope,scope_args=self.scope(doctor_id);where=[scope];args=list(scope_args)
+    def list(self,patient_id=None,category=None,status=None,unread_only=False,limit=200,doctor_id=None,conn=None):
+        if conn is None:self.sync_legacy(doctor_id)
+        scope,scope_args=self.scope(doctor_id);where=[scope];args=list(scope_args)
         for key,value in [('patient_id',patient_id),('category',category),('status',status)]:
             if value:where.append('n.'+key+'=?');args.append(value)
         if unread_only:where.append('n.read_at IS NULL')
-        with self.store.connect() as c:
+        with (nullcontext(conn) if conn is not None else self.store.connect()) as c:
             if patient_id and doctor_id is not None and not c.execute("SELECT 1 FROM patients p JOIN doctor_patient_assignments d ON d.patient_id=p.patient_id WHERE p.patient_id=? AND d.doctor_id=? AND json_type(p.profile,'$.synthetic')='true'",(patient_id,doctor_id)).fetchone():
                 raise HTTPException(404,'Record not found')
             rows=c.execute('SELECT n.* FROM notifications n WHERE '+' AND '.join(where)+' ORDER BY n.id DESC LIMIT ?',[*args,limit]).fetchall()

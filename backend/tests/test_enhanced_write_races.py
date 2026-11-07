@@ -216,3 +216,136 @@ def test_synthetic_marker_rechecked_for_each_patient_mutation(writes,monkeypatch
         assert response.status_code==404,(path,response.status_code,response.text)
         with store.connect() as c:c.execute("UPDATE patients SET profile=? WHERE patient_id='PG-0001'",(profile,))
         assert snapshot(client)==before
+
+
+def test_registry_reads_revalidate_after_middleware_and_before_sync(writes,monkeypatch):
+    client,did,_,_=writes;store=client.app.state.engine.store
+    registry=client.app.state.enhanced.registry;notices=client.app.state.enhanced.notifications
+    for target,path in [(registry,'/api/enhanced/registry/patients'),(notices,'/api/enhanced/registry/patients/PG-0001')]:
+        headers=auth(client,'doctor');before=snapshot(client)
+        attr='list' if target is registry else 'sync_legacy';original=getattr(target,attr)
+        def revoked(*args,**kwargs):
+            revoke(store,headers)
+            return original(*args,**kwargs)
+        with monkeypatch.context() as patch:
+            patch.setattr(target,attr,revoked)
+            response=client.get(path,headers=headers)
+        assert response.status_code==401,(path,response.text)
+        assert snapshot(client)==before
+
+
+def test_registry_detail_rechecks_after_sync_before_snapshot(writes,monkeypatch):
+    client,did,_,_=writes;store=client.app.state.engine.store;notices=client.app.state.enhanced.notifications
+    original=notices.sync_legacy
+    for change,code in [('revoke',401),('unassign',404)]:
+        with store.connect() as c:c.execute('INSERT OR IGNORE INTO doctor_patient_assignments VALUES (?,?)',(did,'PG-0001'))
+        headers=auth(client,'doctor')
+        def changed(*args,**kwargs):
+            result=original(*args,**kwargs)
+            if change=='revoke':revoke(store,headers)
+            else:
+                with store.connect() as c:c.execute('DELETE FROM doctor_patient_assignments WHERE doctor_id=? AND patient_id=?',(did,'PG-0001'))
+            return result
+        with monkeypatch.context() as patch:
+            patch.setattr(notices,'sync_legacy',changed)
+            response=client.get('/api/enhanced/registry/patients/PG-0001',headers=headers)
+        assert response.status_code==code,response.text
+
+
+@pytest.mark.parametrize(('change','status'),[('revoke',401),('unassign',404),('synthetic',404),('city',409)])
+def test_registry_detail_rechecks_after_environment(writes,monkeypatch,change,status):
+    client,did,_,_=writes;store=client.app.state.engine.store;headers=auth(client,'doctor');seen=[]
+    with store.connect() as c:profile=c.execute("SELECT profile FROM patients WHERE patient_id='PG-0001'").fetchone()[0]
+    async def provider(city):
+        seen.append(city)
+        if change=='revoke':revoke(store,headers)
+        else:
+            with store.connect() as c:
+                if change=='unassign':c.execute('DELETE FROM doctor_patient_assignments WHERE doctor_id=? AND patient_id=?',(did,'PG-0001'))
+                elif change=='synthetic':c.execute("UPDATE patients SET profile=json_set(profile,'$.synthetic',json('false')) WHERE patient_id='PG-0001'")
+                else:c.execute("UPDATE patients SET profile=json_set(profile,'$.city','Delhi') WHERE patient_id='PG-0001'")
+        return {'test':'external response'}
+    with monkeypatch.context() as patch:
+        patch.setattr(client.app.state.enhanced.environment,'get',provider)
+        response=client.get('/api/enhanced/registry/patients/PG-0001',headers=headers)
+    with store.connect() as c:c.execute("UPDATE patients SET profile=? WHERE patient_id='PG-0001'",(profile,))
+    assert seen and response.status_code==status,response.text
+    assert 'external response' not in response.text
+
+
+def test_registry_detail_snapshot_consistent_during_concurrent_changes(writes,monkeypatch):
+    client,did,_,nid=writes;store=client.app.state.engine.store;registry=client.app.state.enhanced.registry
+    headers=auth(client,'doctor')
+    with store.connect() as c:
+        notice_title=c.execute('SELECT title FROM notifications WHERE id=?',(nid,)).fetchone()[0]
+        obs=c.execute("INSERT INTO demo_observations(patient_id,created_at,symptom_score,adherence,note) VALUES ('PG-0001',?,1,1,'before snapshot')",(portal.timestamp(),)).lastrowid
+        row=c.execute("SELECT version,state FROM states WHERE patient_id='PG-0001' ORDER BY version DESC LIMIT 1").fetchone()
+        version,state=row['version'],row['state']
+    original=registry.require;changed=[]
+    def after_snapshot(pid,conn=None):
+        profile=original(pid,conn=conn)
+        if not changed:
+            changed.append(True)
+            new_state=json.loads(state);new_state['model_version']='changed after snapshot'
+            with store.connect() as c:
+                c.execute("UPDATE demo_observations SET note='after snapshot' WHERE id=?",(obs,))
+                c.execute("UPDATE notifications SET title='after snapshot' WHERE id=?",(nid,))
+                c.execute("UPDATE states SET state=? WHERE patient_id='PG-0001' AND version=?",(json.dumps(new_state),version))
+        return profile
+    async def provider(city):return {'city':city}
+    with monkeypatch.context() as patch:
+        patch.setattr(registry,'require',after_snapshot)
+        patch.setattr(client.app.state.enhanced.environment,'get',provider)
+        response=client.get('/api/enhanced/registry/patients/PG-0001',headers=headers)
+    with store.connect() as c:
+        c.execute('DELETE FROM demo_observations WHERE id=?',(obs,))
+        c.execute('UPDATE notifications SET title=? WHERE id=?',(notice_title,nid))
+        c.execute("UPDATE states SET state=? WHERE patient_id='PG-0001' AND version=?",(state,version))
+    assert response.status_code==200,response.text
+    result=response.json()
+    assert next(x for x in result['observations'] if x['id']==obs)['note']=='before snapshot'
+    assert result['model_state']==json.loads(state)
+    assert next(x for x in result['notifications'] if x['id']==nid)['title']==notice_title
+
+
+def test_registry_list_scope_and_manual_baseline_use_one_snapshot(writes,monkeypatch):
+    client,did,_,_=writes;store=client.app.state.engine.store;registry=client.app.state.enhanced.registry
+    headers=auth(client,'doctor');body={**REG,'request_id':'enhanced-list-snapshot'}
+    response=client.post('/api/enhanced/registry/patients',headers=headers,json=body);assert response.status_code==200,response.text
+    pid=response.json()['patient_id'];original=registry.baseline;changed=[]
+    def after_snapshot(target,conn=None):
+        if target==pid and not changed:
+            changed.append(True)
+            with store.connect() as c:
+                at=portal.timestamp()
+                c.execute('INSERT INTO devices(id,patient_id,kind,label,created_at,token_hash) VALUES (?,?,?,?,?,?)',('snapshot-device',pid,'pulse_oximeter','demo',at,'hash'))
+                event=c.execute("INSERT INTO ingestion_events(device_id,patient_id,event_id,payload_hash,observed_at,received_at,source_type) VALUES (?,?,?,?,?,?,'simulated_device')",('snapshot-device',pid,'snapshot-event','hash',at,at)).lastrowid
+                c.execute("INSERT INTO device_readings(event_pk,patient_id,device_id,metric,value,unit,observed_at,received_at) VALUES (?,?,?,?,?,?,?,?)",(event,pid,'snapshot-device','spo2',95,'%',at,at))
+                c.execute('DELETE FROM doctor_patient_assignments WHERE doctor_id=? AND patient_id=?',(did,pid))
+        return original(target,conn=conn)
+    with monkeypatch.context() as patch:
+        patch.setattr(registry,'baseline',after_snapshot)
+        response=client.get('/api/enhanced/registry/patients',headers=headers)
+    assert response.status_code==200,response.text
+    record=next(p for p in response.json()['patients'] if p['patient_id']==pid)
+    assert record['monitoring_status']=='baseline_not_started' and record['device_count']==0
+    later=client.get('/api/enhanced/registry/patients',headers=headers)
+    assert all(p['patient_id']!=pid for p in later.json()['patients'])
+
+
+@pytest.mark.parametrize('change',['unassign','synthetic'])
+def test_registry_list_scopes_changes_before_snapshot(writes,monkeypatch,change):
+    client,did,_,_=writes;store=client.app.state.engine.store;registry=client.app.state.enhanced.registry
+    headers=auth(client,'doctor');original=registry.list
+    with store.connect() as c:profile=c.execute("SELECT profile FROM patients WHERE patient_id='PG-0001'").fetchone()[0]
+    def changed(*args,**kwargs):
+        with store.connect() as c:
+            if change=='unassign':c.execute('DELETE FROM doctor_patient_assignments WHERE doctor_id=? AND patient_id=?',(did,'PG-0001'))
+            else:c.execute("UPDATE patients SET profile=json_set(profile,'$.synthetic',json('false')) WHERE patient_id='PG-0001'")
+        return original(*args,**kwargs)
+    with monkeypatch.context() as patch:
+        patch.setattr(registry,'list',changed)
+        response=client.get('/api/enhanced/registry/patients',headers=headers)
+    with store.connect() as c:c.execute("UPDATE patients SET profile=? WHERE patient_id='PG-0001'",(profile,))
+    assert response.status_code==200,response.text
+    assert all(p['patient_id']!='PG-0001' for p in response.json()['patients'])
