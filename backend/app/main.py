@@ -90,7 +90,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         assigned=workspace.assigned_ids(user)
         if request.method not in ('GET','HEAD') and user.get('role')!='doctor':
             return JSONResponse(status_code=403,content={'detail':'Only an assigned demo doctor can perform research-workspace writes.'})
-        if path.startswith('/api/enhanced/') or path in ('/api/validation','/api/model48/study','/api/replay','/api/status') or path.startswith('/api/replay/'):
+        if path.startswith('/api/enhanced/') or path.startswith('/api/model48/') or path in ('/api/validation','/api/replay','/api/status') or path.startswith('/api/replay/'):
             if user.get('role')!='doctor' or len(assigned)!=len(request.app.state.engine.profiles):
                 return JSONResponse(status_code=403,content={'detail':'This research operation requires a doctor account assigned to the complete synthetic cohort.'})
         match=re.match(r'^/api/patients/([^/]+)(?:/|$)',path)
@@ -134,9 +134,13 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     @app.get('/api/alerts')
     def alerts(request:Request,patient_id:str|None=None,e:TwinEngine=Depends(engine)):\n        allowed=getattr(request.state,'workspace_patient_ids',None)\n        if allowed is None:return {'alerts':e.store.alerts(patient_id)}\n        if patient_id is not None and patient_id not in allowed:return {'alerts':[]}\n        return {'alerts':[a for a in e.store.alerts(patient_id) if a['patient_id'] in allowed]}
     @app.patch('/api/alerts/{alert_id}',dependencies=[Depends(authorize)])
-    async def update_alert(alert_id:int,body:AlertUpdate,e:TwinEngine=Depends(engine)):
+    async def update_alert(alert_id:int,body:AlertUpdate,request:Request,e:TwinEngine=Depends(engine)):
         with e.store.connect() as c:
+            c.execute('BEGIN IMMEDIATE')
             row=c.execute('SELECT * FROM alerts WHERE id=?',(alert_id,)).fetchone()
+            allowed=getattr(request.state,'workspace_patient_ids',None)
+            if allowed is not None and row is not None and row['patient_id'] not in allowed:
+                raise HTTPException(404,'Alert not found in this account scope.')
             if not row:raise HTTPException(404,'Alert not found')
             if row['status']=='resolved':raise HTTPException(409,'Resolved alert is immutable. A later high-risk state may create a new alert.')
             c.execute('UPDATE alerts SET status=?,note=?,updated_at=? WHERE id=?',(body.status,body.note,now(),alert_id))
@@ -186,6 +190,14 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         result=await asyncio.to_thread(perform);await hub.broadcast({'type':'twin_updated','replay':result});return result
     @app.websocket('/api/ws')
     async def websocket(socket:WebSocket):
+        if os.getenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH','0')=='1':
+            try:
+                user=socket.app.state.workspace.principal(socket.query_params.get('token'))
+                assigned=socket.app.state.workspace.assigned_ids(user)
+                if user.get('role')!='doctor' or len(assigned)!=len(socket.app.state.engine.profiles):
+                    await socket.close(code=4403);return
+            except HTTPException:
+                await socket.close(code=4401);return
         await socket.accept();hub.clients.add(socket)
         try:
             await socket.send_json({'type':'connected','synthetic':True})
