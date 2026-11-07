@@ -16,8 +16,8 @@ def make_router(authorize,hub):
         user=request.state.workspace_user
         header=request.headers.get('authorization','')
         token=header[7:] if header.startswith('Bearer ') else None
-        def check(conn):
-            request.app.state.workspace.authorize_write(conn,token,user['username'],pid,full_cohort=True)
+        def check(conn,actual_pid=None):
+            request.app.state.workspace.authorize_write(conn,token,user['username'],actual_pid if actual_pid is not None else pid,full_cohort=True)
         return check
     @r.get('/status')
     def status(s=Depends(services)):return s.status()
