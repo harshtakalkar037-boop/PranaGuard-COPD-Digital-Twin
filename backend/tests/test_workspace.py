@@ -269,6 +269,11 @@ def test_enhanced_registration_is_assigned_and_remains_mutable_in_unified_mode(c
     notice=client.get('/api/enhanced/notifications?patient_id='+pid,headers=doctor).json()['notifications'][0]
     reviewed=client.patch(f"/api/enhanced/notifications/{notice['id']}",headers=doctor,json={'status':'acknowledged','note':'Synthetic notification review'})
     assert reviewed.status_code==200,reviewed.text
+    device=client.post('/api/enhanced/devices',headers=doctor,json={'patient_id':pid,'kind':'pulse_oximeter','interval_seconds':60})
+    assert device.status_code==200,device.text
+    did=device.json()['id']
+    assert client.post(f'/api/enhanced/devices/{did}/start',headers=doctor,json={'interval_seconds':60}).status_code==200
+    assert client.post(f'/api/enhanced/devices/{did}/stop',headers=doctor,json={}).status_code==200
     second=client.post('/api/enhanced/registry/patients',headers=doctor,json={
         'request_id':'UNIFIED-ASSIGN-0002',
         'fictional_identity_confirmed':True,
