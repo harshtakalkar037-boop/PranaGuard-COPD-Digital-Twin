@@ -12,7 +12,9 @@
     "test:e2e:unified": "node e2e/unified-navigation.mjs",
     "test:e2e:registration": "node e2e/registration.mjs",
     "test:e2e:accessibility": "node e2e/accessibility.mjs",
-    "test:e2e:scoped": "node e2e/scoped-research.mjs"
+    "test:e2e:scoped": "node e2e/scoped-research.mjs",
+    "test:e2e:partial": "node e2e/partial-cohort.mjs",
+    "test:e2e:patient-management": "node e2e/patient-management.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

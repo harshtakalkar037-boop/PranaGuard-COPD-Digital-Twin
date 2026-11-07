@@ -151,3 +151,8 @@
 @media (prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+/* Account controls and historical-risk labels also appear inside the registry profile. */
+.pg-enhanced .main-shell .pgx .portal-card p,
+.pg-enhanced .main-shell .pgx .portal-card small,
+.pg-enhanced .main-shell .pgx-inline-metrics span{color:#405b48}
+.pg-enhanced .main-shell .pgx-inline-metrics span{font-size:11px}

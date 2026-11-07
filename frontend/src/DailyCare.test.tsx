@@ -1,6 +1,7 @@
 import {render,screen,waitFor,within} from '@testing-library/react';
 import {afterEach,describe,it,expect,vi} from 'vitest';
-import {DailyPatient} from './DailyCare';
+import {DailyPatient,Provision} from './DailyCare';
+import userEvent from '@testing-library/user-event';
 
 describe('daily care safety and loading states',()=>{
  afterEach(()=>vi.unstubAllGlobals());
@@ -27,4 +28,15 @@ describe('daily care safety and loading states',()=>{
   expect(screen.queryByText(/No personal hydration target has been set/)).not.toBeInTheDocument();
   expect(screen.queryByText(/0 meals recorded/)).not.toBeInTheDocument();
  });
+});
+
+
+it('does not display a late one-time credential after changing patient',async()=>{
+ let resolve!: (value:unknown)=>void;vi.stubGlobal('fetch',vi.fn(()=>new Promise(r=>{resolve=r})));
+ const {rerender}=render(<Provision key="one" pid="PG-0001"/>);
+ await userEvent.click(screen.getByRole('button',{name:'Provision assigned patient'}));
+ rerender(<Provision key="two" pid="PG-0002"/>);
+ resolve({ok:true,json:async()=>({login_id:'PG-0001',patient_id:'PG-0001',assigned_doctor:'doc',status:'pending',temporary_password:'ephemeral-example-password',temporary_password_expires_at:'2099-01-01T00:00:00Z'})});
+ await new Promise(r=>setTimeout(r,0));
+ expect(screen.queryByText('One-time onboarding details')).not.toBeInTheDocument();expect(screen.getByText('PG-0002')).toBeInTheDocument();
 });
