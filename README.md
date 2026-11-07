@@ -102,6 +102,8 @@ live environment panels (disabled by default — see below).
 | Variable | Default | Purpose |
 |---|---|---|
 | `PRANAGUARD_DB` | `data/pranaguard.sqlite` | Database path (use a copy for risky testing) |
+| `PRANAGUARD_REQUIRE_WORKSPACE_AUTH` | `0` | Require a current workspace bearer session on legacy research APIs; enable `1` only after hosted verification |
+| `PRANAGUARD_CORS_ORIGINS` | `*` | Comma-separated allowed browser origins; set the hosted frontend origin explicitly where possible |
 | `PRANAGUARD_DEMO_{ATLAS,NOVA,PATIENT}_PASSWORD` | documented demo values | Demo account passwords on first seed |
 | `PRANAGUARD_TWIN_CACHE_PATH` | `models_store/artifacts/twin/twin_cache.sqlite` | Precomputed twin cache (hash-protected) |
 | `PRANAGUARD_WATCHDOG_ENABLED` | `0` | Auto-recompute twins (never in demo mode) |
