@@ -39,10 +39,10 @@ function App(){
   api<{user:SessionUser}>('/workspace/me').then(r=>{setUser(r.user);setAuthState('ready');}).catch(e=>{if(e instanceof ApiError&&e.status===401){sessionStorage.removeItem('pg-workspace-session');}setAuthState('signed-out');});},[]);
  const isEnhanced=enhancedViews.includes(view);
  const profileExport=['registry','devices'].includes(view);const exportPid=profileExport?registryPid:pid;
- const {data:overview,error:loadError}=useRemote<Overview>(authState==='ready'?'/overview':null,revision);
+ const {data:overview,error:loadError}=useRemote<Overview>(authState==='ready'?'/workspace/overview':null,revision);
  const refresh=()=>setRevision(r=>r+1);
- useEffect(()=>{if(overview&&!pid)setPid(overview.replay.demo.patient_id);},[overview,pid]);
- useEffect(()=>{let ws:WebSocket;try{ws=new WebSocket(websocketUrl());ws.onopen=()=>setSocket(true);ws.onclose=()=>setSocket(false);ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==='twin_updated'||m.type==='alert_updated'||m.type==='enhanced_updated')setRevision(r=>r+1);};}catch{setSocket(false);}const timer=window.setInterval(()=>setRevision(r=>r+1),15000);return ()=>{ws?.close();clearInterval(timer);};},[]);
+ useEffect(()=>{if(overview&&!pid)setPid(overview.patients?.[0]?.patient_id||'');},[overview,pid]);
+ useEffect(()=>{let ws:WebSocket;try{ws=new WebSocket(websocketUrl());ws.onopen=()=>{const session=sessionStorage.getItem('pg-workspace-session');if(session)ws.send(`auth:${session}`);setSocket(true);};ws.onclose=()=>setSocket(false);ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==='twin_updated'||m.type==='alert_updated'||m.type==='enhanced_updated')setRevision(r=>r+1);};}catch{setSocket(false);}const timer=window.setInterval(()=>setRevision(r=>r+1),15000);return ()=>{ws?.close();clearInterval(timer);};},[]);
  useEffect(()=>{if(toast){const timer=setTimeout(()=>setToast(''),4500);return ()=>clearTimeout(timer);}},[toast]);
  function navigate(next:View){setView(next);location.hash=next;setMenu(false);}
  const open=(id:string)=>{setPid(id);navigate('patient');};
@@ -69,7 +69,8 @@ const openProfile=(id:string)=>{setRegistryPid(id);navigate('profile');};
  {view==='notifications'&&<NotificationsPage revision={revision} refresh={refresh} notify={setToast} openProfile={openProfile}/>}
  {view==='sources'&&<SourcesPage revision={revision} refresh={refresh} notify={setToast} openProfile={openProfile}/>}
  {view==='overview'&&<OverviewPage overview={overview} query={query} setQuery={setQuery} onOpen={open} navigate={navigate}/>}
- {['patient','explain','scenario','activity'].includes(view)&&<div className="patient-picker"><Users size={16}/><label htmlFor="patient-select">Selected synthetic twin</label><select id="patient-select" value={pid} onChange={e=>setPid(e.target.value)}>{overview.patients.map(p=><option key={p.patient_id} value={p.patient_id}>{p.patient_id} · {p.display_name} · {p.city}</option>)}</select><Pill tone="neutral">SYNTHETIC</Pill></div>}
+ {['patient','explain','scenario','activity'].includes(view)&&!pid&&<Notice tone="warning">No synthetic twin is assigned to this demo account. Ask a workspace administrator to assign a fictional patient before opening research or care views.</Notice>}
+ {['patient','explain','scenario','activity'].includes(view)&&pid&&<div className="patient-picker"><Users size={16}/><label htmlFor="patient-select">Selected synthetic twin</label><select id="patient-select" value={pid} onChange={e=>setPid(e.target.value)}>{overview.patients.map(p=><option key={p.patient_id} value={p.patient_id}>{p.patient_id} · {p.display_name} · {p.city}</option>)}</select><Pill tone="neutral">SYNTHETIC</Pill></div>}
  {view==='patient'&&pid&&<PatientPage pid={pid} revision={revision} navigate={navigate}/>}
  {view==='explain'&&pid&&<ExplainPage pid={pid} revision={revision}/>}
  {view==='scenario'&&pid&&<ScenarioPage pid={pid} revision={revision} notify={setToast}/>}

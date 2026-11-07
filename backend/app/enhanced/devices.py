@@ -30,30 +30,38 @@ class Devices:
         with self.store.connect() as c:
             rows=c.execute('SELECT * FROM devices'+(' WHERE patient_id=?' if pid else '')+' ORDER BY created_at DESC',(pid,) if pid else ()).fetchall()
         return {'devices':[public_device(r) for r in rows],'catalog':DEVICE_CATALOG,'metrics':METRICS,'hardware_supported':False,'authentication':'Per-device HMAC token; backend-owned simulator. Provisioning real hardware is not implemented.','persistent_device_secret_configured':bool(self.settings.device_secret)}
-    def associate(self,body):
-        self.registry.require(body.patient_id);did='SIM-'+uuid.uuid4().hex[:16].upper();at=stamp()
+    def associate(self,body,authorize=None):
+        did='SIM-'+uuid.uuid4().hex[:16].upper();at=stamp()
         with self.store.connect() as c:
             c.execute('BEGIN IMMEDIATE')
+            if authorize is not None:authorize(c,body.patient_id)
+            self.registry.require(body.patient_id,conn=c)
             if c.execute('SELECT COUNT(*) AS n FROM devices WHERE patient_id=?',(body.patient_id,)).fetchone()['n']>=16:raise HTTPException(409,'Demo limit: 16 simulated devices per patient.')
             catalog=next(x for x in DEVICE_CATALOG if x['kind']==body.kind)
             label=body.label or catalog['label']
             c.execute('INSERT INTO devices(id,patient_id,kind,label,created_at,interval_seconds,token_hash) VALUES (?,?,?,?,?,?,?)',(did,body.patient_id,body.kind,label,at,body.interval_seconds,hashlib.sha256(self.token_for(did).encode()).hexdigest()))
         return public_device(self.require(did))
-    def start(self,did,interval):
-        d=self.require(did);at=stamp();run=uuid.uuid4().hex
+    def start(self,did,interval,authorize=None):
+        at=stamp();run=uuid.uuid4().hex
         with self.store.connect() as c:
             c.execute('BEGIN IMMEDIATE')
+            d=c.execute('SELECT * FROM devices WHERE id=?',(did,)).fetchone()
+            if not d:raise HTTPException(404,'Simulated device not found.')
+            if authorize is not None:authorize(c,d['patient_id'])
             if not d['is_simulating'] and c.execute('SELECT COUNT(*) AS n FROM devices WHERE is_simulating=1').fetchone()['n']>=16:raise HTTPException(409,'Demo limit: 16 concurrent simulations.')
             c.execute("UPDATE devices SET status='connected_simulation',is_simulating=1,interval_seconds=?,next_due_at=?,last_error=NULL,run_id=?,sequence=0 WHERE id=?",(interval,at,run,did))
         return public_device(self.require(did))
-    def stop(self,did):
-        d=self.require(did)
+    def stop(self,did,authorize=None):
         with self.store.connect() as c:
+            c.execute('BEGIN IMMEDIATE')
+            d=c.execute('SELECT * FROM devices WHERE id=?',(did,)).fetchone()
+            if not d:raise HTTPException(404,'Simulated device not found.')
+            if authorize is not None:authorize(c,d['patient_id'])
             c.execute("UPDATE devices SET status='disconnected',is_simulating=0,next_due_at=NULL,last_error=NULL WHERE id=?",(did,))
             if d['is_simulating']:
                 self.notifications.create(category='data_quality',title='Simulated device stream stopped',reason='The user explicitly stopped this synthetic stream. New readings are not being collected; no physical-device disconnection is implied.',source='Device simulation control',source_type='system_demo',patient_id=d['patient_id'],dedupe_key=f"device-stop:{did}:{d['run_id']}",metadata={'device_id':did},conn=c)
         return public_device(self.require(did))
-    def ingest(self,body,token):
+    def ingest(self,body,token,authorize=None):
         d=self.require(body.device_id)
         if not token or not secrets.compare_digest(hashlib.sha256(token.encode()).hexdigest(),d['token_hash']):raise HTTPException(401,'Valid per-device ingestion token required (X-Device-Token).')
         if d['patient_id']!=body.patient_id:raise HTTPException(409,'Device/patient association mismatch.')
@@ -63,6 +71,7 @@ class Devices:
         data=body.model_dump(mode='json');data['readings']=sorted(data['readings'],key=lambda x:x['metric']);digest=fingerprint(data);received=stamp();observed=body.observed_at.isoformat()
         with self.store.connect() as c:
             c.execute('BEGIN IMMEDIATE')
+            if authorize is not None:authorize(c,d['patient_id'])
             existing=c.execute('SELECT * FROM ingestion_events WHERE device_id=? AND event_id=?',(body.device_id,body.event_id)).fetchone()
             if existing:
                 if existing['payload_hash']!=digest:raise HTTPException(409,'Event ID already exists with different content.')

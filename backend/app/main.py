@@ -1,5 +1,5 @@
 """FastAPI application. Offline by default; all patients synthetic."""
-import asyncio, json, os
+import asyncio, json, os, re
 from contextlib import asynccontextmanager
 from typing import Literal
 from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect, Depends, Header, Query
@@ -74,7 +74,40 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     app.include_router(make_router(authorize,hub))
     app.include_router(make_v3_router())
     app.include_router(make_workspace_router())
+
+    @app.middleware('http')
+    async def enforce_workspace_scope(request, call_next):
+        path=request.url.path
+        if os.getenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH','0')!='1' or request.method=='OPTIONS' or not path.startswith('/api/') or path in ('/api/health','/api/workspace/login') or path.startswith('/api/workspace/'):
+            return await call_next(request)
+        authorization=request.headers.get('authorization','')
+        token=authorization[7:] if authorization.startswith('Bearer ') else None
+        try:
+            user=request.app.state.workspace.principal(token)
+        except HTTPException as exc:
+            return JSONResponse(status_code=exc.status_code,content={'detail':exc.detail})
+        workspace=request.app.state.workspace
+        assigned=workspace.assigned_ids(user)
+        if request.method not in ('GET','HEAD') and user.get('role')!='doctor':
+            return JSONResponse(status_code=403,content={'detail':'Only an assigned demo doctor can perform research-workspace writes.'})
+        if path.startswith('/api/enhanced/') or path.startswith('/api/model48/') or path in ('/api/validation','/api/replay','/api/status') or path.startswith('/api/replay/'):
+            if user.get('role')!='doctor' or not set(request.app.state.engine.profiles).issubset(assigned):
+                return JSONResponse(status_code=403,content={'detail':'This research operation requires a doctor account assigned to the complete synthetic cohort.'})
+        match=re.match(r'^/api/patients/([^/]+)(?:/|$)',path)
+        if match and match.group(1) not in assigned:
+            return JSONResponse(status_code=404,content={'detail':'Synthetic patient not found in this account scope.'})
+        request.state.workspace_user=user
+        request.state.workspace_patient_ids=assigned
+        return await call_next(request)
     def engine(request:Request):return request.app.state.engine
+    def workspace_write_authorizer(request:Request,pid:str|None=None):
+        if os.getenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH','0')!='1':return None
+        user=request.state.workspace_user
+        header=request.headers.get('authorization','')
+        token=header[7:] if header.startswith('Bearer ') else None
+        def check(conn):
+            request.app.state.workspace.authorize_write(conn,token,user['username'],pid,full_cohort=True)
+        return check
     @app.exception_handler(KeyError)
     async def key_error(request,exc):return JSONResponse(status_code=404,content={'detail':str(exc)})
     @app.exception_handler(ValueError)
@@ -83,10 +116,13 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     def health(e:TwinEngine=Depends(engine)):
         return {'status':'ok','synthetic':True,'model_version':e.bundle['version']}
     @app.get('/api/overview')
-    def overview(e:TwinEngine=Depends(engine)):return e.cohort()
+    def overview(request:Request,e:TwinEngine=Depends(engine)):
+        user=request.state.workspace_user
+        return request.app.state.workspace.overview(user)[0]
     @app.get('/api/patients')
-    def patients(q:str='',risk:Literal['all','low','elevated','high']='all',e:TwinEngine=Depends(engine)):
-        cohort=e.cohort()['patients']
+    def patients(request:Request,q:str='',risk:Literal['all','low','elevated','high']='all',e:TwinEngine=Depends(engine)):
+        user=getattr(request.state,'workspace_user',None)
+        cohort=(request.app.state.workspace.overview(user)[0]['patients'] if user else e.cohort()['patients'])
         return {'patients':[p for p in cohort if (q.lower() in (p['display_name']+p['patient_id']+p['city']).lower()) and (risk=='all' or p['risk_category']==risk)]}
     @app.get('/api/patients/{pid}')
     def patient(pid:str,version:int|None=Query(default=None,ge=1),e:TwinEngine=Depends(engine)):return e.patient(pid,version)
@@ -100,18 +136,29 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         if horizon not in (24,48,72):raise HTTPException(422,'Horizon must be 24, 48 or 72 hours.')
         return e.explain(pid,horizon,version)
     @app.post('/api/patients/{pid}/scenarios',dependencies=[Depends(authorize)])
-    def scenario(pid:str,body:Scenario,e:TwinEngine=Depends(engine)):return e.scenario(pid,body.model_dump())
+    def scenario(pid:str,body:Scenario,request:Request,e:TwinEngine=Depends(engine)):
+        return e.scenario(pid,body.model_dump(),authorize=workspace_write_authorizer(request,pid))
     @app.get('/api/patients/{pid}/scenarios')
     def scenarios(pid:str,e:TwinEngine=Depends(engine)):
         e.patient(pid)
         with e.store.connect() as c:
             return {'scenarios':[{'id':r['id'],'state_version':r['state_version'],'created_at':r['created_at'],'assumptions':json.loads(r['assumptions']),'result':json.loads(r['result'])} for r in c.execute('SELECT * FROM scenarios WHERE patient_id=? ORDER BY id DESC LIMIT 20',(pid,))]}
     @app.get('/api/alerts')
-    def alerts(patient_id:str|None=None,e:TwinEngine=Depends(engine)):return {'alerts':e.store.alerts(patient_id)}
+    def alerts(request:Request,patient_id:str|None=None,e:TwinEngine=Depends(engine)):
+        allowed=getattr(request.state,'workspace_patient_ids',None)
+        if allowed is None:return {'alerts':e.store.alerts(patient_id)}
+        if patient_id is not None and patient_id not in allowed:return {'alerts':[]}
+        return {'alerts':[a for a in e.store.alerts(patient_id) if a['patient_id'] in allowed]}
     @app.patch('/api/alerts/{alert_id}',dependencies=[Depends(authorize)])
-    async def update_alert(alert_id:int,body:AlertUpdate,e:TwinEngine=Depends(engine)):
+    async def update_alert(alert_id:int,body:AlertUpdate,request:Request,e:TwinEngine=Depends(engine)):
         with e.store.connect() as c:
+            c.execute('BEGIN IMMEDIATE')
+            check=workspace_write_authorizer(request)
+            if check is not None:check(c)
             row=c.execute('SELECT * FROM alerts WHERE id=?',(alert_id,)).fetchone()
+            allowed=getattr(request.state,'workspace_patient_ids',None)
+            if allowed is not None and row is not None and row['patient_id'] not in allowed:
+                raise HTTPException(404,'Alert not found in this account scope.')
             if not row:raise HTTPException(404,'Alert not found')
             if row['status']=='resolved':raise HTTPException(409,'Resolved alert is immutable. A later high-risk state may create a new alert.')
             c.execute('UPDATE alerts SET status=?,note=?,updated_at=? WHERE id=?',(body.status,body.note,now(),alert_id))
@@ -122,10 +169,13 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     def interventions(pid:str,e:TwinEngine=Depends(engine)):
         e.patient(pid);return {'interventions':e.store.interventions(pid)}
     @app.post('/api/patients/{pid}/interventions',dependencies=[Depends(authorize)])
-    def add_intervention(pid:str,body:Intervention,e:TwinEngine=Depends(engine)):
+    def add_intervention(pid:str,body:Intervention,request:Request,e:TwinEngine=Depends(engine)):
         with e.lock:
-            state=e.patient(pid)
             with e.store.connect() as c:
+                c.execute('BEGIN IMMEDIATE')
+                check=workspace_write_authorizer(request,pid)
+                if check is not None:check(c)
+                state=e.patient(pid)
                 cur=c.execute('INSERT INTO interventions(patient_id,kind,note,created_at,state_version) VALUES (?,?,?,?,?)',(pid,body.kind,body.note,now(),state['version']))
                 iid=cur.lastrowid
         return {'intervention':next(i for i in e.store.interventions(pid) if i['id']==iid),'notice':'Logged only. This does not change the patient state or imply a treatment effect.'}
@@ -161,7 +211,19 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         result=await asyncio.to_thread(perform);await hub.broadcast({'type':'twin_updated','replay':result});return result
     @app.websocket('/api/ws')
     async def websocket(socket:WebSocket):
-        await socket.accept();hub.clients.add(socket)
+        await socket.accept()
+        if os.getenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH','0')=='1':
+            try:
+                message=await asyncio.wait_for(socket.receive_text(),timeout=10)
+                if not message.startswith('auth:'):
+                    await socket.close(code=4401);return
+                user=socket.app.state.workspace.principal(message[5:])
+                assigned=socket.app.state.workspace.assigned_ids(user)
+                if user.get('role')!='doctor' or not set(socket.app.state.engine.profiles).issubset(assigned):
+                    await socket.close(code=4403);return
+            except (HTTPException,asyncio.TimeoutError,WebSocketDisconnect):
+                await socket.close(code=4401);return
+        hub.clients.add(socket)
         try:
             await socket.send_json({'type':'connected','synthetic':True})
             while True:

@@ -154,6 +154,16 @@ def test_legacy_alert_bridge_both_directions_and_review_history(ec):
     e.reset();assert ec.get(f'/api/enhanced/notifications/{nid}').json()['legacy_alert_id'] is None
     with e.store.connect() as c:assert c.execute("SELECT COUNT(*) FROM enhanced_audit WHERE source='alerts'").fetchone()[0]>=1
 
+def test_notification_update_returns_detail_from_same_write_transaction(ec):
+    created=ec.post('/api/enhanced/notifications/test',json={}).json()
+    response=ec.patch(f"/api/enhanced/notifications/{created['id']}",json={'status':'acknowledged','note':'Transactional consistency check.'})
+    assert response.status_code==200,response.text
+    updated=response.json()
+    assert updated['status']=='acknowledged'
+    assert updated['history'][-1]['to_status']=='acknowledged'
+    assert updated['history'][-1]['note']=='Transactional consistency check.'
+
+
 def test_notification_unread_filters_and_all_review_states(ec):
     n=ec.post('/api/enhanced/notifications/test',json={}).json();nid=n['id'];assert n['unread']
     assert ec.get('/api/enhanced/notifications/counts').json()['unread']==1

@@ -1,5 +1,5 @@
 """Care workspace: demo auth, doctor scoping/isolation, review workflow, plans, sputum, activity."""
-import base64,json
+import base64,json,hashlib
 import pytest
 
 def login(client,username,password):return client.post('/api/workspace/login',json={'username':username,'password':password})
@@ -147,3 +147,139 @@ def test_workspace_me_authorization_cors_preflight(client):
     allowed = response.headers.get('access-control-allow-headers', '').lower()
     assert 'authorization' in allowed
     assert 'content-type' in allowed
+
+
+def test_legacy_research_api_uses_workspace_scope_when_enabled(client, monkeypatch):
+    monkeypatch.setenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH', '1')
+    assert client.get('/api/overview').status_code == 401
+
+    doctor = auth(client)
+    overview = client.get('/api/overview', headers=doctor)
+    assert overview.status_code == 200
+    assert overview.json()['summary']['total'] == 120
+
+    empty_doctor = auth(client, 'dr-nova', 'prana-nova-demo')
+    assert client.get('/api/overview', headers=empty_doctor).json()['summary']['total'] == 0
+    assert client.get('/api/patients/PG-0071', headers=empty_doctor).status_code == 404
+    assert client.get('/api/enhanced/notifications', headers=empty_doctor).status_code == 403
+    assert client.get('/api/validation', headers=empty_doctor).status_code == 403
+
+    patient = auth(client, 'pat-pg0071', 'prana-patient-demo')
+    assert client.post(
+        '/api/patients/PG-0071/interventions',
+        headers=patient,
+        json={'kind': 'clinical_review', 'note': 'Should be blocked for patient role'},
+    ).status_code == 403
+
+    preflight = client.options(
+        '/api/overview',
+        headers={
+            'Origin': 'https://prana-guard-copd-digital-twin.vercel.app',
+            'Access-Control-Request-Method': 'GET',
+            'Access-Control-Request-Headers': 'authorization,content-type',
+        },
+    )
+    assert preflight.status_code == 200
+    assert 'authorization' in preflight.headers.get('access-control-allow-headers', '').lower()
+
+
+def test_workspace_login_throttle_persists_and_expires(client, engine):
+    for attempt in range(4):
+        assert login(client, 'dr-atlas', 'wrong-password').status_code == 401
+    assert login(client, 'dr-atlas', 'wrong-password').status_code == 429
+    assert login(client, 'dr-atlas', 'prana-atlas-demo').status_code == 429
+    assert login(client, 'dr-nova', 'prana-nova-demo').status_code == 200
+
+    username_hash=hashlib.sha256(b'dr-atlas').hexdigest()
+    with engine.store.connect() as c:
+        c.execute('UPDATE care_login_failures SET window_expires_at=? WHERE username_hash=?',
+                  ('2000-01-01T00:00:00+00:00', username_hash))
+    assert login(client, 'dr-atlas', 'prana-atlas-demo').status_code == 200
+
+
+def test_alert_id_and_websocket_are_scoped_in_unified_mode(client, engine, monkeypatch):
+    from backend.app.engine import now
+    with engine.store.connect() as c:
+        alert_id=c.execute(
+            "INSERT INTO alerts(patient_id,state_version,created_at,risk,horizon,status) VALUES ('PG-0071',1,?,.4,24,'new')",
+            (now(),),
+        ).lastrowid
+    monkeypatch.setenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH', '1')
+    empty_doctor=auth(client, 'dr-nova', 'prana-nova-demo')
+    assert client.patch(
+        f'/api/alerts/{alert_id}', headers=empty_doctor,
+        json={'status':'acknowledged','note':'out of scope'},
+    ).status_code == 403
+    full_doctor=auth(client)
+    assert client.patch(
+        f'/api/alerts/{alert_id}', headers=full_doctor,
+        json={'status':'acknowledged','note':'assigned synthetic alert review'},
+    ).status_code == 200
+    with client.websocket_connect('/api/ws') as ws:
+        ws.send_text('auth:'+full_doctor['Authorization'][7:])
+        assert ws.receive_json()['type'] == 'connected'
+    with pytest.raises(Exception):
+        with client.websocket_connect('/api/ws') as ws:
+            ws.send_text('auth:'+empty_doctor['Authorization'][7:])
+            ws.receive_json()
+
+
+def test_followup_completion_ledger_is_scoped_and_idempotent(client, engine):
+    doctor=auth(client)
+    patient=auth(client,'pat-pg0071','prana-patient-demo')
+    review=client.post('/api/workspace/care/reviews',headers=doctor,json={
+        'patient_id':'PG-0071','note':'Synthetic follow-up ledger test'
+    }).json()['review']
+    rid=review['id']
+    assert client.patch(f'/api/workspace/care/reviews/{rid}',headers=doctor,json={'status':'awaiting_review'}).status_code==200
+    assert client.patch(f'/api/workspace/care/reviews/{rid}',headers=doctor,json={'status':'under_review'}).status_code==200
+    scheduled=client.patch(f'/api/workspace/care/reviews/{rid}',headers=doctor,json={
+        'status':'follow_up_scheduled','follow_up_at':'2099-01-01T10:00:00+00:00'
+    })
+    assert scheduled.status_code==200
+    assert client.post(f'/api/workspace/care/reviews/{rid}/complete-follow-up',headers=patient,json={'note':'patient cannot close clinician follow-up'}).status_code==403
+    completed=client.post(f'/api/workspace/care/reviews/{rid}/complete-follow-up',headers=doctor,json={'note':'Synthetic follow-up completed'})
+    assert completed.status_code==200,completed.text
+    assert completed.json()['review']['status']=='completed'
+    assert completed.json()['completion']['scheduled_for'].startswith('2099-01-01')
+    assert client.post(f'/api/workspace/care/reviews/{rid}/complete-follow-up',headers=doctor,json={}).status_code==409
+    ledger=client.get('/api/workspace/patients/PG-0071/follow-up-ledger',headers=doctor).json()
+    assert ledger['total']==1 and ledger['items'][0]['review_id']==rid
+    assert client.get('/api/workspace/patients/PG-0071/follow-up-ledger',headers=auth(client,'dr-nova','prana-nova-demo')).status_code==403
+
+
+def test_enhanced_registration_is_assigned_and_remains_mutable_in_unified_mode(client, monkeypatch):
+    monkeypatch.setenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH','1')
+    doctor=auth(client)
+    created=client.post('/api/enhanced/registry/patients',headers=doctor,json={
+        'request_id':'UNIFIED-ASSIGN-0001',
+        'fictional_identity_confirmed':True,
+        'demo_alias':'Mira Integration',
+        'age':62,
+        'city':'Pune',
+    })
+    assert created.status_code==200,created.text
+    pid=created.json()['patient_id']
+    directory=client.get('/api/workspace/patients?q='+pid,headers=doctor).json()
+    assert directory['total']==1 and directory['items'][0]['patient_id']==pid
+    observation=client.post(f'/api/enhanced/registry/patients/{pid}/observations',headers=doctor,json={
+        'fictional_data_confirmed':True,'symptom_score':8,'adherence':0.4,'note':'Synthetic follow-up observation'
+    })
+    assert observation.status_code==200,observation.text
+    notice=client.get('/api/enhanced/notifications?patient_id='+pid,headers=doctor).json()['notifications'][0]
+    reviewed=client.patch(f"/api/enhanced/notifications/{notice['id']}",headers=doctor,json={'status':'acknowledged','note':'Synthetic notification review'})
+    assert reviewed.status_code==200,reviewed.text
+    device=client.post('/api/enhanced/devices',headers=doctor,json={'patient_id':pid,'kind':'pulse_oximeter','interval_seconds':60})
+    assert device.status_code==200,device.text
+    did=device.json()['id']
+    assert client.post(f'/api/enhanced/devices/{did}/start',headers=doctor,json={'interval_seconds':60}).status_code==200
+    assert client.post(f'/api/enhanced/devices/{did}/stop',headers=doctor,json={}).status_code==200
+    second=client.post('/api/enhanced/registry/patients',headers=doctor,json={
+        'request_id':'UNIFIED-ASSIGN-0002',
+        'fictional_identity_confirmed':True,
+        'demo_alias':'Mira Integration Two',
+        'age':63,
+        'city':'Mumbai',
+    })
+    assert second.status_code==200,second.text
+    assert client.get('/api/overview',headers=doctor).json()['summary']['total']==120

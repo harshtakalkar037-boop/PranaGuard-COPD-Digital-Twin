@@ -8,6 +8,8 @@ def utcnow():return datetime.now(timezone.utc)
 def stamp():return utcnow().isoformat()
 
 SESSION_HOURS=12
+LOGIN_FAILURE_LIMIT=5
+LOGIN_FAILURE_WINDOW_MINUTES=15
 # Valid forward transitions for the care-review workflow.
 TRANSITIONS={'new':{'awaiting_review','under_review','closed'},
              'awaiting_review':{'under_review','closed'},
@@ -40,14 +42,38 @@ class Workspace:
                     c.execute('INSERT OR IGNORE INTO patient_assignments VALUES (?,?,?)',(pid,'dr-atlas',stamp()))
     # ---------- authentication ----------
     def login(self,username,password):
+        normalized=username.strip().lower()
+        username_hash=hashlib.sha256(normalized.encode()).hexdigest()
+        failure_status=None
+        result=None
         with self.store.connect() as c:
-            row=c.execute('SELECT * FROM care_users WHERE username=?',(username.strip().lower(),)).fetchone()
-            if not row or not secrets.compare_digest(row['pass_hash'],hash_password(password,row['salt'])):
-                raise HTTPException(401,'Incorrect demo username or password.')
-            token='pgw_'+secrets.token_urlsafe(32);digest=hashlib.sha256(token.encode()).hexdigest()
-            c.execute('DELETE FROM care_sessions WHERE username=? AND expires_at<?',(row['username'],stamp()))
-            c.execute('INSERT INTO care_sessions VALUES (?,?,?,?)',(digest,row['username'],stamp(),(utcnow()+timedelta(hours=SESSION_HOURS)).isoformat()))
-        return {'token':token,'user':self.public_user(row)}
+            c.execute('BEGIN IMMEDIATE')
+            now=stamp()
+            failure=c.execute('SELECT * FROM care_login_failures WHERE username_hash=?',(username_hash,)).fetchone()
+            active=failure is not None and failure['window_expires_at']>now
+            if active and failure['failure_count']>=LOGIN_FAILURE_LIMIT:
+                failure_status=429
+            else:
+                if failure is not None and not active:
+                    c.execute('DELETE FROM care_login_failures WHERE username_hash=?',(username_hash,))
+                row=c.execute('SELECT * FROM care_users WHERE username=?',(normalized,)).fetchone()
+                valid=bool(row and secrets.compare_digest(row['pass_hash'],hash_password(password,row['salt'])))
+                if not valid:
+                    count=(failure['failure_count']+1) if active else 1
+                    expires=(failure['window_expires_at'] if active else (utcnow()+timedelta(minutes=LOGIN_FAILURE_WINDOW_MINUTES)).isoformat())
+                    c.execute('INSERT OR REPLACE INTO care_login_failures(username_hash,failure_count,window_expires_at) VALUES (?,?,?)',(username_hash,count,expires))
+                    failure_status=429 if count>=LOGIN_FAILURE_LIMIT else 401
+                else:
+                    c.execute('DELETE FROM care_login_failures WHERE username_hash=?',(username_hash,))
+                    token='pgw_'+secrets.token_urlsafe(32);digest=hashlib.sha256(token.encode()).hexdigest()
+                    c.execute('DELETE FROM care_sessions WHERE username=? AND expires_at<?',(row['username'],now))
+                    c.execute('INSERT INTO care_sessions VALUES (?,?,?,?)',(digest,row['username'],now,(utcnow()+timedelta(hours=SESSION_HOURS)).isoformat()))
+                    result={'token':token,'user':self.public_user(row)}
+        if failure_status==429:
+            raise HTTPException(429,'Too many failed sign-in attempts. Try again after the 15-minute lockout window.')
+        if failure_status==401:
+            raise HTTPException(401,'Incorrect demo username or password.')
+        return result
     def public_user(self,row):
         with self.store.connect() as c:
             assigned=c.execute('SELECT COUNT(*) AS n FROM patient_assignments WHERE doctor=?',(row['username'],)).fetchone()['n']
@@ -62,6 +88,20 @@ class Workspace:
                 c.execute('DELETE FROM care_sessions WHERE token_hash=?',(digest,));raise HTTPException(401,'Demo session expired. Sign in again.')
             user=c.execute('SELECT * FROM care_users WHERE username=?',(session['username'],)).fetchone()
         return self.public_user(user)
+    def authorize_write(self,conn,token,expected_username,patient_id=None,full_cohort=False):
+        if not token:raise HTTPException(401,'Workspace session required.')
+        digest=hashlib.sha256(token.encode()).hexdigest()
+        session=conn.execute('SELECT * FROM care_sessions WHERE token_hash=?',(digest,)).fetchone()
+        if not session or session['expires_at']<stamp():raise HTTPException(401,'Workspace session expired or revoked.')
+        user=conn.execute('SELECT * FROM care_users WHERE username=?',(session['username'],)).fetchone()
+        if not user or user['username']!=expected_username or user['role']!='doctor':
+            raise HTTPException(403,'A current assigned doctor session is required.')
+        assigned={r['patient_id'] for r in conn.execute('SELECT patient_id FROM patient_assignments WHERE doctor=?',(user['username'],))}
+        if full_cohort and not set(self.engine.profiles).issubset(assigned):
+            raise HTTPException(403,'This operation requires assignment to the complete synthetic cohort.')
+        if patient_id is not None and patient_id not in assigned:
+            raise HTTPException(404,'Synthetic patient not found in this account scope.')
+        return user
     def logout(self,token):
         with self.store.connect() as c:c.execute('DELETE FROM care_sessions WHERE token_hash=?',(hashlib.sha256(token.encode()).hexdigest(),))
     # ---------- scoping ----------
@@ -183,6 +223,38 @@ class Workspace:
             if status:c.execute('INSERT INTO care_review_events(review_id,created_at,event,actor,note) VALUES (?,?,?,?,?)',(rid,at,f"{row['status']} → {status}",user['username'],note or ''))
             elif note or follow_up_at is not None:c.execute('INSERT INTO care_review_events(review_id,created_at,event,actor,note) VALUES (?,?,?,?,?)',(rid,at,'note/follow-up updated',user['username'],note or ''))
         return {'review':self.review_detail(user,rid)['review']}
+    def complete_follow_up(self,user,rid,note=''):
+        if user.get('role')!='doctor':raise HTTPException(403,'Only a demo doctor can complete a follow-up.')
+        at=stamp()
+        with self.store.connect() as c:
+            c.execute('BEGIN IMMEDIATE')
+            row=c.execute('SELECT * FROM care_reviews WHERE id=?',(rid,)).fetchone()
+            if not row:raise HTTPException(404,'Review not found.')
+            pid=row['patient_id']
+            if user['role']=='patient':
+                if user.get('patient_id')!=pid:raise HTTPException(404,'Review not found.')
+            else:
+                assigned=c.execute('SELECT 1 FROM patient_assignments WHERE doctor=? AND patient_id=?',(user['username'],pid)).fetchone()
+                if not assigned:raise HTTPException(404,'Review not found in this account scope.')
+            if row['status']!='follow_up_scheduled' or not row['follow_up_at']:
+                raise HTTPException(409,'Only a scheduled follow-up can be completed in this ledger.')
+            existing=c.execute('SELECT * FROM care_followup_completions WHERE review_id=?',(rid,)).fetchone()
+            if existing:raise HTTPException(409,'This follow-up already has a completion record.')
+            c.execute('INSERT INTO care_followup_completions(review_id,patient_id,doctor,scheduled_for,completed_at,note) VALUES (?,?,?,?,?,?)',
+                      (rid,pid,user['username'],row['follow_up_at'],at,note.strip()))
+            c.execute("UPDATE care_reviews SET status='completed',updated_at=? WHERE id=?",(at,rid))
+            c.execute('INSERT INTO care_review_events(review_id,created_at,event,actor,note) VALUES (?,?,?,?,?)',
+                      (rid,at,'follow-up completed',user['username'],note.strip()))
+            completion=dict(c.execute('SELECT * FROM care_followup_completions WHERE review_id=?',(rid,)).fetchone())
+            review=dict(c.execute('SELECT * FROM care_reviews WHERE id=?',(rid,)).fetchone())
+        return {'completion':completion,'review':review,'notice':'Follow-up completion recorded in the immutable demo ledger.'}
+    def followup_ledger(self,user,pid,page=1,page_size=20):
+        self.require_assigned(user,pid)
+        with self.store.connect() as c:
+            rows=[dict(r) for r in c.execute('SELECT * FROM care_followup_completions WHERE patient_id=? ORDER BY completed_at DESC LIMIT ? OFFSET ?',
+                                              (pid,page_size,(page-1)*page_size))]
+            total=c.execute('SELECT COUNT(*) AS n FROM care_followup_completions WHERE patient_id=?',(pid,)).fetchone()['n']
+        return {'items':rows,'total':total,'page':page,'page_size':page_size}
     # ---------- care plans ----------
     def get_plan(self,user,pid):
         self.require_assigned(user,pid)

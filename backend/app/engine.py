@@ -167,7 +167,7 @@ class TwinEngine:
                   'missing_fields':s['missing_fields']})
         return clean(e)
 
-    def scenario(self,pid,assumptions):
+    def scenario(self,pid,assumptions,authorize=None):
         """Conditional feature-path sensitivity, not a causal intervention or treatment model.
         Body measurements persist at last observation; environmental/adherence/activity paths
         transition exponentially toward requested assumptions. Past observations never change.
@@ -210,6 +210,9 @@ class TwinEngine:
                           'warning':'NOT causal, NOT a treatment recommendation. No proven effect of adherence, exposure reduction or activity. Forecasts at projected times extend beyond the original horizon. No future observed records used.',
                           'original_state_preserved':before==json.dumps(self.patient(pid),sort_keys=True)})
             with self.store.connect() as c:
+                c.execute('BEGIN IMMEDIATE')
+                if authorize is not None:authorize(c)
+                self.patient(pid)
                 cur=c.execute('INSERT INTO scenarios(patient_id,state_version,created_at,assumptions,result) VALUES (?,?,?,?,?)',(pid,original['version'],now(),json.dumps(assumptions),json.dumps(result)))
                 result['scenario_id']=cur.lastrowid
             return result

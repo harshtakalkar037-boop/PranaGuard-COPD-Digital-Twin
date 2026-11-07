@@ -63,14 +63,14 @@ Sessions are bearer tokens (PBKDF2-hashed demo passwords, 12-hour expiry, persis
   content digests verified at startup; `PRANAGUARD_STRICT_DATA=1` turns tampering into a fatal error).
 - Additive, checksummed migrations in `backend/app/migrations/` (`001` enhanced monitoring,
   `002` environment backoff, `003` care workspace: users/sessions, assignments, sputum entries+attachments,
-  care plans+revisions, review workflow+timeline, notification reads). Applied automatically on boot;
+  care plans+revisions, review workflow+timeline, notification reads; `004` persistent demo login throttling; `005` immutable follow-up completion ledger). Applied automatically on boot;
   original tables are never erased or rewritten. Failed migrations roll back.
 - `PRANAGUARD_DB=/path/to/copy.sqlite` points the API at a disposable database copy for experiments.
 
 ## Testing
 
 ```bash
-# Backend: 132 tests (original + enhanced + workspace auth/scoping/isolation)
+# Backend: 139 tests (original + enhanced + workspace auth/scoping/isolation + follow-up ledger + alert/WebSocket scope)
 .venv/bin/python -m pytest backend/tests/ -q
 
 # Frontend: 63 tests across 5 suites (auth gate, directory, profile, care centre, errors, research pages)
@@ -87,7 +87,7 @@ API_PROXY_TARGET=http://127.0.0.1:8011 npm --prefix frontend run dev &
 .venv/bin/python -m scripts.verify_live_environment     # opt-in live provider check (PRANAGUARD_LIVE_ENV_ENABLED=true)
 ```
 
-Latest verification evidence: `docs/workspace-verification/BROWSER_WORKSPACE.json` (+`screenshots/`) and
+The unified integration branch currently passes 138 local backend tests and Python compilation. Vercel preview production build is READY; a separate Render preview service is LIVE with workspace authorization enabled. Frontend unit tests and a hosted authenticated browser journey are still pending; do not treat preview availability as production sign-off. The local browser evidence from the earlier build is not a fresh verification of this integration.\n\nLatest verification evidence: `docs/workspace-verification/BROWSER_WORKSPACE.json` (+`screenshots/`) and
 `docs/model48-v3/BROWSER_MODEL48_V3_COMPLETED.json` — 15+18 real-Chromium checks against the shipped code.
 
 ## Production build & deployment
@@ -102,6 +102,8 @@ live environment panels (disabled by default — see below).
 | Variable | Default | Purpose |
 |---|---|---|
 | `PRANAGUARD_DB` | `data/pranaguard.sqlite` | Database path (use a copy for risky testing) |
+| `PRANAGUARD_REQUIRE_WORKSPACE_AUTH` | `0` | Require a current workspace bearer session on legacy research APIs; enable `1` only after hosted verification |
+| `PRANAGUARD_CORS_ORIGINS` | `*` | Comma-separated allowed browser origins; set the hosted frontend origin explicitly where possible |
 | `PRANAGUARD_DEMO_{ATLAS,NOVA,PATIENT}_PASSWORD` | documented demo values | Demo account passwords on first seed |
 | `PRANAGUARD_TWIN_CACHE_PATH` | `models_store/artifacts/twin/twin_cache.sqlite` | Precomputed twin cache (hash-protected) |
 | `PRANAGUARD_WATCHDOG_ENABLED` | `0` | Auto-recompute twins (never in demo mode) |
@@ -115,8 +117,8 @@ backend/app/
   main.py, engine.py, store.py      frozen research API (patients/risk/history/explain/scenario/alerts/export…)
   enhanced/                         registry CRUD, preferences, alerts, devices, environment, evidence, email
   workspace/                        NEW: auth+sessions, doctor-scoped directory/overview/profile,
-                                    sputum, care plans, review queue/workflow (state machine + timeline)
-  migrations/                       001–003 additive, checksummed
+                                    sputum, care plans, review queue/workflow (state machine + timeline + follow-up completion ledger)
+  migrations/                       001–005 additive, checksummed (login throttle + follow-up ledger)
 models_store/, baseline_outcomes/   frozen trained artifacts; findings/ hold-out finalist registry
 experiments-v2…v4, docs/model*v*/   versioned studies (v3 active experimental; v2/v4 rejected, preserved)
 frontend/src/
@@ -138,7 +140,7 @@ docs/                               UPGRADE_PLAN, IMPLEMENTATION_SUMMARY, verifi
 - Device integrations are simulators/sandbox surfaces — presented as such, never as real telemonitoring.
 - ARIMA/LightGBM/CatBoost baselines are honest underground benchmarks; the shipped runtime remains sklearn
   losses; what-if scenarios are noncausal ranked persistence checks.
-- No external email/push delivery is shipped; notification centre is in-app with opt-in local primitives.
+- No external email/push delivery is shipped; notification centre is in-app with opt-in local primitives.\n- Demo username throttling is not distributed/IP-based anti-abuse protection; independent security review and manual accessibility review remain required.\n- Render preview uses free-tier ephemeral SQLite storage; records may reset on restart/redeploy. No production patient data or durable clinical records belong here. Persistent production storage, backup/restore and authenticated hosted E2E verification are not yet signed off.\n- Unified API enforcement is enabled only on the isolated preview service (`PRANAGUARD_REQUIRE_WORKSPACE_AUTH=1`); the production service has not been changed.
 
 ## Provenance
 
