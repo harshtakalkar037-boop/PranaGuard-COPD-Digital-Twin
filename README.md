@@ -57,15 +57,17 @@ The public frontend is hosted on Vercel and the FastAPI backend on Render. The c
 7. **Show doctor-to-patient actions.** Share a fictional document or follow-up instruction, then show the linked patient view and authorized document access.
 8. **Finish with Insights and Study Explorer.** Highlight date filters, honest missing-data states, experiment comparisons, and explicit model limitations.
 
-### Demo identities
+### Demo identities and login instructions
 
-These are public synthetic demonstration credentials, not production credentials. Passwords may be overridden with environment variables before the first database seed.
+Use these accounts for the current deployed workspace. They are public synthetic demonstration credentials, not production credentials. Passwords may be overridden with environment variables before the first database seed.
 
-| Username | Demo password | Experience |
-|---|---|---|
-| `dr-atlas` | `prana-atlas-demo` | Doctor account with synthetic cohort |
-| `dr-nova` | `prana-nova-demo` | Empty doctor panel for assignment/isolation demonstration |
-| `pat-pg0071` | `prana-patient-demo` | Patient account linked to synthetic patient PG-0071 |
+| Role | Username | Demo password | Experience |
+|---|---|---|---|
+| Doctor | `dr-atlas` | `prana-atlas-demo` | Doctor account with the synthetic cohort |
+| Doctor (isolation demo) | `dr-nova` | `prana-nova-demo` | Empty doctor panel for assignment/isolation demonstration |
+| Patient | `pat-pg0071` | `prana-patient-demo` | Patient account linked to synthetic patient PG-0071 |
+
+**Legacy login note:** `pg_doctor_demo` was used by an older version of the project. It is not seeded/supported by the current workspace source; use `dr-atlas` for the doctor demonstration. The old password could not be confirmed, so it is intentionally not listed as a working credential.
 
 Sessions use bearer tokens, PBKDF2 password hashes, and a 12-hour expiry. This is demo-grade authentication, not production identity management.
 
@@ -257,7 +259,7 @@ Use a disposable database copy for risky tests or reset/bootstrap commands. Neve
 | `PRANAGUARD_ADMIN_TOKEN` | Optional shared demo admin token for protected legacy write routes |
 | `PRANAGUARD_CORS_ORIGINS` | Comma-separated allowed frontend origins |
 
-Set secrets only in the backend environment. Do not commit `.env`, credentials, tokens, or private keys. Demo password overrides apply when demo users are first seeded; changing an environment variable after account creation does not automatically rewrite the stored password.
+Set secrets only in the backend environment. Do not commit `.env`, credentials, tokens, or private keys. Demo password overrides apply when users are first seeded; changing an environment variable after account creation does not automatically rewrite the stored password.
 
 ## 12. Team and institution
 
