@@ -263,9 +263,12 @@ def test_enhanced_registration_is_assigned_and_remains_mutable_in_unified_mode(c
     directory=client.get('/api/workspace/patients?q='+pid,headers=doctor).json()
     assert directory['total']==1 and directory['items'][0]['patient_id']==pid
     observation=client.post(f'/api/enhanced/registry/patients/{pid}/observations',headers=doctor,json={
-        'fictional_data_confirmed':True,'symptom_score':6,'adherence':0.8,'note':'Synthetic follow-up observation'
+        'fictional_data_confirmed':True,'symptom_score':8,'adherence':0.4,'note':'Synthetic follow-up observation'
     })
     assert observation.status_code==200,observation.text
+    notice=client.get('/api/enhanced/notifications?patient_id='+pid,headers=doctor).json()['notifications'][0]
+    reviewed=client.patch(f"/api/enhanced/notifications/{notice['id']}",headers=doctor,json={'status':'acknowledged','note':'Synthetic notification review'})
+    assert reviewed.status_code==200,reviewed.text
     second=client.post('/api/enhanced/registry/patients',headers=doctor,json={
         'request_id':'UNIFIED-ASSIGN-0002',
         'fictional_identity_confirmed':True,
