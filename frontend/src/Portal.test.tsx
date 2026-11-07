@@ -1,6 +1,6 @@
 import {render,screen,renderHook,waitFor,act} from '@testing-library/react';
 import {describe,it,expect,vi,afterEach} from 'vitest';
-import Portal, {CareQueue,CompleteFollowup,usePortal} from './Portal';
+import Portal, {CareQueue,CompleteFollowup,FocusedQueueRecord,usePortal} from './Portal';
 import userEvent from '@testing-library/user-event';
 
 afterEach(()=>vi.unstubAllGlobals());
@@ -66,16 +66,33 @@ describe('assigned care queue',()=>{
    const url=new URL(input,'http://localhost');const offset=Number(url.searchParams.get('offset'));const kind=url.searchParams.get('kind');
    const total=kind==='upload'?0:26;const items=kind==='upload'?[]:Array.from({length:offset?1:25},(_,i)=>({kind:'checkin',id:offset+i+1,patient_id:'PG-0001',timestamp:'2020-01-01T00:00:00Z',status:'Under Review'}));
    return new Response(JSON.stringify({items,limit:25,offset,total,has_more:offset+items.length<total,notice:'not urgency'}));
-  });vi.stubGlobal('fetch',fetcher);const select=vi.fn();render(<CareQueue revision={0} selected="" select={select}/>);
+  });vi.stubGlobal('fetch',fetcher);const select=vi.fn();render(<CareQueue revision={0} selected={null} select={select}/>);
   expect(await screen.findByText('Showing 1–25 of 26 items')).toBeVisible();expect(screen.getByRole('button',{name:'Previous queue page'})).toBeDisabled();
   await userEvent.click(screen.getByRole('button',{name:'Next queue page'}));await screen.findByText('Showing 26–26 of 26 items');expect(screen.getByRole('button',{name:'Next queue page'})).toBeDisabled();
-  await userEvent.click(screen.getByRole('button',{name:/Symptom check-in.*PG-0001/}));expect(select).toHaveBeenCalledWith('PG-0001');
+  await userEvent.click(screen.getByRole('button',{name:/Symptom check-in.*PG-0001/}));expect(select).toHaveBeenCalledWith(expect.objectContaining({patient_id:'PG-0001',kind:'checkin',id:26}));
   await userEvent.selectOptions(screen.getByLabelText('Queue item type'),'upload');await screen.findByText('No open items or due follow-ups.');
   expect(fetcher.mock.calls.some(([url])=>String(url).includes('kind=upload')&&String(url).includes('offset=0'))).toBe(true);
   await userEvent.selectOptions(screen.getByLabelText('Queue order'),'oldest');await waitFor(()=>expect(fetcher.mock.calls.some(([url])=>String(url).includes('order=oldest'))).toBe(true));
  });
  it('shows permission failures rather than an empty queue',async()=>{
   vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({detail:'Denied'}),{status:403})));
-  render(<CareQueue revision={0} selected="" select={()=>{}}/>);expect(await screen.findByRole('alert')).toHaveTextContent('Permission denied');expect(screen.queryByText('No open items or due follow-ups.')).not.toBeInTheDocument();
+  render(<CareQueue revision={0} selected={null} select={()=>{}}/>);expect(await screen.findByRole('alert')).toHaveTextContent('Permission denied');expect(screen.queryByText('No open items or due follow-ups.')).not.toBeInTheDocument();
+ });
+});
+
+
+describe('focused queue record',()=>{
+ const item={kind:'checkin' as const,id:7,patient_id:'PG-0001',timestamp:'2020-01-01T00:00:00Z',status:'Pending Review'};
+ const record={id:7,created_at:'2020-01-01T00:00:00Z',breathlessness:'mild',cough:'none',sputum_amount:'usual',sputum_colour:'clear',wheezing:'no',fatigue:'mild',fever:'no',comments:'Old unique record',additional_symptoms:'',review_status:'Pending Review',reviews:[]};
+ it('loads the exact record and saves a review linked to its ID',async()=>{
+  const fetcher=vi.fn(async(_input:string,init?:RequestInit)=>new Response(JSON.stringify(init?.method==='POST'?{id:1}:{kind:'checkin',record})));vi.stubGlobal('fetch',fetcher);const refresh=vi.fn();
+  render(<FocusedQueueRecord item={item} revision={0} refresh={refresh}/>);expect(await screen.findByText('Old unique record')).toBeVisible();expect(screen.getByRole('heading',{name:'Selected queue record'})).toHaveFocus();
+  await userEvent.click(screen.getByText('Review this record'));await userEvent.selectOptions(screen.getByLabelText('Status'),'Reviewed');await userEvent.type(screen.getByLabelText('Review notes'),'Recorded');await userEvent.click(screen.getByRole('button',{name:'Save review'}));
+  await waitFor(()=>expect(refresh).toHaveBeenCalledOnce());expect(fetcher).toHaveBeenCalledWith('/api/portal/patients/PG-0001/queue-items/checkin/7',expect.anything());
+  const post=fetcher.mock.calls.find(([url,init])=>String(url).endsWith('/reviews')&&init?.method==='POST');expect(JSON.parse(String(post?.[1]?.body))).toMatchObject({checkin_id:7,upload_id:null,status:'Reviewed',notes:'Recorded'});
+ });
+ it('clears the previous record and shows a denial after changing selection',async()=>{
+  const fetcher=vi.fn(async(input:string)=>String(input).endsWith('/7')?new Response(JSON.stringify({kind:'checkin',record})):new Response(JSON.stringify({detail:'Record not found'}),{status:404}));vi.stubGlobal('fetch',fetcher);
+  const {rerender}=render(<FocusedQueueRecord item={item} revision={0} refresh={()=>{}}/>);await screen.findByText('Old unique record');rerender(<FocusedQueueRecord item={{...item,id:8}} revision={0} refresh={()=>{}}/>);expect(screen.queryByText('Old unique record')).not.toBeInTheDocument();expect(await screen.findByRole('alert')).toHaveTextContent('Record not found');
  });
 });

@@ -384,7 +384,7 @@ def test_every_protected_http_route_rejects_missing_expired_and_revoked_sessions
             method=method.upper()
             if (method,path) in public:continue
             concrete=path
-            for name,value in {'pid':'PG-0002','upload_id':'1','notification_id':'1','review_id':'1','entry_id':'1','log_id':'1','did':'not-a-device','city':'Pune','nid':'1','alert_id':'1'}.items():
+            for name,value in {'pid':'PG-0002','upload_id':'1','notification_id':'1','review_id':'1','entry_id':'1','log_id':'1','kind':'checkin','record_id':'1','did':'not-a-device','city':'Pune','nid':'1','alert_id':'1'}.items():
                 concrete=concrete.replace('{'+name+'}',value)
             assert '{' not in concrete,(method,path)
             routes.append((method,concrete))
@@ -1020,3 +1020,66 @@ def test_review_queue_paginates_open_states_without_cross_doctor_leaks(tmp_path)
         assert page(a,kind='upload')['total']==0
         for params in ({'limit':201},{'limit':0},{'offset':-1},{'kind':'invalid'},{'order':'priority'}):
             assert client.get('/api/portal/care-queue',headers=a,params=params).status_code==422
+
+
+def test_targeted_queue_records_beyond_history_caps_and_authorization(tmp_path):
+    with TestClient(create_app(tmp_path/'target.sqlite',background_tasks=False,legacy_demo=False)) as client:
+        with client.app.state.engine.store.connect() as c:
+            for name,role in [('target_doc','doctor'),('target_other','doctor'),('target_patient','patient')]:
+                c.execute('INSERT INTO portal_users(username,password_hash,role,created_at) VALUES (?,?,?,?)',(name,hash_password(PASSWORD),role,timestamp()))
+            ids={r['username']:r['id'] for r in c.execute('SELECT id,username FROM portal_users')}
+            c.execute('INSERT INTO doctor_patient_assignments VALUES (?,?)',(ids['target_doc'],'PG-0001'))
+            c.execute('INSERT INTO doctor_patient_assignments VALUES (?,?)',(ids['target_other'],'PG-0002'))
+            c.execute('INSERT INTO patient_user_links VALUES (?,?)',(ids['target_patient'],'PG-0001'))
+            for i in range(501):
+                if i<101:
+                    c.execute("INSERT INTO symptom_checkins(patient_id,created_at,breathlessness,cough,sputum_amount,sputum_colour,wheezing,fatigue,fever,comments) VALUES ('PG-0001','2020-01-01','mild','none','usual','clear','no','mild','no',?)",(f'checkin {i}',))
+                    c.execute("INSERT INTO patient_uploads(patient_id,kind,original_name,stored_name,mime,description,created_at) VALUES ('PG-0001','care_plan',?,?, 'application/pdf',?,'2020-01-01')",(f'plan{i}.pdf',f'secret-file-{i}',f'upload {i}'))
+                    c.execute("INSERT INTO doctor_reviews(patient_id,doctor_id,status,notes,follow_up,follow_up_date,shared,created_at) VALUES ('PG-0001',?,'Follow-up Required',?,'follow-up','2000-01-01',0,'2020-01-01')",(ids['target_doc'],f'review {i}'))
+                c.execute("INSERT INTO sputum_entries(patient_id,user_id,observed_at,colour,amount,consistency,cough,description,created_at,updated_at) VALUES ('PG-0001',?,'2020-01-01','clear','small','thin','mild',?,'2020-01-01','2020-01-01')",(ids['target_patient'],f'sputum {i}'))
+                c.execute("INSERT INTO daily_care_logs(patient_id,user_id,kind,occurred_at,created_at,item,status,effort,comments,client_key) VALUES ('PG-0001',?,'meal','2020-01-01','2020-01-01','Breakfast','Completed','',?,?)",(ids['target_patient'],f'daily {i}',f'target-{i}'))
+            c.execute('UPDATE doctor_reviews SET checkin_id=1,upload_id=1 WHERE id=1')
+            c.execute("INSERT INTO sputum_reviews(entry_id,patient_id,doctor_id,notes,follow_up,shared,created_at) VALUES (1,'PG-0001',?,'private sputum review','follow',0,'2020-01-01')",(ids['target_doc'],))
+            c.execute("INSERT INTO daily_care_reviews(log_id,doctor_id,notes,shared,created_at) VALUES (1,?,'private daily review',0,'2020-01-01')",(ids['target_doc'],))
+        doc=auth(client,'target_doc');other=auth(client,'target_other');patient=auth(client,'target_patient')
+        details=client.get('/api/portal/patients/PG-0001',headers=doc).json()
+        assert all(x['id']!=1 for key in ('checkins','uploads','reviews') for x in details[key])
+        assert all(x['id']!=1 for x in client.get('/api/portal/patients/PG-0001/sputum',headers=doc).json()['entries'])
+        assert all(x['id']!=1 for x in client.get('/api/portal/patients/PG-0001/daily-care',headers=doc).json()['logs'])
+        for kind,field,value in [('checkin','comments','checkin 0'),('upload','description','upload 0'),('followup','notes','review 0'),('sputum','description','sputum 0'),('daily','comments','daily 0')]:
+            path=f'/api/portal/patients/PG-0001/queue-items/{kind}/1'
+            result=client.get(path,headers=doc)
+            assert result.status_code==200,result.text
+            assert result.json()['kind']==kind and result.json()['record'][field]==value
+            assert 'stored_name' not in result.json()['record']
+            assert client.get(path,headers=other).status_code==404
+            assert client.get(path,headers=patient).status_code==403
+            assert client.get(path).status_code==401
+            assert client.get(path.replace('PG-0001','PG-0002'),headers=other).status_code==404
+            assert client.get(path.replace('/1','/999999'),headers=doc).status_code==404
+        assert client.get('/api/portal/patients/PG-0001/queue-items/invalid/1',headers=doc).status_code==422
+        assert client.get('/api/portal/patients/PG-0001/queue-items/checkin/0',headers=doc).status_code==422
+        root='/api/portal/patients/PG-0001/queue-items/'
+        assert client.get(root+'checkin/1',headers=doc).json()['record']['reviews'][0]['notes']=='review 0'
+        assert client.get(root+'upload/1',headers=doc).json()['record']['reviews'][0]['notes']=='review 0'
+        follow=client.get(root+'followup/1',headers=doc).json()['record']
+        assert follow['checkin']['comments']=='checkin 0' and follow['upload']['description']=='upload 0' and 'stored_name' not in follow['upload']
+        assert client.get(root+'sputum/1',headers=doc).json()['record']['reviews'][0]['notes']=='private sputum review'
+        assert client.get(root+'daily/1',headers=doc).json()['record']['reviews'][0]['notes']=='private daily review'
+        assert client.post('/api/portal/patients/PG-0001/reviews',headers=other,json={'status':'Reviewed','notes':'Forbidden','checkin_id':1}).status_code==404
+        assert client.post('/api/portal/patients/PG-0001/sputum/1/reviews',headers=other,json={'notes':'Forbidden','follow_up':'','shared':False}).status_code==404
+        assert client.post('/api/portal/patients/PG-0001/daily-care/1/reviews',headers=other,json={'notes':'Forbidden','shared':False}).status_code==404
+        assert client.post('/api/portal/patients/PG-0001/reviews/1/complete-followup',headers=other,json={'notes':'Forbidden'}).status_code==404
+        result=client.post('/api/portal/patients/PG-0001/reviews',headers=doc,json={'status':'Reviewed','notes':'Old record reviewed','checkin_id':1})
+        assert result.status_code==201,result.text
+        assert client.get('/api/portal/patients/PG-0001/queue-items/checkin/1',headers=doc).json()['record']['review_status']=='Reviewed'
+        completion=client.post('/api/portal/patients/PG-0001/reviews/1/complete-followup',headers=doc,json={'notes':'Old follow-up completed'})
+        assert completion.status_code==201,completion.text
+        assert client.get('/api/portal/patients/PG-0001/queue-items/followup/1',headers=doc).json()['record']['followup_completion_notes']=='Old follow-up completed'
+        with client.app.state.engine.store.connect() as c:
+            c.execute('DELETE FROM doctor_patient_assignments WHERE doctor_id=? AND patient_id=?',(ids['target_doc'],'PG-0001'))
+        assert client.get('/api/portal/patients/PG-0001/queue-items/checkin/1',headers=doc).status_code==404
+        with client.app.state.engine.store.connect() as c:
+            c.execute('INSERT INTO doctor_patient_assignments VALUES (?,?)',(ids['target_doc'],'PG-0001'))
+            c.execute("UPDATE patients SET profile=json_set(profile,'$.synthetic',0) WHERE patient_id='PG-0001'")
+        assert client.get('/api/portal/patients/PG-0001/queue-items/checkin/1',headers=doc).status_code==404

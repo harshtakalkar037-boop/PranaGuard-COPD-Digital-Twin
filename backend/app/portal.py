@@ -214,6 +214,40 @@ def details(pid:str,request:Request,user=Depends(current)):
     if user['role']=='patient' and twin: twin={'profile':twin['profile'],'timestamp':twin['timestamp'],'synthetic':True}
     return {'profile':profile,'twin':twin,'history':history,'checkins':checkins,'uploads':uploads,'reviews':reviews}
 
+@router.get('/patients/{pid}/queue-items/{kind}/{record_id}')
+def queue_item(pid:str,kind:Literal['checkin','upload','sputum','daily','followup'],record_id:int,request:Request,user=Depends(current)):
+    """Retrieve one assigned record even when it is outside the recent-history window."""
+    role(user,'doctor')
+    if record_id<1: raise HTTPException(422,'Invalid record ID')
+    with store(request).connect() as c:
+        c.execute('BEGIN')
+        access(c,user,pid)
+        queries={
+            'checkin':'SELECT * FROM symptom_checkins WHERE patient_id=? AND id=?',
+            'upload':'SELECT id,patient_id,kind,original_name,mime,description,created_at,review_status FROM patient_uploads WHERE patient_id=? AND id=?',
+            'sputum':'SELECT * FROM sputum_entries WHERE patient_id=? AND id=?',
+            'daily':'SELECT id,patient_id,kind,occurred_at,created_at,item,status,amount_ml,duration_minutes,effort,comments,review_status FROM daily_care_logs WHERE patient_id=? AND id=?',
+            'followup':'SELECT r.*,f.completed_at AS followup_completed_at,f.notes AS followup_completion_notes FROM doctor_reviews r LEFT JOIN followup_completions f ON f.review_id=r.id WHERE r.patient_id=? AND r.id=?',
+        }
+        found=c.execute(queries[kind],(pid,record_id)).fetchone()
+        if not found: raise HTTPException(404,'Record not found')
+        record=dict(found)
+        if kind in ('checkin','upload'):
+            column='checkin_id' if kind=='checkin' else 'upload_id'
+            record['reviews']=[dict(r) for r in c.execute('SELECT r.*,f.completed_at AS followup_completed_at,f.notes AS followup_completion_notes FROM doctor_reviews r LEFT JOIN followup_completions f ON f.review_id=r.id WHERE r.patient_id=? AND r.'+column+'=? ORDER BY r.id DESC',(pid,record_id))]
+        elif kind=='followup':
+            checkin=c.execute('SELECT * FROM symptom_checkins WHERE patient_id=? AND id=?',(pid,record['checkin_id'])).fetchone() if record['checkin_id'] else None
+            upload=c.execute('SELECT id,patient_id,kind,original_name,mime,description,created_at,review_status FROM patient_uploads WHERE patient_id=? AND id=?',(pid,record['upload_id'])).fetchone() if record['upload_id'] else None
+            record['checkin']=dict(checkin) if checkin else None
+            record['upload']=dict(upload) if upload else None
+        elif kind=='sputum':
+            record['photos']=[dict(r) for r in c.execute('SELECT id,original_name,created_at,review_status FROM patient_uploads WHERE patient_id=? AND sputum_entry_id=? ORDER BY id',(pid,record_id))]
+            record['reviews']=[dict(r) for r in c.execute('SELECT id,notes,follow_up,shared,created_at FROM sputum_reviews WHERE entry_id=? ORDER BY id DESC',(record_id,))]
+            record['edit_history']=[dict(r) for r in c.execute('SELECT changed_at,snapshot FROM sputum_entry_history WHERE entry_id=? ORDER BY id DESC',(record_id,))]
+        elif kind=='daily':
+            record['reviews']=[dict(r) for r in c.execute('SELECT notes,shared,created_at FROM daily_care_reviews WHERE log_id=? ORDER BY id DESC',(record_id,))]
+    return {'kind':kind,'record':record}
+
 @router.get('/patients/{pid}/environment')
 async def environment(pid:str,request:Request,user=Depends(current)):
     with store(request).connect() as c:
