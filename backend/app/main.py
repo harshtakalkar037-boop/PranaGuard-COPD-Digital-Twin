@@ -108,10 +108,13 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     def health(e:TwinEngine=Depends(engine)):
         return {'status':'ok','synthetic':True,'model_version':e.bundle['version']}
     @app.get('/api/overview')
-    def overview(request:Request,e:TwinEngine=Depends(engine)):\n        user=request.state.workspace_user\n        return request.app.state.workspace.overview(user)[0]
+    def overview(request:Request,e:TwinEngine=Depends(engine)):
+        user=request.state.workspace_user
+        return request.app.state.workspace.overview(user)[0]
     @app.get('/api/patients')
-    def patients(q:str='',risk:Literal['all','low','elevated','high']='all',e:TwinEngine=Depends(engine)):
-        cohort=e.cohort()['patients']
+    def patients(request:Request,q:str='',risk:Literal['all','low','elevated','high']='all',e:TwinEngine=Depends(engine)):
+        user=getattr(request.state,'workspace_user',None)
+        cohort=(request.app.state.workspace.overview(user)[0]['patients'] if user else e.cohort()['patients'])
         return {'patients':[p for p in cohort if (q.lower() in (p['display_name']+p['patient_id']+p['city']).lower()) and (risk=='all' or p['risk_category']==risk)]}
     @app.get('/api/patients/{pid}')
     def patient(pid:str,version:int|None=Query(default=None,ge=1),e:TwinEngine=Depends(engine)):return e.patient(pid,version)
@@ -132,7 +135,11 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         with e.store.connect() as c:
             return {'scenarios':[{'id':r['id'],'state_version':r['state_version'],'created_at':r['created_at'],'assumptions':json.loads(r['assumptions']),'result':json.loads(r['result'])} for r in c.execute('SELECT * FROM scenarios WHERE patient_id=? ORDER BY id DESC LIMIT 20',(pid,))]}
     @app.get('/api/alerts')
-    def alerts(request:Request,patient_id:str|None=None,e:TwinEngine=Depends(engine)):\n        allowed=getattr(request.state,'workspace_patient_ids',None)\n        if allowed is None:return {'alerts':e.store.alerts(patient_id)}\n        if patient_id is not None and patient_id not in allowed:return {'alerts':[]}\n        return {'alerts':[a for a in e.store.alerts(patient_id) if a['patient_id'] in allowed]}
+    def alerts(request:Request,patient_id:str|None=None,e:TwinEngine=Depends(engine)):
+        allowed=getattr(request.state,'workspace_patient_ids',None)
+        if allowed is None:return {'alerts':e.store.alerts(patient_id)}
+        if patient_id is not None and patient_id not in allowed:return {'alerts':[]}
+        return {'alerts':[a for a in e.store.alerts(patient_id) if a['patient_id'] in allowed]}
     @app.patch('/api/alerts/{alert_id}',dependencies=[Depends(authorize)])
     async def update_alert(alert_id:int,body:AlertUpdate,request:Request,e:TwinEngine=Depends(engine)):
         with e.store.connect() as c:
