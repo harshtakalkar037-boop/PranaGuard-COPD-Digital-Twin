@@ -74,6 +74,29 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     app.include_router(make_router(authorize,hub))
     app.include_router(make_v3_router())
     app.include_router(make_workspace_router())
+
+    @app.middleware('http')
+    async def enforce_workspace_scope(request, call_next):
+        path=request.url.path
+        if not path.startswith('/api/') or path in ('/api/health','/api/workspace/login') or path.startswith('/api/workspace/'):
+            return await call_next(request)
+        authorization=request.headers.get('authorization','')
+        token=authorization[7:] if authorization.startswith('Bearer ') else None
+        try:
+            user=request.app.state.workspace.principal(token)
+        except HTTPException as exc:
+            return JSONResponse(status_code=exc.status_code,content={'detail':exc.detail})
+        workspace=request.app.state.workspace
+        assigned=workspace.assigned_ids(user)
+        if path.startswith('/api/enhanced/') or path in ('/api/validation','/api/model48/study','/api/replay','/api/status') or path.startswith('/api/replay/'):
+            if user.get('role')!='doctor' or len(assigned)!=len(request.app.state.engine.profiles):
+                return JSONResponse(status_code=403,content={'detail':'This research operation requires a doctor account assigned to the complete synthetic cohort.'})
+        match=re.match(r'^/api/patients/([^/]+)(?:/|$)',path)
+        if match and match.group(1) not in assigned:
+            return JSONResponse(status_code=404,content={'detail':'Synthetic patient not found in this account scope.'})
+        request.state.workspace_user=user
+        request.state.workspace_patient_ids=assigned
+        return await call_next(request)
     def engine(request:Request):return request.app.state.engine
     @app.exception_handler(KeyError)
     async def key_error(request,exc):return JSONResponse(status_code=404,content={'detail':str(exc)})
@@ -83,7 +106,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     def health(e:TwinEngine=Depends(engine)):
         return {'status':'ok','synthetic':True,'model_version':e.bundle['version']}
     @app.get('/api/overview')
-    def overview(e:TwinEngine=Depends(engine)):return e.cohort()
+    def overview(request:Request,e:TwinEngine=Depends(engine)):\n        user=request.state.workspace_user\n        return request.app.state.workspace.overview(user)[0]
     @app.get('/api/patients')
     def patients(q:str='',risk:Literal['all','low','elevated','high']='all',e:TwinEngine=Depends(engine)):
         cohort=e.cohort()['patients']
@@ -107,11 +130,10 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         with e.store.connect() as c:
             return {'scenarios':[{'id':r['id'],'state_version':r['state_version'],'created_at':r['created_at'],'assumptions':json.loads(r['assumptions']),'result':json.loads(r['result'])} for r in c.execute('SELECT * FROM scenarios WHERE patient_id=? ORDER BY id DESC LIMIT 20',(pid,))]}
     @app.get('/api/alerts')
-    def alerts(patient_id:str|None=None,e:TwinEngine=Depends(engine)):return {'alerts':e.store.alerts(patient_id)}
+    def alerts(request:Request,patient_id:str|None=None,e:TwinEngine=Depends(engine)):\n        allowed=request.state.workspace_patient_ids\n        if patient_id is not None and patient_id not in allowed:return {'alerts':[]}\n        return {'alerts':[a for a in e.store.alerts(patient_id) if a['patient_id'] in allowed]}
     @app.patch('/api/alerts/{alert_id}',dependencies=[Depends(authorize)])
     async def update_alert(alert_id:int,body:AlertUpdate,e:TwinEngine=Depends(engine)):
         with e.store.connect() as c:
-            c.execute('BEGIN IMMEDIATE')
             row=c.execute('SELECT * FROM alerts WHERE id=?',(alert_id,)).fetchone()
             if not row:raise HTTPException(404,'Alert not found')
             if row['status']=='resolved':raise HTTPException(409,'Resolved alert is immutable. A later high-risk state may create a new alert.')
