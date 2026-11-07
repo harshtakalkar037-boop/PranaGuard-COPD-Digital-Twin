@@ -88,6 +88,20 @@ class Workspace:
                 c.execute('DELETE FROM care_sessions WHERE token_hash=?',(digest,));raise HTTPException(401,'Demo session expired. Sign in again.')
             user=c.execute('SELECT * FROM care_users WHERE username=?',(session['username'],)).fetchone()
         return self.public_user(user)
+    def authorize_write(self,conn,token,expected_username,patient_id=None,full_cohort=False):
+        if not token:raise HTTPException(401,'Workspace session required.')
+        digest=hashlib.sha256(token.encode()).hexdigest()
+        session=conn.execute('SELECT * FROM care_sessions WHERE token_hash=?',(digest,)).fetchone()
+        if not session or session['expires_at']<stamp():raise HTTPException(401,'Workspace session expired or revoked.')
+        user=conn.execute('SELECT * FROM care_users WHERE username=?',(session['username'],)).fetchone()
+        if not user or user['username']!=expected_username or user['role']!='doctor':
+            raise HTTPException(403,'A current assigned doctor session is required.')
+        assigned={r['patient_id'] for r in conn.execute('SELECT patient_id FROM patient_assignments WHERE doctor=?',(user['username'],))}
+        if full_cohort and len(assigned)!=len(self.engine.profiles):
+            raise HTTPException(403,'This operation requires assignment to the complete synthetic cohort.')
+        if patient_id is not None and patient_id not in assigned:
+            raise HTTPException(404,'Synthetic patient not found in this account scope.')
+        return user
     def logout(self,token):
         with self.store.connect() as c:c.execute('DELETE FROM care_sessions WHERE token_hash=?',(hashlib.sha256(token.encode()).hexdigest(),))
     # ---------- scoping ----------
