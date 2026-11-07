@@ -215,11 +215,13 @@ def test_alert_id_and_websocket_are_scoped_in_unified_mode(client, engine, monke
         f'/api/alerts/{alert_id}', headers=full_doctor,
         json={'status':'acknowledged','note':'assigned synthetic alert review'},
     ).status_code == 200
-    with client.websocket_connect('/api/ws?token='+full_doctor['Authorization'][7:]) as ws:
+    with client.websocket_connect('/api/ws') as ws:
+        ws.send_text('auth:'+full_doctor['Authorization'][7:])
         assert ws.receive_json()['type'] == 'connected'
     with pytest.raises(Exception):
-        with client.websocket_connect('/api/ws?token='+empty_doctor['Authorization'][7:]):
-            pass
+        with client.websocket_connect('/api/ws') as ws:
+            ws.send_text('auth:'+empty_doctor['Authorization'][7:])
+            ws.receive_json()
 
 
 def test_followup_completion_ledger_is_scoped_and_idempotent(client, engine):
