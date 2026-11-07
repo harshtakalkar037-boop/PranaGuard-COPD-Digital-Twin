@@ -248,6 +248,50 @@ def queue_item(pid:str,kind:Literal['checkin','upload','sputum','daily','followu
             record['reviews']=[dict(r) for r in c.execute('SELECT notes,shared,created_at FROM daily_care_reviews WHERE log_id=? ORDER BY id DESC',(record_id,))]
     return {'kind':kind,'record':record}
 
+@router.get('/patients/{pid}/history/{kind}')
+def patient_history(pid:str,kind:Literal['checkins','uploads','reviews','sputum','daily','plans'],request:Request,
+                    limit:int=Query(default=25,ge=1,le=100),offset:int=Query(default=0,ge=0,le=9007199254740991),
+                    start:date|None=None,end:date|None=None,
+                    review_status:Literal['all','Pending Review','Under Review','Reviewed','Follow-up Required','Completed']='all',
+                    activity_kind:Literal['all','meal','hydration','activity']='all',user=Depends(current)):
+    """Browse patient history without truncation, preserving ownership and sharing rules."""
+    if kind=='plans': role(user,'doctor')
+    if start and end and start>end: raise HTTPException(422,'Invalid date range')
+    if activity_kind!='all' and kind!='daily': raise HTTPException(422,'Activity type applies only to daily care')
+    if review_status!='all' and kind not in ('checkins','uploads','sputum','daily'): raise HTTPException(422,'Review status does not filter clinician reviews')
+    tables={
+        'checkins':('symptom_checkins','s','s.*','s.created_at'),
+        'uploads':('patient_uploads','s','s.id,s.patient_id,s.kind,s.original_name,s.mime,s.description,s.created_at,s.review_status','s.created_at'),
+        'reviews':('doctor_reviews','s','s.*','s.created_at'),
+        'sputum':('sputum_entries','s','s.*','s.observed_at'),
+        'daily':('daily_care_logs','s','s.id,s.patient_id,s.kind,s.occurred_at,s.created_at,s.item,s.status,s.amount_ml,s.duration_minutes,s.effort,s.comments,s.review_status','s.occurred_at'),
+        'plans':('care_plan_versions','s','s.*','s.created_at'),
+    }
+    table,alias,columns,time_col=tables[kind]
+    with store(request).connect() as c:
+        c.execute('BEGIN')
+        access(c,user,pid)
+        joins=''
+        if kind=='reviews' and user['role']=='doctor':
+            joins=' LEFT JOIN followup_completions f ON f.review_id=s.id'
+            columns+=',f.completed_at AS followup_completed_at,f.notes AS followup_completion_notes'
+        sql=f' FROM {table} {alias}'+joins+' WHERE s.patient_id=?';args=[pid]
+        if kind=='reviews' and user['role']=='patient': sql+=' AND s.shared=1'
+        if start: sql+=f' AND substr({time_col},1,10)>=?';args.append(str(start))
+        if end: sql+=f' AND substr({time_col},1,10)<=?';args.append(str(end))
+        if review_status!='all': sql+=' AND s.review_status=?';args.append(review_status)
+        if activity_kind!='all': sql+=' AND s.kind=?';args.append(activity_kind)
+        total=c.execute('SELECT COUNT(*)'+sql,args).fetchone()[0]
+        items=[dict(r) for r in c.execute('SELECT '+columns+sql+f' ORDER BY {time_col} DESC,s.id DESC LIMIT ? OFFSET ?',(*args,limit,offset))]
+        for item in items:
+            if kind=='sputum':
+                item['photos']=[dict(r) for r in c.execute('SELECT id,original_name,created_at,review_status FROM patient_uploads WHERE patient_id=? AND sputum_entry_id=? ORDER BY id',(pid,item['id']))]
+                item['reviews']=[dict(r) for r in c.execute('SELECT id,notes,follow_up,shared,created_at FROM sputum_reviews WHERE entry_id=? '+('AND shared=1 ' if user['role']=='patient' else '')+'ORDER BY id DESC',(item['id'],))]
+                item['edit_history']=[dict(r) for r in c.execute('SELECT changed_at,snapshot FROM sputum_entry_history WHERE entry_id=? ORDER BY id DESC',(item['id'],))]
+            elif kind=='daily':
+                item['reviews']=[dict(r) for r in c.execute('SELECT notes,shared,created_at FROM daily_care_reviews WHERE log_id=? '+('AND shared=1 ' if user['role']=='patient' else '')+'ORDER BY id DESC',(item['id'],))]
+    return {'items':items,'limit':limit,'offset':offset,'total':total,'has_more':offset+len(items)<total}
+
 @router.get('/patients/{pid}/environment')
 async def environment(pid:str,request:Request,user=Depends(current)):
     with store(request).connect() as c:
@@ -513,6 +557,21 @@ def add_daily(body:DailyInput,request:Request,user=Depends(current)):
         cur=c.execute('INSERT INTO daily_care_logs(patient_id,user_id,kind,occurred_at,created_at,item,status,amount_ml,duration_minutes,effort,comments,client_key) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',(pid,user['id'],body.kind,utc_time(body.occurred_at),timestamp(),body.item,body.status,body.amount_ml,body.duration_minutes,body.effort,body.comments,body.client_key))
         notify_doctors(c,pid,'New daily care activity',f'{pid} recorded {body.kind}.',f'/doctor/dashboard?patient={quote(pid)}&view=Patient%20Activity%20%26%20Adherence')
     return {'id':cur.lastrowid,'duplicate':False}
+
+@router.get('/patients/{pid}/daily-summary')
+def daily_summary(pid:str,request:Request,start:datetime,end:datetime,user=Depends(current)):
+    """Aggregate all patient-reported activity within a bounded, timezone-aware interval."""
+    start_utc=utc_time(start);end_utc=utc_time(end)
+    if end<=start or end-start>timedelta(hours=27): raise HTTPException(422,'Invalid daily interval')
+    with store(request).connect() as c:
+        c.execute('BEGIN')
+        access(c,user,pid)
+        row=c.execute("""SELECT
+            COALESCE(SUM(CASE WHEN kind='meal' THEN 1 ELSE 0 END),0) AS meals_recorded,
+            COALESCE(SUM(CASE WHEN kind='hydration' AND status='Completed' THEN amount_ml ELSE 0 END),0) AS water_ml,
+            COALESCE(SUM(CASE WHEN kind='activity' AND status='Completed' THEN 1 ELSE 0 END),0) AS activities_completed
+            FROM daily_care_logs WHERE patient_id=? AND julianday(occurred_at)>=julianday(?) AND julianday(occurred_at)<julianday(?)""",(pid,start_utc,end_utc)).fetchone()
+    return dict(row)
 
 @router.get('/patients/{pid}/daily-care')
 def list_daily(pid:str,request:Request,kind:Literal['all','meal','hydration','activity']='all',start:date|None=None,end:date|None=None,review_status:Literal['all','Pending Review','Reviewed']='all',user=Depends(current)):

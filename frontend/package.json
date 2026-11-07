@@ -17,7 +17,8 @@
     "test:e2e:patient-management": "node e2e/patient-management.mjs",
     "test:e2e:login-throttle": "node e2e/login-throttle.mjs",
     "test:e2e:care-queue": "node e2e/care-queue.mjs",
-    "test:e2e:focused-queue": "node e2e/focused-queue.mjs"
+    "test:e2e:focused-queue": "node e2e/focused-queue.mjs",
+    "test:e2e:patient-history": "node e2e/patient-history.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

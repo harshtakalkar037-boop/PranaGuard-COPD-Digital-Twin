@@ -1036,11 +1036,15 @@ def test_targeted_queue_records_beyond_history_caps_and_authorization(tmp_path):
                     c.execute("INSERT INTO symptom_checkins(patient_id,created_at,breathlessness,cough,sputum_amount,sputum_colour,wheezing,fatigue,fever,comments) VALUES ('PG-0001','2020-01-01','mild','none','usual','clear','no','mild','no',?)",(f'checkin {i}',))
                     c.execute("INSERT INTO patient_uploads(patient_id,kind,original_name,stored_name,mime,description,created_at) VALUES ('PG-0001','care_plan',?,?, 'application/pdf',?,'2020-01-01')",(f'plan{i}.pdf',f'secret-file-{i}',f'upload {i}'))
                     c.execute("INSERT INTO doctor_reviews(patient_id,doctor_id,status,notes,follow_up,follow_up_date,shared,created_at) VALUES ('PG-0001',?,'Follow-up Required',?,'follow-up','2000-01-01',0,'2020-01-01')",(ids['target_doc'],f'review {i}'))
+                    c.execute("INSERT INTO care_plan_versions(patient_id,doctor_id,created_at,active,title,start_date,food_guidance,breakfast,lunch,dinner,snacks,hydration_instructions,activities,activity_schedule,activity_restrictions,notes) VALUES ('PG-0001',?,'2020-01-01',1,?,'2020-01-01','','','','','','','','','','')",(ids['target_doc'],f'plan version {i}'))
                 c.execute("INSERT INTO sputum_entries(patient_id,user_id,observed_at,colour,amount,consistency,cough,description,created_at,updated_at) VALUES ('PG-0001',?,'2020-01-01','clear','small','thin','mild',?,'2020-01-01','2020-01-01')",(ids['target_patient'],f'sputum {i}'))
                 c.execute("INSERT INTO daily_care_logs(patient_id,user_id,kind,occurred_at,created_at,item,status,effort,comments,client_key) VALUES ('PG-0001',?,'meal','2020-01-01','2020-01-01','Breakfast','Completed','',?,?)",(ids['target_patient'],f'daily {i}',f'target-{i}'))
             c.execute('UPDATE doctor_reviews SET checkin_id=1,upload_id=1 WHERE id=1')
+            c.execute('UPDATE doctor_reviews SET shared=1 WHERE id=2')
             c.execute("INSERT INTO sputum_reviews(entry_id,patient_id,doctor_id,notes,follow_up,shared,created_at) VALUES (1,'PG-0001',?,'private sputum review','follow',0,'2020-01-01')",(ids['target_doc'],))
             c.execute("INSERT INTO daily_care_reviews(log_id,doctor_id,notes,shared,created_at) VALUES (1,?,'private daily review',0,'2020-01-01')",(ids['target_doc'],))
+            c.execute("INSERT INTO sputum_reviews(entry_id,patient_id,doctor_id,notes,follow_up,shared,created_at) VALUES (1,'PG-0001',?,'shared sputum review','',1,'2020-01-01')",(ids['target_doc'],))
+            c.execute("INSERT INTO daily_care_reviews(log_id,doctor_id,notes,shared,created_at) VALUES (1,?,'shared daily review',1,'2020-01-01')",(ids['target_doc'],))
         doc=auth(client,'target_doc');other=auth(client,'target_other');patient=auth(client,'target_patient')
         details=client.get('/api/portal/patients/PG-0001',headers=doc).json()
         assert all(x['id']!=1 for key in ('checkins','uploads','reviews') for x in details[key])
@@ -1064,8 +1068,47 @@ def test_targeted_queue_records_beyond_history_caps_and_authorization(tmp_path):
         assert client.get(root+'upload/1',headers=doc).json()['record']['reviews'][0]['notes']=='review 0'
         follow=client.get(root+'followup/1',headers=doc).json()['record']
         assert follow['checkin']['comments']=='checkin 0' and follow['upload']['description']=='upload 0' and 'stored_name' not in follow['upload']
-        assert client.get(root+'sputum/1',headers=doc).json()['record']['reviews'][0]['notes']=='private sputum review'
-        assert client.get(root+'daily/1',headers=doc).json()['record']['reviews'][0]['notes']=='private daily review'
+        assert {r['notes'] for r in client.get(root+'sputum/1',headers=doc).json()['record']['reviews']}=={'private sputum review','shared sputum review'}
+        assert {r['notes'] for r in client.get(root+'daily/1',headers=doc).json()['record']['reviews']}=={'private daily review','shared daily review'}
+        # Every history is paginated before presentation, with ties and filters scoped to the user.
+        history='/api/portal/patients/PG-0001/history/'
+        for kind,count in [('checkins',101),('uploads',101),('reviews',101),('sputum',501),('daily',501),('plans',101)]:
+            response=client.get(history+kind,headers=doc,params={'limit':100,'offset':count-1})
+            assert response.status_code==200,response.text
+            page=response.json();assert page['total']==count and page['items'][0]['id']==1 and not page['has_more']
+            pages=[client.get(history+kind,headers=doc,params={'limit':100,'offset':n}).json() for n in range(0,count,100)]
+            assert [row['id'] for p in pages for row in p['items']]==list(range(count,0,-1))
+            assert all(p['total']==count for p in pages)
+            assert 'stored_name' not in page['items'][0]
+            assert client.get(history+kind,headers=other).status_code==404
+            assert client.get(history+kind,headers=patient).status_code==(403 if kind=='plans' else 200)
+            assert client.get(history+kind).status_code==401
+            assert client.get(history+kind,headers=doc,params={'limit':101}).status_code==422
+            assert client.get(history+kind,headers=doc,params={'offset':-1}).status_code==422
+            assert client.get(history+kind,headers=doc,params={'start':'2021-01-01'}).json()['total']==0
+        visible=client.get(history+'reviews',headers=patient).json()
+        assert visible['total']==1 and [r['id'] for r in visible['items']]==[2]
+        p_sputum=client.get(history+'sputum',headers=patient,params={'limit':1,'offset':500}).json()['items'][0]
+        p_daily=client.get(history+'daily',headers=patient,params={'limit':1,'offset':500}).json()['items'][0]
+        assert [r['notes'] for r in p_sputum['reviews']]==['shared sputum review']
+        assert [r['notes'] for r in p_daily['reviews']]==['shared daily review']
+        assert client.get(history+'checkins',headers=doc,params={'review_status':'Pending Review'}).json()['total']==101
+        assert client.get(history+'daily',headers=doc,params={'activity_kind':'hydration'}).json()['total']==0
+        assert client.get(history+'daily',headers=doc,params={'start':'2021-01-01','end':'2020-01-01'}).status_code==422
+        assert client.get(history+'reviews',headers=doc,params={'review_status':'Reviewed'}).status_code==422
+        assert client.get(history+'sputum',headers=doc,params={'activity_kind':'meal'}).status_code==422
+        summary='/api/portal/patients/PG-0001/daily-summary'
+        window={'start':'2020-01-01T00:00:00+00:00','end':'2020-01-02T00:00:00+00:00'}
+        assert client.get(summary,headers=doc,params=window).json()=={'meals_recorded':501,'water_ml':0,'activities_completed':0}
+        assert client.get(summary,headers=patient,params=window).json()['meals_recorded']==501
+        assert client.get(summary,headers=other,params=window).status_code==404
+        assert client.get(summary,params=window).status_code==401
+        for params in ({'start':'2020-01-01T00:00:00','end':'2020-01-02T00:00:00Z'},{'start':'2020-01-02T00:00:00Z','end':'2020-01-01T00:00:00Z'},{'start':'2020-01-01T00:00:00Z','end':'2020-01-03T00:00:00Z'}):
+            assert client.get(summary,headers=doc,params=params).status_code==422
+        with client.app.state.engine.store.connect() as c:
+            for i,(kind,status,amount,at) in enumerate([('hydration','Completed',200,'2020-01-01T12:00:00+00:00'),('hydration','Not completed',100,'2020-01-01T12:00:00+00:00'),('activity','Completed',None,'2020-01-01T12:00:00+00:00'),('activity','Not completed',None,'2020-01-01T12:00:00+00:00'),('hydration','Completed',100,'2020-01-02T00:00:00+00:00')]):
+                c.execute("INSERT INTO daily_care_logs(patient_id,user_id,kind,occurred_at,created_at,item,status,amount_ml,effort,comments,client_key) VALUES ('PG-0001',?,?,?,'2020-01-01','test',?,?,'','',?)",(ids['target_patient'],kind,at,status,amount,f'summary-{i}'))
+        assert client.get(summary,headers=patient,params=window).json()=={'meals_recorded':501,'water_ml':200,'activities_completed':1}
         assert client.post('/api/portal/patients/PG-0001/reviews',headers=other,json={'status':'Reviewed','notes':'Forbidden','checkin_id':1}).status_code==404
         assert client.post('/api/portal/patients/PG-0001/sputum/1/reviews',headers=other,json={'notes':'Forbidden','follow_up':'','shared':False}).status_code==404
         assert client.post('/api/portal/patients/PG-0001/daily-care/1/reviews',headers=other,json={'notes':'Forbidden','shared':False}).status_code==404

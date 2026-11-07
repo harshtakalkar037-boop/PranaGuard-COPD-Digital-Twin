@@ -1,6 +1,6 @@
-import {render,screen,renderHook,waitFor,act} from '@testing-library/react';
+import {render,screen,renderHook,waitFor,act,within} from '@testing-library/react';
 import {describe,it,expect,vi,afterEach} from 'vitest';
-import Portal, {CareQueue,CompleteFollowup,FocusedQueueRecord,usePortal} from './Portal';
+import Portal, {CareQueue,CompleteFollowup,FocusedQueueRecord,Records,Dashboard,usePortal} from './Portal';
 import userEvent from '@testing-library/user-event';
 
 afterEach(()=>vi.unstubAllGlobals());
@@ -95,4 +95,42 @@ describe('focused queue record',()=>{
   const fetcher=vi.fn(async(input:string)=>String(input).endsWith('/7')?new Response(JSON.stringify({kind:'checkin',record})):new Response(JSON.stringify({detail:'Record not found'}),{status:404}));vi.stubGlobal('fetch',fetcher);
   const {rerender}=render(<FocusedQueueRecord item={item} revision={0} refresh={()=>{}}/>);await screen.findByText('Old unique record');rerender(<FocusedQueueRecord item={{...item,id:8}} revision={0} refresh={()=>{}}/>);expect(screen.queryByText('Old unique record')).not.toBeInTheDocument();expect(await screen.findByRole('alert')).toHaveTextContent('Record not found');
  });
+});
+
+describe('paginated patient history',()=>{
+ it('loads independent pages, clears related selection and filters on the server',async()=>{
+  const fetcher=vi.fn(async(input:string)=>{const u=new URL(input,'http://localhost'),kind=u.pathname.split('/').at(-1),offset=Number(u.searchParams.get('offset'));
+   let items:unknown[]=[];
+   if(kind==='checkins')items=[{id:offset?1:26,created_at:'2020-01-01T00:00:00Z',breathlessness:'mild',cough:'none',sputum_amount:'usual',sputum_colour:'clear',wheezing:'no',fatigue:'mild',fever:'no',comments:offset?'old checkin':'new checkin',review_status:'Pending Review'}];
+   if(kind==='uploads')items=[{id:offset?1:26,kind:'care_plan',original_name:offset?'old.pdf':'new.pdf',description:'',created_at:'2020-01-01T00:00:00Z',review_status:'Pending Review'}];
+   if(kind==='reviews')items=[{id:offset?1:26,notes:offset?'old review':'new review',status:'Reviewed',created_at:'2020-01-01T00:00:00Z',shared:0,follow_up:'',follow_up_date:null}];
+   if(u.searchParams.get('review_status')==='Reviewed')items=[];
+   return new Response(JSON.stringify({items,offset,limit:25,total:items.length?26:0,has_more:!offset&&items.length>0}));
+  });vi.stubGlobal('fetch',fetcher);render(<Records doctor pid="PG-0001" revision={0} refresh={()=>{}}/>);
+  await screen.findByText('new checkin');expect(within(screen.getByRole('heading',{name:'Documents & care plans'}).closest('section')!).getByText('new.pdf')).toBeVisible();expect(screen.getByText('new review')).toBeVisible();
+  await userEvent.selectOptions(screen.getByLabelText('Related check-in (optional)'),'26');await userEvent.click(screen.getByRole('button',{name:'Next check-ins page'}));await screen.findByText('old checkin');expect(screen.getByLabelText('Related check-in (optional)')).toHaveValue('');
+  await userEvent.click(screen.getByRole('button',{name:'Next documents page'}));await waitFor(()=>expect(within(screen.getByRole('heading',{name:'Documents & care plans'}).closest('section')!).getByText('old.pdf')).toBeVisible());
+  await userEvent.click(screen.getByRole('button',{name:'Next reviews page'}));expect(await screen.findByText('old review')).toBeVisible();
+  await userEvent.selectOptions(screen.getByLabelText('Check-in review status'),'Reviewed');expect(await screen.findByText('No check-ins.')).toBeVisible();
+  expect(fetcher.mock.calls.some(([url])=>String(url).includes('review_status=Reviewed')&&String(url).includes('offset=0'))).toBe(true);
+ });
+ it('shows malformed responses as errors instead of empty histories or a crash',async()=>{
+  vi.stubGlobal('fetch',vi.fn(async()=>new Response(JSON.stringify({logs:[]}))));render(<Records doctor={false} pid="PG-0001" revision={0} refresh={()=>{}}/>);
+  await waitFor(()=>expect(screen.getAllByRole('alert')).toHaveLength(3));expect(screen.getAllByText('Invalid patient history response. Please retry.')).toHaveLength(3);
+ });
+});
+
+
+it('does not duplicate patient history panels when changing doctor views',async()=>{
+ const fetcher=vi.fn(async(input:string)=>{const u=new URL(input,'http://localhost');let result:unknown={};
+  if(u.pathname.endsWith('/me'))result={username:'doctor',role:'doctor',patient_id:null,must_change_password:false};
+  else if(u.pathname.endsWith('/care-queue'))result={items:[],limit:25,offset:0,total:0,has_more:false,notice:''};
+  else if(u.pathname.includes('/history/'))result={items:[],limit:25,offset:0,total:0,has_more:false};
+  else if(u.pathname.endsWith('/patients'))result={patients:[]};
+  else if(u.pathname.endsWith('/environment'))result={city:'Pune',scope:'City',components:{air:{metrics:[],source:'test',status:'test',freshness:'test',valid_at:null,retrieved_at:null},weather:{metrics:[],source:'test',status:'test',freshness:'test',valid_at:null,retrieved_at:null}}};
+  else if(u.pathname.endsWith('/PG-0001'))result={profile:null,twin:null,history:null,checkins:[],uploads:[],reviews:[]};
+  return new Response(JSON.stringify(result));
+ });vi.stubGlobal('fetch',fetcher);render(<Dashboard kind="doctor" initialView="Care Action Centre" selectedPatient="PG-0001"/>);
+ await screen.findByRole('heading',{name:'Patient daily activity & adherence'});await userEvent.click(screen.getByRole('button',{name:'Patient Activity & Adherence'}));
+ expect(screen.getAllByRole('heading',{name:'Patient daily activity & adherence'})).toHaveLength(1);
 });
