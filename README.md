@@ -71,6 +71,22 @@ Use these accounts for the current deployed workspace. They are public synthetic
 
 Sessions use bearer tokens, PBKDF2 password hashes, and a 12-hour expiry. This is demo-grade authentication, not production identity management.
 
+### 4.1 Product walkthrough and visual evidence
+
+The live application is the source of truth for the current interface: [open the PranaGuard demo](https://prana-guard-copd-digital-twin.vercel.app). The repository currently has no checked-in, verified UI screenshot set, so this README does not embed mockups or generated screenshots in place of the running product.
+
+| Area to inspect | What the walkthrough demonstrates |
+|---|---|
+| Research overview | Synthetic cohort status, risk grouping, replay context, and system-level summaries. |
+| Patient digital twin | Personal baseline, current synthetic state, longitudinal history, and missing-data context. |
+| Model risk and evidence | 24h/48h/72h baseline outputs, separately labelled v3 48h experiment, model version, and limitations. |
+| Clinician workspace | Assigned synthetic patient directory, patient profile, review queue, action history, and follow-ups. |
+| Patient workspace | Daily wellbeing, sputum diary, adherence entries, and shared clinical documents. |
+| Notifications and environment | Notification review lifecycle, source/freshness context, and optional city-level environmental data. |
+
+Screenshots should be captured from the deployed application using the public demo accounts and added under a dedicated `docs/screenshots/` directory only after checking that they contain no real personal information or session tokens. This keeps the visual evidence authentic and reproducible.
+
+
 ## 5. Feature set
 
 ### 5.1 Original digital-twin and research dashboard
@@ -260,6 +276,234 @@ frontend/src/
 
 > **Architecture and safety boundary:** this is a research/demo deployment, not a production clinical system. Demo authentication is not production identity management; the hosted SQLite filesystem is not durable storage; model outputs are not clinically validated; and the optional environmental feed is not a personal exposure sensor. Do not store real patient information or use the system for diagnosis, triage, prescribing, or treatment decisions.
 
+
+### 6.7 Database architecture and entity relationships
+
+The database is a relational SQLite store. The frozen synthetic cohort and replay state are kept separate from additive clinician/patient workspace records, monitoring/demo-device records, and prediction-history provenance. Foreign keys are enabled; schema changes are applied through ordered, checksummed SQL migrations.
+
+```mermaid
+erDiagram
+    PATIENTS ||--o{ STATES : has_versions
+    PATIENTS ||--o{ ALERTS : raises
+    PATIENTS ||--o{ INTERVENTIONS : receives_demo_actions
+    PATIENTS ||--o{ SCENARIOS : has_branches
+    PATIENTS ||--o{ PREDICTION_HISTORY : records
+    CARE_USERS ||--o{ CARE_SESSIONS : owns
+    CARE_USERS ||--o{ PATIENT_ASSIGNMENTS : assigned_doctor
+    PATIENTS ||--o| PATIENT_ASSIGNMENTS : assigned_to
+    PATIENTS ||--o{ CARE_REVIEWS : reviewed
+    CARE_REVIEWS ||--o{ CARE_REVIEW_EVENTS : audit_events
+    PATIENTS ||--o| CARE_PLANS : has_plan
+    CARE_PLANS ||--o{ CARE_PLAN_REVISIONS : revisions
+    PATIENTS ||--o{ DAILY_LOGS : reports
+    PATIENTS ||--o{ PLAN_MEDICATIONS : has_demo_medications
+    PLAN_MEDICATIONS ||--o{ MED_ADHERENCE : adherence_entries
+    PATIENTS ||--o{ DOCUMENTS : stores
+    CARE_USERS ||--o{ DOCUMENTS : uploads
+    PATIENTS ||--o{ FOLLOW_UPS : schedules
+    CARE_USERS ||--o{ FOLLOW_UPS : creates
+    PATIENTS ||--o{ SPUTUM_ENTRIES : reports
+    SPUTUM_ENTRIES ||--o{ ATTACHMENTS : may_include
+    PATIENTS ||--o{ REGISTRATIONS : registered_demo
+    PATIENTS ||--o{ DEVICES : associated_simulated_devices
+    DEVICES ||--o{ INGESTION_EVENTS : emits
+    INGESTION_EVENTS ||--o{ DEVICE_READINGS : contains
+    PATIENTS ||--o{ DEVICE_READINGS : observed_for
+    PATIENTS ||--o{ MONITORING_STATES : snapshots
+    INGESTION_EVENTS ||--o| MONITORING_STATES : produces
+    PATIENTS ||--o{ DEMO_OBSERVATIONS : manual_demo_observations
+    PATIENTS ||--o{ NOTIFICATIONS : receives
+    NOTIFICATIONS ||--o{ NOTIFICATION_HISTORY : status_history
+    PATIENTS ||--o{ AUDIT_EVENTS : activity_audit
+    PATIENTS ||--o{ ENHANCED_AUDIT : enhanced_audit
+    ENVIRONMENT_CACHE ||--o{ ENVIRONMENT_ATTEMPTS : retry_state
+
+    PATIENTS {
+        text patient_id PK
+        text profile
+    }
+    STATES {
+        text patient_id FK
+        int version
+        int hour
+        text timestamp
+        text state
+    }
+    CARE_USERS {
+        text username PK
+        text role
+        text patient_id FK
+        text pass_hash
+    }
+    CARE_SESSIONS {
+        text token_hash PK
+        text username FK
+        text expires_at
+    }
+    PATIENT_ASSIGNMENTS {
+        text patient_id PK,FK
+        text doctor FK
+        text assigned_at
+    }
+    CARE_REVIEWS {
+        int id PK
+        text patient_id FK
+        text doctor
+        text status
+        text note
+    }
+    CARE_PLANS {
+        text patient_id PK,FK
+        text doctor
+        text goals
+        text status
+    }
+    DAILY_LOGS {
+        int id PK
+        text patient_id FK
+        text entry_date
+        text created_by
+    }
+    PLAN_MEDICATIONS {
+        int id PK
+        text patient_id FK
+        text name
+        text added_by
+    }
+    MED_ADHERENCE {
+        int id PK
+        int medication_id FK
+        text patient_id FK
+        int as_prescribed
+    }
+    DOCUMENTS {
+        int id PK
+        text patient_id FK
+        text uploaded_by FK
+        text filename
+        text sha256
+        blob data
+    }
+    FOLLOW_UPS {
+        int id PK
+        text patient_id FK
+        text doctor FK
+        text due_at
+        text status
+    }
+    SPUTUM_ENTRIES {
+        int id PK
+        text patient_id FK
+        text occurred_at
+        text colour
+    }
+    ATTACHMENTS {
+        int id PK
+        int entry_id FK
+        text sha256
+        blob data
+    }
+    DEVICES {
+        text id PK
+        text patient_id FK
+        text status
+        int sequence
+    }
+    INGESTION_EVENTS {
+        int id PK
+        text device_id FK
+        text event_id
+        text payload_hash
+    }
+    DEVICE_READINGS {
+        int id PK
+        int event_pk FK
+        text metric
+        real value
+    }
+    MONITORING_STATES {
+        int id PK
+        int event_pk FK
+        text snapshot
+    }
+    NOTIFICATIONS {
+        int id PK
+        text patient_id FK
+        text category
+        text status
+        text dedupe_key
+    }
+    PREDICTION_HISTORY {
+        int id PK
+        text patient_id FK
+        int horizon
+        text model_version
+        real risk
+        int state_version
+    }
+    ALERTS {
+        int id PK
+        text patient_id FK
+        int state_version
+        real risk
+        text status
+    }
+    INTERVENTIONS {
+        int id PK
+        text patient_id FK
+        text kind
+        text note
+    }
+    SCENARIOS {
+        int id PK
+        text patient_id FK
+        int state_version
+        text assumptions
+    }
+    ENVIRONMENT_CACHE {
+        text city PK
+        text component PK
+        text valid_at
+    }
+    ENVIRONMENT_ATTEMPTS {
+        text city PK,FK
+        text component PK,FK
+        int consecutive_failures
+    }
+```
+
+**Core table groups**
+
+| Group | Tables | Purpose |
+|---|---|---|
+| Twin and replay | `patients`, `states`, `meta` | Synthetic patient profiles, immutable replay versions, replay cursor and engine metadata. |
+| Research actions | `alerts`, `interventions`, `scenarios`, `prediction_history` | Alert lifecycle, clinician demo actions, conditional scenario branches, and model/version provenance. |
+| Identity and access | `care_users`, `care_sessions`, `patient_assignments` | Demo identities, expiring sessions, and doctor-to-patient assignment scope. |
+| Care workflow | `care_reviews`, `care_review_events`, `care_plans`, `care_plan_revisions`, `follow_ups` | Review state transitions, plan snapshots, revisions, and scheduled follow-ups. |
+| Patient-submitted records | `daily_logs`, `sputum_entries`, `attachments`, `plan_medications`, `med_adherence`, `documents` | Synthetic daily reports, sputum entries, file attachments, medication records, adherence reports, and shared documents. |
+| Enhanced monitoring | `registrations`, `devices`, `ingestion_events`, `device_readings`, `monitoring_states`, `demo_observations` | Fictional registrations and simulated-device ingestion/monitoring records. |
+| Notifications and provenance | `notifications`, `notification_history`, `audit_events`, `enhanced_audit`, `email_outbox` | Notification lifecycle, audit history, enhanced-operation audit, and explicit demo email test outbox. |
+| Environmental context | `environment_cache`, `environment_attempts` | Cached city-level air/weather context and bounded retry state. |
+
+The diagram focuses on principal foreign-key relationships. Some auxiliary columns and append-only event tables are intentionally omitted from the entity boxes for readability; the authoritative schema is in [backend/app/migrations](backend/app/migrations/).
+
+### 6.8 API reference
+
+The complete endpoint catalogue, request examples, response semantics, error codes, WebSocket contract, demo-token behaviour, enhanced routes, and v3 compatibility notes are maintained in the dedicated API guide: **[docs/API.md](docs/API.md)**. The running interactive OpenAPI specification is available at [`/docs`](https://pranaguard-api.onrender.com/docs) and [`/openapi.json`](https://pranaguard-api.onrender.com/openapi.json).
+
+| API area | Representative routes | Purpose |
+|---|---|---|
+| Health and research | `GET /api/health`, `GET /api/overview`, `GET /api/patients/{id}` | Readiness, synthetic cohort, patient twin and saved state. |
+| Replay and evidence | `POST /api/replay/step`, `GET /api/validation`, `GET /api/status` | Advance replay, inspect evaluation metrics and provenance/status. |
+| Scenarios and alerts | `POST /api/patients/{id}/scenarios`, `GET /api/alerts` | Run conditional branches and inspect alert records. |
+| Care workspace | `POST /api/workspace/login`, `GET /api/workspace/patients`, `GET /api/workspace/care/reviews` | Demo sign-in, scoped patient directory and review workflow. |
+| Enhanced services | `GET /api/enhanced/status`, `GET /api/enhanced/notifications`, `GET /api/enhanced/environment/{city}` | Monitoring status, notification workflow and optional city context. |
+| Experimental v3 | `GET /api/model48/v3/study`, `GET /api/model48/v3/patients/{id}` | Separately versioned experimental synthetic 48-hour result and evidence. |
+| Live updates | `WS /api/ws` | Replay/alert invalidation events for connected clients. |
+
+Most original synthetic research read endpoints are public in the demo configuration. Workspace routes use a bearer session; configured protected write routes may also require the shared demo header. This is not production-grade authorization. Consult the API guide before calling write/reset endpoints.
+
+
 ## 7. Data, model methodology, and interpretation
 
 - The research cohort contains 120 synthetic patient profiles and 3,000 synthetic window states. These records do not represent real people.
@@ -269,6 +513,70 @@ frontend/src/
 - Environmental context is optional, city-level gridded/modelled information. USAQI is not CPCB/Indian NAQI; environmental context is not a personal exposure measurement and is not a frozen-model input.
 - What-if scenarios are conditional sensitivity analyses, not validated disease trajectories, causal intervention effects, or treatment recommendations.
 - TreeSHAP/model explanations describe model associations, not causation. A lower model score is not evidence that an intervention improves health.
+
+### 7.1 Data pipeline and inference lifecycle
+
+The implemented baseline pipeline is an offline-trained, runtime-loaded workflow:
+
+```mermaid
+flowchart LR
+    A["Seeded synthetic cohort<br/>120 profiles · 60 days"] --> B["Schema, range, timestamp<br/>and duplicate validation"]
+    B --> C["Personal baseline<br/>first 72 observed hours"]
+    C --> D["Causal feature engineering<br/>current + trailing windows"]
+    D --> E["Frozen model bundle<br/>LightGBM / LogisticRegression"]
+    E --> F["Horizon inference<br/>24h · 48h · 72h"]
+    F --> G["Twin state + provenance<br/>versioned replay"]
+    G --> H["API, dashboard and<br/>prediction history"]
+    G --> I["Scenario branches<br/>separate conditional outputs"]
+```
+
+1. The deterministic generator creates the synthetic patient profiles and hourly longitudinal records. The checked-in dataset and model bundle are fingerprinted.
+2. The engine validates schema, ranges, patient-hour uniqueness, timestamp alignment, and supported follow-up before replay.
+3. Each patient's first 72 observed hours define the personal median baseline. Runtime model forecasts are only supported after this warm-up and when evaluation eligibility requirements are met.
+4. Shared feature engineering builds current values and strictly trailing temporal summaries/deltas. Patient identifiers, city labels, timestamp/hour indices, event flags, and future labels are excluded from fitted predictors.
+5. Training-only preprocessing is applied to the frozen fitted model pipelines. Runtime loads the bundled artifacts; it does not retrain on incoming demo records.
+6. Replay advances the synthetic cohort and stores immutable patient-state versions. The original baseline exposes 24h, 48h, and 72h outputs. The v3 48h experiment is a separate read-only path and is not written into original replay history.
+7. Scenario branches use only the selected state's observed past and stated assumptions. They are conditional sensitivity analyses, not causal intervention simulations.
+
+See [methodology](docs/METHODOLOGY.md), [model card](docs/MODEL_CARD.md), [data provenance](docs/DATA_PROVENANCE.md), and [architecture notes](docs/ARCHITECTURE.md) for full implementation detail.
+
+### 7.2 Model evaluation — synthetic research evidence
+
+All figures below are copied from the repository's executed evaluation artifacts. They describe performance on generated outcomes only and must not be interpreted as clinical prediction performance.
+
+**Frozen baseline — LightGBM personalized pipeline**
+
+| Horizon | AUROC | AUPRC | Brier score | Positive test windows / 4,699 |
+|---|---:|---:|---:|---:|
+| 24 hours | 0.6916 | 0.0882 | 0.0279 | 136 |
+| 48 hours | 0.6144 | 0.0968 | 0.0557 | 260 |
+| 72 hours | 0.3951 | 0.0593 | 0.0853 | 363 |
+
+The logistic-regression personalized baseline achieved AUROC/AUPRC/Brier of **0.6619 / 0.1993 / 0.0260** (24h), **0.6285 / 0.1841 / 0.0537** (48h), and **0.6253 / 0.2281 / 0.0800** (72h). The 72h LightGBM result is below chance by AUROC and below test prevalence by AUPRC. At the fixed demonstration threshold of 0.35, all three primary LightGBM horizons had zero sensitivity in the original held-out test. The 72h Platt calibration slope is negative and reverses raw-score direction; this is retained and disclosed rather than hidden by post-hoc test tuning.
+
+**Separate v3 experimental 48-hour study — fresh synthetic audit**
+
+| Metric | Original 48h | Experimental v3 48h |
+|---|---:|---:|
+| AUROC | 0.5579 | 0.5986 |
+| AUPRC | 0.1101 | 0.1402 |
+| Brier score | 0.0756 | 0.0736 |
+| Window recall | 0.00% | 14.61% |
+| Precision | 0.00% | 16.40% |
+| False-positive rate | 0.00% | 6.57% |
+
+The matched fresh audit contains **45,941 eligible hourly windows**, including **3,724 positive windows**, from 240 new synthetic patients. The v3 experiment passed its predeclared synthetic acceptance gates and is exposed only as a separately labelled experimental 48h result. It still misses approximately 85.39% of positive windows at its selected operating point; its precision is 16.40%. These are overlapping, correlated hourly windows—not independent patients or clinical alarms. The v3 result does not upgrade the original 24h/72h pipeline or establish real-world benefit.
+
+**Interpretation rules**
+
+- AUROC measures ranking; AUPRC must be interpreted against the positive-window prevalence. Neither alone establishes useful alerting.
+- Brier score and log loss measure probabilistic error, but synthetic calibration does not transfer to clinical populations.
+- A fixed demonstration cutoff is not a medical threshold. Precision/recall depend on prevalence and operating point.
+- The baseline evaluation has only five test-window onsets in its original test design; the lead-time audit detected zero of five at the 72h score threshold. Median detected lead time is therefore undefined.
+- V3's fresh audit is same-generator synthetic data, not an external clinical validation cohort. Its paired bootstrap uncertainty and repeated-study context are documented in the [v3 results report](docs/model-v3/RESULTS.md).
+
+Reproducible sources: [executed baseline evaluation](artifacts/evaluation.md), [metrics CSV](artifacts/metrics.csv), [metric verification](artifacts/evaluation_verification.json), [v3 fresh-audit results](docs/model-v3/RESULTS.md), and [v2 rejected-study results](docs/model-upgrade/RESULTS.md).
+
 
 ## 8. Validation, tests, and verification evidence
 
@@ -382,6 +690,43 @@ Use a disposable database copy for risky tests or reset/bootstrap commands. Neve
 | `PRANAGUARD_CORS_ORIGINS` | Comma-separated allowed frontend origins |
 
 Set secrets only in the backend environment. Do not commit `.env`, credentials, tokens, or private keys. Demo password overrides apply when users are first seeded; changing an environment variable after account creation does not automatically rewrite the stored password.
+
+### 11.1 Deployment guide
+
+The current public demo uses a separately hosted frontend and backend. The frontend is configured to call the backend through `VITE_API_BASE_URL`; the Vite development proxy uses `API_PROXY_TARGET`. Keep backend-only secrets out of Vercel/browser variables.
+
+**Backend — Render**
+
+| Setting | Value |
+|---|---|
+| Runtime | Python |
+| Build command | `pip install -r requirements.txt` |
+| Start command | `uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT` |
+| Health check | `/api/health` |
+| Database | `PRANAGUARD_DB` (SQLite path; use persistent storage for durable writes) |
+
+**Frontend — Vercel**
+
+| Setting | Value |
+|---|---|
+| Root directory | `frontend` |
+| Framework/build | Vite; `npm run build` |
+| Output directory | `dist` |
+| Backend origin | `VITE_API_BASE_URL=https://<your-backend-host>` (origin only; frontend appends `/api`) |
+
+For a same-origin local Vite workflow, leave `VITE_API_BASE_URL` empty and set `API_PROXY_TARGET=http://127.0.0.1:8000`. On separate hosting, set the Vercel frontend variable to the backend origin and configure `PRANAGUARD_CORS_ORIGINS` on the backend with the exact frontend origin. Redeploy the relevant service after changing build/runtime environment variables.
+
+**Deployment checklist**
+
+1. Confirm the backend health endpoint returns `status: ok` and `synthetic: true`.
+2. Confirm the frontend has the correct backend origin; browser requests and document downloads must use the configured API base.
+3. Configure the allowed frontend origin and any required backend demo tokens. Never put server secrets in `VITE_*` variables.
+4. Verify login, patient assignment isolation, patient-owned records, file upload/download, notifications, and WebSocket/replay behaviour after deployment.
+5. Back up the database before schema changes or destructive replay resets. A SQLite file on an ephemeral service filesystem is not durable.
+6. Re-run the backend tests, frontend tests, TypeScript/build checks, and browser verification against the exact release commit.
+
+**Known hosting limitation:** the currently documented Render Free deployment uses local SQLite storage. Writes can disappear on restart/redeploy or filesystem reset. This deployment is suitable only for synthetic demonstration; do not enter real patient data. For durable operation, move writable data to managed persistent storage/database, add backups and restore drills, and validate migrations before switching traffic.
+
 
 ## 12. Team and institution
 
