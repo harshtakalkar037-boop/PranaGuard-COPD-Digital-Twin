@@ -209,7 +209,7 @@ def test_alert_id_and_websocket_are_scoped_in_unified_mode(client, engine, monke
     assert client.patch(
         f'/api/alerts/{alert_id}', headers=empty_doctor,
         json={'status':'acknowledged','note':'out of scope'},
-    ).status_code == 404
+    ).status_code == 403
     full_doctor=auth(client)
     assert client.patch(
         f'/api/alerts/{alert_id}', headers=full_doctor,
