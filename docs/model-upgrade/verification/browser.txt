@@ -1,0 +1,14 @@
+PASS Original cohort remains available
+PASS Original evaluation and negative72h result retained
+PASS Rejected candidate honestly labelled; no automatic deployment
+PASS Actual matched fresh-cohort metrics rendered
+PASS All predeclared acceptance failures exposed
+PASS All8 candidate validation scores and bootstrap uncertainty inspectable
+PASS Known historical comparison separated from fresh audit
+PASS No nonfunctional activation or clinical action controls
+PASS Original theme retained without desktop viewport overflow
+PASS 390px responsive study uses scrollable data tables, not viewport overflow
+PASS Patient probabilities and saved history unchanged by study viewing
+PASS Original48h native TreeSHAP and model version remain active
+PASS No JS/console/API errors or external browser assets
+{"passed": 13, "failed": 0}

@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "cached_source_checks": [
+    {
+      "file": "pune_air.json",
+      "sha256_matches": true,
+      "hours": 1440
+    },
+    {
+      "file": "pune_weather.json",
+      "sha256_matches": true,
+      "hours": 1440
+    },
+    {
+      "file": "mumbai_air.json",
+      "sha256_matches": true,
+      "hours": 1440
+    },
+    {
+      "file": "mumbai_weather.json",
+      "sha256_matches": true,
+      "hours": 1440
+    },
+    {
+      "file": "delhi_air.json",
+      "sha256_matches": true,
+      "hours": 1440
+    },
+    {
+      "file": "delhi_weather.json",
+      "sha256_matches": true,
+      "hours": 1440
+    },
+    {
+      "file": "bengaluru_air.json",
+      "sha256_matches": true,
+      "hours": 1440
+    },
+    {
+      "file": "bengaluru_weather.json",
+      "sha256_matches": true,
+      "hours": 1440
+    }
+  ],
+  "count": 8,
+  "note": "Unmodified cached response hashes match the retrieval manifest; no clinical datasets included."
+}

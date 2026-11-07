@@ -1,0 +1,83 @@
+[
+  {
+    "horizon": 24,
+    "verified": true,
+    "metrics": {
+      "auroc": 0.6915648244833766,
+      "auprc": 0.08824952556055754,
+      "brier": 0.0278640898691064,
+      "log_loss": 0.1287568682321808,
+      "precision": 0.0,
+      "recall": 0.0,
+      "specificity": 1.0,
+      "threshold": 0.35,
+      "confusion_matrix": [
+        [
+          4563,
+          0
+        ],
+        [
+          136,
+          0
+        ]
+      ],
+      "n": 4699,
+      "positive_hours": 136,
+      "prevalence": 0.028942328154926582
+    }
+  },
+  {
+    "horizon": 48,
+    "verified": true,
+    "metrics": {
+      "auroc": 0.6143769386729512,
+      "auprc": 0.09675617680405191,
+      "brier": 0.05573064293960756,
+      "log_loss": 0.2345492710392779,
+      "precision": 0.0,
+      "recall": 0.0,
+      "specificity": 1.0,
+      "threshold": 0.35,
+      "confusion_matrix": [
+        [
+          4439,
+          0
+        ],
+        [
+          260,
+          0
+        ]
+      ],
+      "n": 4699,
+      "positive_hours": 260,
+      "prevalence": 0.055330921472653755
+    }
+  },
+  {
+    "horizon": 72,
+    "verified": true,
+    "metrics": {
+      "auroc": 0.3951458987730373,
+      "auprc": 0.05929082387932489,
+      "brier": 0.08531570202745549,
+      "log_loss": 0.3250844593442102,
+      "precision": 0.0,
+      "recall": 0.0,
+      "specificity": 1.0,
+      "threshold": 0.35,
+      "confusion_matrix": [
+        [
+          4336,
+          0
+        ],
+        [
+          363,
+          0
+        ]
+      ],
+      "n": 4699,
+      "positive_hours": 363,
+      "prevalence": 0.07725047882528198
+    }
+  }
+]

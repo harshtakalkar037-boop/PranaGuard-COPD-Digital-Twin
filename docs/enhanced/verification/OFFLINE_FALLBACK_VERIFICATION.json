@@ -1,0 +1,144 @@
+{
+  "executed_at": "2026-11-05T14:11:17.209615+00:00",
+  "status": "PASS",
+  "read_only_no_reset": true,
+  "results": [
+    {
+      "city": "Pune",
+      "http_status": 200,
+      "components": {
+        "air": {
+          "status": "historical_fallback",
+          "original_valid_at": "2026-09-29T23:00:00+00:00",
+          "original_retrieved_at": "2026-10-18T09:14:48.048939+00:00",
+          "missing_keys": [
+            "us_aqi"
+          ],
+          "original_values_preserved": true
+        },
+        "weather": {
+          "status": "historical_fallback",
+          "original_valid_at": "2026-09-29T23:00:00+00:00",
+          "original_retrieved_at": "2026-10-18T09:14:48.689182+00:00",
+          "missing_keys": [
+            "weather_code",
+            "wind_speed_10m",
+            "wind_direction_10m"
+          ],
+          "original_values_preserved": true
+        }
+      }
+    },
+    {
+      "city": "Mumbai",
+      "http_status": 200,
+      "components": {
+        "air": {
+          "status": "historical_fallback",
+          "original_valid_at": "2026-09-29T23:00:00+00:00",
+          "original_retrieved_at": "2026-10-18T09:14:49.490829+00:00",
+          "missing_keys": [
+            "us_aqi"
+          ],
+          "original_values_preserved": true
+        },
+        "weather": {
+          "status": "historical_fallback",
+          "original_valid_at": "2026-09-29T23:00:00+00:00",
+          "original_retrieved_at": "2026-10-18T09:14:50.118463+00:00",
+          "missing_keys": [
+            "weather_code",
+            "wind_speed_10m",
+            "wind_direction_10m"
+          ],
+          "original_values_preserved": true
+        }
+      }
+    },
+    {
+      "city": "Delhi",
+      "http_status": 200,
+      "components": {
+        "air": {
+          "status": "historical_fallback",
+          "original_valid_at": "2026-09-29T23:00:00+00:00",
+          "original_retrieved_at": "2026-10-18T09:14:50.894390+00:00",
+          "missing_keys": [
+            "us_aqi"
+          ],
+          "original_values_preserved": true
+        },
+        "weather": {
+          "status": "historical_fallback",
+          "original_valid_at": "2026-09-29T23:00:00+00:00",
+          "original_retrieved_at": "2026-10-18T09:14:51.533212+00:00",
+          "missing_keys": [
+            "weather_code",
+            "wind_speed_10m",
+            "wind_direction_10m"
+          ],
+          "original_values_preserved": true
+        }
+      }
+    },
+    {
+      "city": "Bengaluru",
+      "http_status": 200,
+      "components": {
+        "air": {
+          "status": "historical_fallback",
+          "original_valid_at": "2026-09-29T23:00:00+00:00",
+          "original_retrieved_at": "2026-10-18T09:14:52.307014+00:00",
+          "missing_keys": [
+            "us_aqi"
+          ],
+          "original_values_preserved": true
+        },
+        "weather": {
+          "status": "historical_fallback",
+          "original_valid_at": "2026-09-29T23:00:00+00:00",
+          "original_retrieved_at": "2026-10-18T09:14:52.943020+00:00",
+          "missing_keys": [
+            "weather_code",
+            "wind_speed_10m",
+            "wind_direction_10m"
+          ],
+          "original_values_preserved": true
+        }
+      }
+    }
+  ],
+  "four_missing_metrics_per_city_remain_null": true,
+  "browser_cities_verified": 4,
+  "browser_errors": [],
+  "failed_browser_requests": [],
+  "external_browser_requests": [],
+  "original_database_tables_unchanged": {
+    "patients": {
+      "rows": 120,
+      "content_sha256": "2cec18e85cc7f88e466c9963cb8924d315d8e2560621efa7f7cb0ea4d01e257b"
+    },
+    "states": {
+      "rows": 3000,
+      "content_sha256": "dd7bac060a7c9eb0e81a31f5765f5c31ec487f42db3bfbdc0b8e2eef79c35e7d"
+    },
+    "alerts": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "interventions": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "scenarios": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "meta": {
+      "rows": 3,
+      "content_sha256": "5c1d8473c0092fbc7b7d626a56661663ab9aef329363aa0f4ef43390c4a9d3f6"
+    }
+  },
+  "patient_count": 120,
+  "original_states": 3000
+}

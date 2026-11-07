@@ -1,0 +1,265 @@
+{
+  "seed": 31006,
+  "patients": 240,
+  "days": 60,
+  "hours_per_patient": 1440,
+  "rows": 345600,
+  "synthetic_events": 525,
+  "eligible_rows": 276417,
+  "environment_sources": [
+    "cached_real_ambient"
+  ],
+  "generator": "Causal stochastic latent burden with probabilistic onsets; all physiology and labels synthetic.",
+  "sha256": "d8bf42a363efd28eb2b6a8b11bd2cc5223bf4cee8e9fbac346ccf88ee30d2e1a",
+  "start": "2026-08-01T00:00:00Z",
+  "clinical_validity": "NONE; not a validated physiological disease model"
+}
+FRESH AUDIT POINT ESTIMATES {
+  "original": {
+    "auroc": 0.5578643283803972,
+    "auprc": 0.11011285130756997,
+    "brier": 0.07556857359817873,
+    "log_loss": 0.28721357231255135,
+    "threshold": 0.35,
+    "recall": 0.0,
+    "precision": 0.0,
+    "false_positive_rate": 0.0,
+    "confusion_matrix": [
+      [
+        42217,
+        0
+      ],
+      [
+        3724,
+        0
+      ]
+    ],
+    "n": 45941,
+    "positive_rows": 3724,
+    "prevalence": 0.08106049062928539,
+    "mean_probability": 0.11650491758207504
+  },
+  "revised": {
+    "auroc": 0.5986208105342488,
+    "auprc": 0.1401810705352235,
+    "brier": 0.07355143085502765,
+    "log_loss": 0.2765427915429696,
+    "threshold": 0.16079386929026823,
+    "recall": 0.1460794844253491,
+    "precision": 0.16395418927064498,
+    "false_positive_rate": 0.06570812705782031,
+    "confusion_matrix": [
+      [
+        39443,
+        2774
+      ],
+      [
+        3180,
+        544
+      ]
+    ],
+    "n": 45941,
+    "positive_rows": 3724,
+    "prevalence": 0.08106049062928539,
+    "mean_probability": 0.09288131453212858
+  },
+  "revised_at_original_0_35": {
+    "auroc": 0.5986208105342488,
+    "auprc": 0.1401810705352235,
+    "brier": 0.07355143085502765,
+    "log_loss": 0.2765427915429696,
+    "threshold": 0.35,
+    "recall": 0.020139634801288938,
+    "precision": 0.5033557046979866,
+    "false_positive_rate": 0.0017528483786152498,
+    "confusion_matrix": [
+      [
+        42143,
+        74
+      ],
+      [
+        3649,
+        75
+      ]
+    ],
+    "n": 45941,
+    "positive_rows": 3724,
+    "prevalence": 0.08106049062928539,
+    "mean_probability": 0.09288131453212858
+  },
+  "original_at_same_revised_cutoff": {
+    "auroc": 0.5578643283803972,
+    "auprc": 0.11011285130756997,
+    "brier": 0.07556857359817873,
+    "log_loss": 0.28721357231255135,
+    "threshold": 0.16079386929026823,
+    "recall": 0.0,
+    "precision": 0.0,
+    "false_positive_rate": 0.0,
+    "confusion_matrix": [
+      [
+        42217,
+        0
+      ],
+      [
+        3724,
+        0
+      ]
+    ],
+    "n": 45941,
+    "positive_rows": 3724,
+    "prevalence": 0.08106049062928539,
+    "mean_probability": 0.11650491758207504
+  }
+}
+FINAL v3 {
+  "status": "EXPERIMENTAL_GATE_PASS",
+  "gate_checks": {
+    "auprc_10_percent_relative_improvement": true,
+    "auroc_not_worse": true,
+    "brier_not_worse_with_0_0001_tolerance": true,
+    "nonzero_recall_at_validation_selected_threshold": true,
+    "false_positive_rate_at_most_15_percent": true
+  },
+  "uncertainty": {
+    "method": "300 paired patient-cluster bootstrap resamples; descriptive synthetic intervals, not clinical validation",
+    "seed": 20261106,
+    "valid_resamples": 300,
+    "ci95": {
+      "old_auroc": [
+        0.49851931375844205,
+        0.608181265145159
+      ],
+      "old_auprc": [
+        0.08282042634740339,
+        0.14057354393750932
+      ],
+      "old_brier": [
+        0.06409557797243007,
+        0.08681268516518266
+      ],
+      "revised_auroc": [
+        0.5488082458078724,
+        0.654588804381657
+      ],
+      "revised_auprc": [
+        0.10513878965564295,
+        0.18738254761128273
+      ],
+      "revised_brier": [
+        0.0613407373024029,
+        0.08479669165964432
+      ],
+      "difference_auroc": [
+        -0.01601525237256795,
+        0.09670325338004573
+      ],
+      "difference_auprc": [
+        0.0005936729576128319,
+        0.06537700630668158
+      ],
+      "difference_brier": [
+        -0.0038016934889210574,
+        -0.0004639222377821017
+      ]
+    }
+  },
+  "historical_benchmark": {
+    "original": {
+      "auroc": 0.6143769386729512,
+      "auprc": 0.09675617680405191,
+      "brier": 0.05573064293960756,
+      "log_loss": 0.2345492710392779,
+      "threshold": 0.35,
+      "recall": 0.0,
+      "precision": 0.0,
+      "false_positive_rate": 0.0,
+      "confusion_matrix": [
+        [
+          4439,
+          0
+        ],
+        [
+          260,
+          0
+        ]
+      ],
+      "n": 4699,
+      "positive_rows": 260,
+      "prevalence": 0.055330921472653755,
+      "mean_probability": 0.11625656892038849
+    },
+    "revised": {
+      "auroc": 0.7526816504063631,
+      "auprc": 0.1822720191324664,
+      "brier": 0.05087811531252789,
+      "log_loss": 0.20797333371747545,
+      "threshold": 0.16079386929026823,
+      "recall": 0.17307692307692307,
+      "precision": 0.13005780346820808,
+      "false_positive_rate": 0.06780806487947735,
+      "confusion_matrix": [
+        [
+          4138,
+          301
+        ],
+        [
+          215,
+          45
+        ]
+      ],
+      "n": 4699,
+      "positive_rows": 260,
+      "prevalence": 0.055330921472653755,
+      "mean_probability": 0.0936806158726487
+    },
+    "revised_at_original_0_35": {
+      "auroc": 0.7526816504063631,
+      "auprc": 0.1822720191324664,
+      "brier": 0.05087811531252789,
+      "log_loss": 0.20797333371747545,
+      "threshold": 0.35,
+      "recall": 0.07307692307692308,
+      "precision": 0.95,
+      "false_positive_rate": 0.00022527596305474206,
+      "confusion_matrix": [
+        [
+          4438,
+          1
+        ],
+        [
+          241,
+          19
+        ]
+      ],
+      "n": 4699,
+      "positive_rows": 260,
+      "prevalence": 0.055330921472653755,
+      "mean_probability": 0.0936806158726487
+    },
+    "original_at_same_revised_cutoff": {
+      "auroc": 0.6143769386729512,
+      "auprc": 0.09675617680405191,
+      "brier": 0.05573064293960756,
+      "log_loss": 0.2345492710392779,
+      "threshold": 0.16079386929026823,
+      "recall": 0.0,
+      "precision": 0.0,
+      "false_positive_rate": 0.0,
+      "confusion_matrix": [
+        [
+          4439,
+          0
+        ],
+        [
+          260,
+          0
+        ]
+      ],
+      "n": 4699,
+      "positive_rows": 260,
+      "prevalence": 0.055330921472653755,
+      "mean_probability": 0.11625656892038849
+    }
+  }
+}

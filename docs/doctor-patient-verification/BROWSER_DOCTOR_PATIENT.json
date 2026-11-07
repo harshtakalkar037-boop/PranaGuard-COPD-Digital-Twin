@@ -1,0 +1,63 @@
+{
+  "status": "PASS",
+  "executed_at": "2026-11-07T06:03:27.180403+00:00",
+  "checks": [
+    {
+      "name": "Doctor keeps the full original 13-item grouped clinician/research navigation & theme",
+      "status": "PASS"
+    },
+    {
+      "name": "Doctor sees patient daily wellbeing + adherence records for assigned patient",
+      "status": "PASS"
+    },
+    {
+      "name": "Doctor uploads document and creates follow-up instruction (persisted, auditable)",
+      "status": "PASS"
+    },
+    {
+      "name": "Doctor flags a patient entry as reviewed",
+      "status": "PASS"
+    },
+    {
+      "name": "Patient sees only the three patient nav items and doctor-issued follow-up",
+      "status": "PASS"
+    },
+    {
+      "name": "Patient downloads an authorized document (integrity-checked)",
+      "status": "PASS"
+    },
+    {
+      "name": "Patient submits daily wellbeing entry; it persists and renders immediately",
+      "status": "PASS"
+    },
+    {
+      "name": "Patient correction saved under audit trail (edited chip visible)",
+      "status": "PASS"
+    },
+    {
+      "name": "Medication adherence report requires missed-dose reason and saves",
+      "status": "PASS"
+    },
+    {
+      "name": "Backend enforces cross-patient isolation for the patient session (403s)",
+      "status": "PASS"
+    },
+    {
+      "name": "Patient's submitted/corrected entries visible in the doctor's assigned-patient view (same record)",
+      "status": "PASS"
+    },
+    {
+      "name": "Unassigned doctor still sees an empty, isolated panel",
+      "status": "PASS"
+    },
+    {
+      "name": "Mobile 390px patient layout has no horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "No JS/console errors or failed requests during the round trip",
+      "status": "PASS"
+    }
+  ],
+  "note": "Disposable DB copy; synthetic patients only; documents are record-keeping, not AI diagnosis."
+}

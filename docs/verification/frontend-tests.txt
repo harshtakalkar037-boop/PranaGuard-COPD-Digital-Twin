@@ -1,0 +1,28 @@
+
+> pranaguard-clinician-dashboard@0.1.0 test
+> vitest run --reporter=verbose --reporter=junit --outputFile=../docs/verification/frontend-junit.xml
+
+
+ RUN  v3.2.7 /home/user/PranaGuard-COPD-Digital-Twin/frontend
+
+ ✓ src/App.test.tsx > backend-fed dashboard > renders the real captured cohort response and explicit synthetic labels 408ms
+ ✓ src/App.test.tsx > backend-fed dashboard > filters patient search without invented rows 641ms
+ ✓ src/App.test.tsx > backend-fed dashboard > shows an empty search result honestly 594ms
+ ✓ src/App.test.tsx > backend-fed dashboard > paginates the complete backend cohort 352ms
+ ✓ src/App.test.tsx > backend-fed dashboard > filters high risk accurately even when none exist 264ms
+ ✓ src/App.test.tsx > backend-fed dashboard > loads the patient state, baseline and persisted version control 506ms
+ ✓ src/App.test.tsx > backend-fed dashboard > loads real model drivers and switches prediction horizon 418ms
+ ✓ src/App.test.tsx > backend-fed dashboard > calls the scenario API and displays the saved calculated result 495ms
+ ✓ src/App.test.tsx > backend-fed dashboard > displays executed validation results, including negative findings 491ms
+ ✓ src/App.test.tsx > backend-fed dashboard > persists clinician notes using the backend endpoint 516ms
+ ✓ src/App.test.tsx > backend-fed dashboard > shows source provenance and saves an optional browser-session token 555ms
+ ✓ src/App.test.tsx > backend-fed dashboard > executes replay controls through POST, not fake local counters 259ms
+ ✓ src/App.test.tsx > API error handling > reports backend validation errors 2ms
+ ✓ src/App.test.tsx > API error handling > attaches only explicitly configured session authorization 2ms
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  10:05:24
+   Duration  7.64s (transform 362ms, setup 236ms, collect 859ms, tests 5.50s, environment 619ms, prepare 243ms)
+
+JUNIT report written to /home/user/PranaGuard-COPD-Digital-Twin/docs/verification/frontend-junit.xml

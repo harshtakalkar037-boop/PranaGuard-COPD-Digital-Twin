@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="14" failures="0" errors="0" time="5.504210929">
+    <testsuite name="src/App.test.tsx" timestamp="2026-10-18T10:05:31.707Z" hostname="e2b.local" tests="14" failures="0" errors="0" skipped="0" time="5.504210929">
+        <testcase classname="src/App.test.tsx" name="backend-fed dashboard &gt; renders the real captured cohort response and explicit synthetic labels" time="0.407804633">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="backend-fed dashboard &gt; filters patient search without invented rows" time="0.640646229">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="backend-fed dashboard &gt; shows an empty search result honestly" time="0.594197673">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="backend-fed dashboard &gt; paginates the complete backend cohort" time="0.352205991">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="backend-fed dashboard &gt; filters high risk accurately even when none exist" time="0.263966869">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="backend-fed dashboard &gt; loads the patient state, baseline and persisted version control" time="0.50632635">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="backend-fed dashboard &gt; loads real model drivers and switches prediction horizon" time="0.417554639">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="backend-fed dashboard &gt; calls the scenario API and displays the saved calculated result" time="0.494880399">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="backend-fed dashboard &gt; displays executed validation results, including negative findings" time="0.490635004">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="backend-fed dashboard &gt; persists clinician notes using the backend endpoint" time="0.515558986">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="backend-fed dashboard &gt; shows source provenance and saves an optional browser-session token" time="0.554655435">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="backend-fed dashboard &gt; executes replay controls through POST, not fake local counters" time="0.259019942">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="API error handling &gt; reports backend validation errors" time="0.00230645">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="API error handling &gt; attaches only explicitly configured session authorization" time="0.001844516">
+        </testcase>
+    </testsuite>
+</testsuites>

@@ -1,0 +1,37 @@
+{
+  "outbox": [
+    {
+      "id": 4,
+      "created_at": "2026-11-05T14:06:53.039772+00:00",
+      "status": "not_sent_disabled",
+      "detail": "Email is disabled. No message was sent.",
+      "channel": "demo_test_only"
+    },
+    {
+      "id": 3,
+      "created_at": "2026-11-05T14:06:03.637207+00:00",
+      "status": "not_sent_disabled",
+      "detail": "Email is disabled. No message was sent.",
+      "channel": "demo_test_only"
+    },
+    {
+      "id": 2,
+      "created_at": "2026-11-05T14:04:11.538847+00:00",
+      "status": "not_sent_disabled",
+      "detail": "Email is disabled. No message was sent.",
+      "channel": "demo_test_only"
+    },
+    {
+      "id": 1,
+      "created_at": "2026-11-05T13:45:50.422755+00:00",
+      "status": "not_sent_disabled",
+      "detail": "Email is disabled. No message was sent.",
+      "channel": "demo_test_only"
+    }
+  ],
+  "mode": "disabled",
+  "recipient_configured": false,
+  "smtp_configured": false,
+  "automatic_patient_email": false,
+  "notice": "Test channel only. SMTP acceptance is not proof of inbox delivery. No patient details are sent."
+}

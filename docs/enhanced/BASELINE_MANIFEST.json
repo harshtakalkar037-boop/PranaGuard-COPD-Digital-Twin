@@ -1,0 +1,60 @@
+{
+  "base_repository": "https://github.com/harshtakalkar037-boop/PranaGuard-COPD-Digital-Twin",
+  "base_commit": "95a4e2b00fcb2d9df7210c6b87ecba171a0c4e91",
+  "protected_files": {
+    "frontend/src/styles.css": "bb0c274cfa0aa9dc01dea89dc191b2008bf0cade1c4b1cd4c3e99bc4759d08de",
+    "frontend/src/components.tsx": "d650034a0ee4cccd8bf1b11e699f51b8d80814fe0ce458f735b78000dc7a4180",
+    "frontend/tailwind.config.cjs": "f797cc454372246efef928cbbe9a9418ff57138d4ffac97f28a1a29d75deb627",
+    "backend/app/features.py": "87f106efb9c4cc2447fe51adf2f2d9e74ba17f928a73677c42941dfad0b3b017",
+    "backend/app/ml.py": "0aacc5430bfd3d1963e52eb0ab2c73dbda7282ff8d01a3f8e916a6faff642fb3",
+    "backend/app/validation.py": "5bbdfe9ce0ac04103f405e4114af027294ce41c21dee8e30c709297369789b2d",
+    "artifacts/evaluation.md": "7a7de87a695f19169f0a9493e835672a5c3f7c77549d499ce072f55959290f16",
+    "artifacts/evaluation.json": "91bac9ae421cf063e3fa17b10a280dfa6ff48ed8142abd145280528848cf2f4a",
+    "artifacts/test_predictions.csv.gz": "7d08af9703f7690f39176b30653d594514035a842137c47557330aae15bafcb5",
+    "artifacts/split_manifest.json": "737daeaf414cad15e850646dfcd78941b4efd79695ca870ad91edb7254769d38",
+    "artifacts/models.joblib": "c695efe51148bf8c168c4b2bf51956a0052073145e7ddc12165fed31837868c9",
+    "artifacts/metrics.csv": "3998f047ccbbfa3f574dee9565995bcff33262d75672e82e0cfa5628c37847de",
+    "artifacts/evaluation_verification.json": "721c3bdaf796f9b18c4c52328c3c9eefc57bc1bb373d2bcc0c333e1dc2e96551",
+    "artifacts/demo_case.json": "d51ec65528a984b44b4d80c21df9ed83d6f5cac9defb26277946d0d96afd991a",
+    "data/synthetic_longitudinal.csv.gz": "a9fddac47dfd28548feb336564928b7510b13d35d89a845727b12a54b3e54a5d",
+    "data/patients.json": "2962c52842f46c2f02ed2597bb912cb6a3d750485306aed93ed0be321af8f097",
+    "data/generation_manifest.json": "c44d42d2717c90e548469da37fda384b3243122c743640d361d1d81699699d23",
+    "data/environment/delhi_air.json": "862c437b82efe5dd1a2d65e76942a9419025ad7cce4c4111c87c1c35e4d40a44",
+    "data/environment/bengaluru_weather.json": "a14c8d7bba0d5f6316cecf3d4b0444a4221781a7d8d7d3f63f74b2f561a4b658",
+    "data/environment/mumbai_air.json": "c7cb81492d999080fd39a912d017dc8d264efc6ec28d7b4e495157537f8f2834",
+    "data/environment/bengaluru_air.json": "37e1dc3f119178d961867ce0e1da9b78b36abda9e160ba9d0528fb48ef8313b4",
+    "data/environment/delhi_weather.json": "ee481b329c02eace44b5cd8948aed5f4989d890cddfc70adc274e900ea870729",
+    "data/environment/pune_weather.json": "def2f5a9ac3cf5a2f14327caffffebb2e4ffd71a5aa3be7bc574e27afba34a6e",
+    "data/environment/mumbai_weather.json": "9c717e4aebe6d23a1bc6bc51346bc932228959bd6fc235011cca0a95ba0a18aa",
+    "data/environment/manifest.json": "cb2a60ea40098bd2c14c134cf4526a66badb13157a2ee57c2b9482d1d8955483",
+    "data/environment/pune_air.json": "cfe76e78ecfe9cb26b79713911c3c3e6bd9902e031a812427d67c610c6535f3f"
+  },
+  "original_workspace_head": "9572315",
+  "source_workspace_db_sha256": "0672612287caadac9c9ca85184a1747bdf94eb533ef2fc4d188f68812f6ddd5a",
+  "database_before": {
+    "patients": {
+      "rows": 120,
+      "content_sha256": "2cec18e85cc7f88e466c9963cb8924d315d8e2560621efa7f7cb0ea4d01e257b"
+    },
+    "states": {
+      "rows": 3000,
+      "content_sha256": "dd7bac060a7c9eb0e81a31f5765f5c31ec487f42db3bfbdc0b8e2eef79c35e7d"
+    },
+    "alerts": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "interventions": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "scenarios": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "meta": {
+      "rows": 3,
+      "content_sha256": "5c1d8473c0092fbc7b7d626a56661663ab9aef329363aa0f4ef43390c4a9d3f6"
+    }
+  }
+}

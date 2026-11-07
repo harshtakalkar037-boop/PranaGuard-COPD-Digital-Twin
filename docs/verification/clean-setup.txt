@@ -1,0 +1,215 @@
+$ git clone --no-hardlinks /home/user/PranaGuard-COPD-Digital-Twin /home/user/.cache/pranaguard-clean-setup
+Cloning into '/home/user/.cache/pranaguard-clean-setup'...
+done.
+
+$ git rev-parse HEAD
+6ecd2b1d86b2ad508ee08a5b8f58c5ac5089333b
+
+$ /home/user/.venv/bin/python -m venv /home/user/.cache/pranaguard-clean-setup/.venv
+
+$ /home/user/.cache/pranaguard-clean-setup/.venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+Collecting fastapi==0.143.3 (from -r requirements.txt (line 1))
+  Using cached fastapi-0.143.3-py3-none-any.whl.metadata (26 kB)
+Collecting uvicorn==0.54.0 (from uvicorn[standard]==0.54.0->-r requirements.txt (line 2))
+  Using cached uvicorn-0.54.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting pydantic==2.14.1 (from -r requirements.txt (line 3))
+  Using cached pydantic-2.14.1-py3-none-any.whl.metadata (133 kB)
+Collecting pandas==3.0.6 (from -r requirements.txt (line 4))
+  Using cached pandas-3.0.6-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+Collecting numpy==2.5.4 (from -r requirements.txt (line 5))
+  Using cached numpy-2.5.4-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+Collecting scikit-learn==1.9.1 (from -r requirements.txt (line 6))
+  Using cached scikit_learn-1.9.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.3 kB)
+Collecting lightgbm==4.7.0 (from -r requirements.txt (line 7))
+  Using cached lightgbm-4.7.0-py3-none-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (18 kB)
+Collecting shap==0.54.1 (from -r requirements.txt (line 8))
+  Using cached shap-0.54.1-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (23 kB)
+Collecting joblib==1.6.0 (from -r requirements.txt (line 9))
+  Using cached joblib-1.6.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting httpx==0.28.1 (from -r requirements.txt (line 10))
+  Using cached httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting python-dotenv==1.2.4 (from -r requirements.txt (line 11))
+  Using cached python_dotenv-1.2.4-py3-none-any.whl.metadata (29 kB)
+Collecting pytest==9.1.1 (from -r requirements.txt (line 12))
+  Using cached pytest-9.1.1-py3-none-any.whl.metadata (7.6 kB)
+Collecting starlette>=0.46.0 (from fastapi==0.143.3->-r requirements.txt (line 1))
+  Using cached starlette-1.8.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting typing-extensions>=4.8.0 (from fastapi==0.143.3->-r requirements.txt (line 1))
+  Using cached typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting typing-inspection>=0.4.2 (from fastapi==0.143.3->-r requirements.txt (line 1))
+  Using cached typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+Collecting annotated-doc>=0.0.2 (from fastapi==0.143.3->-r requirements.txt (line 1))
+  Using cached annotated_doc-0.0.5-py3-none-any.whl.metadata (6.5 kB)
+Collecting opentelemetry-api>=1.44.0 (from fastapi==0.143.3->-r requirements.txt (line 1))
+  Using cached opentelemetry_api-1.45.1-py3-none-any.whl.metadata (1.4 kB)
+Collecting click>=7.0 (from uvicorn==0.54.0->uvicorn[standard]==0.54.0->-r requirements.txt (line 2))
+  Using cached click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+Collecting h11>=0.8 (from uvicorn==0.54.0->uvicorn[standard]==0.54.0->-r requirements.txt (line 2))
+  Using cached h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting annotated-types>=0.6.0 (from pydantic==2.14.1->-r requirements.txt (line 3))
+  Using cached annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.50.1 (from pydantic==2.14.1->-r requirements.txt (line 3))
+  Using cached pydantic_core-2.50.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.5 kB)
+Collecting python-dateutil>=2.8.2 (from pandas==3.0.6->-r requirements.txt (line 4))
+  Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Collecting scipy>=1.10.0 (from scikit-learn==1.9.1->-r requirements.txt (line 6))
+  Using cached scipy-1.18.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+Collecting narwhals>=2.0.1 (from scikit-learn==1.9.1->-r requirements.txt (line 6))
+  Using cached narwhals-2.27.1-py3-none-any.whl.metadata (15 kB)
+Collecting threadpoolctl>=3.5.0 (from scikit-learn==1.9.1->-r requirements.txt (line 6))
+  Using cached threadpoolctl-3.7.0-py3-none-any.whl.metadata (24 kB)
+Collecting tqdm>=4.27.0 (from shap==0.54.1->-r requirements.txt (line 8))
+  Using cached tqdm-4.70.1-py3-none-any.whl.metadata (57 kB)
+Collecting packaging>20.9 (from shap==0.54.1->-r requirements.txt (line 8))
+  Using cached packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting slicer==0.0.8 (from shap==0.54.1->-r requirements.txt (line 8))
+  Using cached slicer-0.0.8-py3-none-any.whl.metadata (4.0 kB)
+Collecting cloudpickle (from shap==0.54.1->-r requirements.txt (line 8))
+  Using cached cloudpickle-3.1.2-py3-none-any.whl.metadata (7.1 kB)
+Collecting anyio (from httpx==0.28.1->-r requirements.txt (line 10))
+  Using cached anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+Collecting certifi (from httpx==0.28.1->-r requirements.txt (line 10))
+  Using cached certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+Collecting httpcore==1.* (from httpx==0.28.1->-r requirements.txt (line 10))
+  Using cached httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting idna (from httpx==0.28.1->-r requirements.txt (line 10))
+  Using cached idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+Collecting iniconfig>=1.0.1 (from pytest==9.1.1->-r requirements.txt (line 12))
+  Using cached iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+Collecting pluggy<2,>=1.5 (from pytest==9.1.1->-r requirements.txt (line 12))
+  Using cached pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+Collecting pygments>=2.7.2 (from pytest==9.1.1->-r requirements.txt (line 12))
+  Using cached pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting httptools>=0.8.0 (from uvicorn[standard]==0.54.0->-r requirements.txt (line 2))
+  Using cached httptools-0.9.0-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (3.5 kB)
+Collecting pyyaml>=5.1 (from uvicorn[standard]==0.54.0->-r requirements.txt (line 2))
+  Using cached pyyaml-6.0.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+Collecting uvloop>=0.15.1 (from uvicorn[standard]==0.54.0->-r requirements.txt (line 2))
+  Using cached uvloop-0.23.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.1 kB)
+Collecting watchfiles>=0.20 (from uvicorn[standard]==0.54.0->-r requirements.txt (line 2))
+  Using cached watchfiles-1.3.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+Collecting websockets>=13.0 (from uvicorn[standard]==0.54.0->-r requirements.txt (line 2))
+  Using cached websockets-17.2-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (6.3 kB)
+Collecting six>=1.5 (from python-dateutil>=2.8.2->pandas==3.0.6->-r requirements.txt (line 4))
+  Using cached six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Using cached fastapi-0.143.3-py3-none-any.whl (144 kB)
+Using cached uvicorn-0.54.0-py3-none-any.whl (87 kB)
+Using cached pydantic-2.14.1-py3-none-any.whl (488 kB)
+Using cached pandas-3.0.6-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (10.8 MB)
+Using cached numpy-2.5.4-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)
+Using cached scikit_learn-1.9.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (9.1 MB)
+Using cached lightgbm-4.7.0-py3-none-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (3.5 MB)
+Using cached shap-0.54.1-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (555 kB)
+Using cached joblib-1.6.0-py3-none-any.whl (306 kB)
+Using cached httpx-0.28.1-py3-none-any.whl (73 kB)
+Using cached python_dotenv-1.2.4-py3-none-any.whl (23 kB)
+Using cached pytest-9.1.1-py3-none-any.whl (386 kB)
+Using cached pydantic_core-2.50.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.2 MB)
+Using cached slicer-0.0.8-py3-none-any.whl (15 kB)
+Using cached httpcore-1.0.9-py3-none-any.whl (78 kB)
+Using cached pluggy-1.7.0-py3-none-any.whl (27 kB)
+Using cached annotated_doc-0.0.5-py3-none-any.whl (5.3 kB)
+Using cached annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Using cached click-8.5.0-py3-none-any.whl (125 kB)
+Using cached cloudpickle-3.1.2-py3-none-any.whl (22 kB)
+Using cached h11-0.16.0-py3-none-any.whl (37 kB)
+Using cached httptools-0.9.0-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (520 kB)
+Using cached iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+Using cached narwhals-2.27.1-py3-none-any.whl (483 kB)
+Using cached opentelemetry_api-1.45.1-py3-none-any.whl (60 kB)
+Using cached packaging-26.3-py3-none-any.whl (129 kB)
+Using cached pygments-2.21.0-py3-none-any.whl (1.3 MB)
+Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+Using cached pyyaml-6.0.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (801 kB)
+Using cached scipy-1.18.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (35.3 MB)
+Using cached six-1.17.0-py2.py3-none-any.whl (11 kB)
+Using cached starlette-1.8.0-py3-none-any.whl (79 kB)
+Using cached anyio-4.15.1-py3-none-any.whl (132 kB)
+Using cached idna-3.20-py3-none-any.whl (69 kB)
+Using cached threadpoolctl-3.7.0-py3-none-any.whl (26 kB)
+Using cached tqdm-4.70.1-py3-none-any.whl (80 kB)
+Using cached typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Using cached typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+Using cached uvloop-0.23.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (4.5 MB)
+Using cached watchfiles-1.3.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (458 kB)
+Using cached websockets-17.2-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (225 kB)
+Using cached certifi-2026.7.22-py3-none-any.whl (136 kB)
+Installing collected packages: websockets, uvloop, typing-extensions, tqdm, threadpoolctl, slicer, six, pyyaml, python-dotenv, pygments, pluggy, packaging, numpy, narwhals, iniconfig, idna, httptools, h11, cloudpickle, click, certifi, annotated-types, annotated-doc, uvicorn, typing-inspection, scipy, python-dateutil, pytest, pydantic-core, opentelemetry-api, joblib, httpcore, anyio, watchfiles, starlette, scikit-learn, pydantic, pandas, lightgbm, httpx, shap, fastapi
+
+Successfully installed annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 certifi-2026.7.22 click-8.5.0 cloudpickle-3.1.2 fastapi-0.143.3 h11-0.16.0 httpcore-1.0.9 httptools-0.9.0 httpx-0.28.1 idna-3.20 iniconfig-2.3.1 joblib-1.6.0 lightgbm-4.7.0 narwhals-2.27.1 numpy-2.5.4 opentelemetry-api-1.45.1 packaging-26.3 pandas-3.0.6 pluggy-1.7.0 pydantic-2.14.1 pydantic-core-2.50.1 pygments-2.21.0 pytest-9.1.1 python-dateutil-2.9.0.post0 python-dotenv-1.2.4 pyyaml-6.0.3 scikit-learn-1.9.1 scipy-1.18.1 shap-0.54.1 six-1.17.0 slicer-0.0.8 starlette-1.8.0 threadpoolctl-3.7.0 tqdm-4.70.1 typing-extensions-4.16.0 typing-inspection-0.4.4 uvicorn-0.54.0 uvloop-0.23.0 watchfiles-1.3.0 websockets-17.2
+
+$ npm --prefix frontend ci --no-audit --no-fund
+npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+npm warn deprecated recharts@2.15.4: 1.x and 2.x branches are no longer active. Bump to Recharts v3 to receive latest features and bugfixes. See https://github.com/recharts/recharts/wiki/3.0-migration-guide
+
+added 265 packages in 4s
+
+$ /home/user/.cache/pranaguard-clean-setup/.venv/bin/python -m scripts.bootstrap --reset
+SQLite initialized: data/pranaguard.sqlite
+Replay: {'running': False, 'cursor_hour': 1039, 'max_hour': 1439, 'version': 25, 'timestamp': '2026-09-13 07:00:00+00:00', 'mode': 'deterministic offline replay', 'seed': 2026, 'demo': {'patient_id': 'PG-0071', 'start_hour': 1039, 'focus_hour': 1051, 'onset_hour': None, 'selected_risk_72': 0.3551213864930386, 'selected_label_72': 0, 'selection': 'Retrospective maximum 72h model score across the synthetic cohort (not a held-out prospective case). Chosen to demonstrate a real model-generated alert, not detection performance. This example is a false positive when selected_label_72=0.'}, 'interval_seconds': 2}
+Cohort: {'total': 120, 'high': 0, 'elevated': 93, 'low': 27, 'open_alerts': 0, 'missing_measurements': 7}
+
+$ /home/user/.cache/pranaguard-clean-setup/.venv/bin/python -c from fastapi.testclient import TestClient
+from backend.app.main import app
+with TestClient(app) as c:
+ r=c.get('/api/overview');assert r.status_code==200;assert r.json()['summary']['total']==120
+ s=c.get('/api/patients/PG-0071').json();assert s['synthetic'] and len(s['risks'])==3
+ print('Clean-clone FastAPI lifespan + bundled model + SQLite + cohort/patient API: PASS')
+/home/user/.cache/pranaguard-clean-setup/.venv/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+Clean-clone FastAPI lifespan + bundled model + SQLite + cohort/patient API: PASS
+
+$ /home/user/.cache/pranaguard-clean-setup/.venv/bin/python -m pytest
+.........................................                                [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /home/user/.cache/pranaguard-clean-setup/.venv/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+41 passed, 1 warning in 5.93s
+
+$ npm --prefix frontend test -- --reporter=verbose
+
+> pranaguard-clinician-dashboard@0.1.0 test
+> vitest run --reporter=verbose
+
+
+ RUN  v3.2.7 /home/user/.cache/pranaguard-clean-setup/frontend
+
+ ✓ src/App.test.tsx > backend-fed dashboard > renders the real captured cohort response and explicit synthetic labels 434ms
+ ✓ src/App.test.tsx > backend-fed dashboard > filters patient search without invented rows 676ms
+ ✓ src/App.test.tsx > backend-fed dashboard > shows an empty search result honestly 656ms
+ ✓ src/App.test.tsx > backend-fed dashboard > paginates the complete backend cohort 284ms
+ ✓ src/App.test.tsx > backend-fed dashboard > filters high risk accurately even when none exist 172ms
+ ✓ src/App.test.tsx > backend-fed dashboard > loads the patient state, baseline and persisted version control 478ms
+ ✓ src/App.test.tsx > backend-fed dashboard > loads real model drivers and switches prediction horizon 424ms
+ ✓ src/App.test.tsx > backend-fed dashboard > calls the scenario API and displays the saved calculated result 382ms
+ ✓ src/App.test.tsx > backend-fed dashboard > displays executed validation results, including negative findings 403ms
+ ✓ src/App.test.tsx > backend-fed dashboard > persists clinician notes using the backend endpoint 482ms
+ ✓ src/App.test.tsx > backend-fed dashboard > shows source provenance and saves an optional browser-session token 416ms
+ ✓ src/App.test.tsx > backend-fed dashboard > executes replay controls through POST, not fake local counters 171ms
+ ✓ src/App.test.tsx > API error handling > reports backend validation errors 2ms
+ ✓ src/App.test.tsx > API error handling > attaches only explicitly configured session authorization 1ms
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  10:03:10
+   Duration  6.72s (transform 402ms, setup 140ms, collect 762ms, tests 4.98s, environment 444ms, prepare 208ms)
+
+
+$ npm --prefix frontend run build
+
+> pranaguard-clinician-dashboard@0.1.0 build
+> tsc -b && vite build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 2201 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.61 kB │ gzip:   0.38 kB
+dist/assets/index-frVYVb7H.css   37.93 kB │ gzip:   8.95 kB
+dist/assets/index-Btk_bpzP.js   270.60 kB │ gzip:  84.25 kB
+dist/assets/charts-UCGEy6vn.js  429.41 kB │ gzip: 116.43 kB
+✓ built in 7.33s

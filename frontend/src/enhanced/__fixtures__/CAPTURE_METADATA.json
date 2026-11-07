@@ -1,0 +1,6 @@
+{
+  "source": "Actual local FastAPI responses captured after real browser verification; device samples are explicitly software simulations; external context was retrieved from actual provider APIs.",
+  "captured_at": "2026-11-05T14:07:00.742552+00:00",
+  "fictional_patient_id": "PG-DEMO-24BE5BE35541",
+  "test_notification_id": 67
+}

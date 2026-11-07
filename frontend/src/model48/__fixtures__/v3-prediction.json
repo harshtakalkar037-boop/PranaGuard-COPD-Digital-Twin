@@ -1,0 +1,370 @@
+{
+  "patient_id": "PG-0071",
+  "state_version": 25,
+  "hour": 1039,
+  "timestamp": "2026-09-13 07:00:00+00:00",
+  "computed_at": "2026-11-05T15:29:55.367077+00:00",
+  "model_version": "pg48-v3-multiseed",
+  "original_model_version": "pg-synthetic-v1",
+  "synthetic": true,
+  "input_source": "original_synthetic_replay",
+  "probability": 0.021824527603872938,
+  "original_risk48": 0.10111926243216601,
+  "prediction_supported": true,
+  "demo_cutoff": 0.16079386929026823,
+  "above_demo_cutoff": false,
+  "persisted": false,
+  "explanation": {
+    "method": "LightGBM native TreeSHAP, affine calibration-rescaled",
+    "units": "calibrated log-odds, not probability differences",
+    "base_value": -2.3530682863844903,
+    "raw_margin": -4.12857535629284,
+    "calibrated_margin": -3.802654616802745,
+    "probability": 0.021824527603872997,
+    "drivers": [
+      {
+        "feature": "v3_spo2_z72",
+        "label": "SpO\u2082 \u00b7 past72h deviation (baseline SD)",
+        "value": 5.44508695602417,
+        "contribution": -0.397805808684881,
+        "imputed": false
+      },
+      {
+        "feature": "v3_symptom_score_slope24",
+        "label": "Symptoms6h deviation \u00b7 change over24h",
+        "value": -2.3460607528686523,
+        "contribution": -0.217630162221491,
+        "imputed": false
+      },
+      {
+        "feature": "v3_spo2_slope72",
+        "label": "SpO\u20826h deviation \u00b7 change over72h",
+        "value": -3.9965436458587646,
+        "contribution": -0.13209412295770298,
+        "imputed": false
+      },
+      {
+        "feature": "v3_spo2_slope24",
+        "label": "SpO\u20826h deviation \u00b7 change over24h",
+        "value": -3.6066908836364746,
+        "contribution": -0.1289427516298898,
+        "imputed": false
+      },
+      {
+        "feature": "v3_body_range72",
+        "label": "Range of body deviations \u00b772h",
+        "value": 3.0209238529205322,
+        "contribution": -0.11419742280263821,
+        "imputed": false
+      },
+      {
+        "feature": "v3_sleep_hours_z120",
+        "label": "Sleep \u00b7 past120h deviation (baseline SD)",
+        "value": 1.5282989740371704,
+        "contribution": -0.10924434322362038,
+        "imputed": false
+      },
+      {
+        "feature": "v3_symptom_score_slope72",
+        "label": "Symptoms6h deviation \u00b7 change over72h",
+        "value": -2.250009298324585,
+        "contribution": -0.10523405073435958,
+        "imputed": false
+      },
+      {
+        "feature": "v3_symptom_score_z72",
+        "label": "Symptoms \u00b7 past72h deviation (baseline SD)",
+        "value": 4.132566452026367,
+        "contribution": 0.07934118849194159,
+        "imputed": false
+      },
+      {
+        "feature": "fev1_pct",
+        "label": "FEV\u2081 percent predicted",
+        "value": 74.88999938964844,
+        "contribution": -0.07926695711949414,
+        "imputed": false
+      },
+      {
+        "feature": "v3_heart_rate_slope24",
+        "label": "Heart rate6h deviation \u00b7 change over24h",
+        "value": -1.8490910530090332,
+        "contribution": -0.05668199634974926,
+        "imputed": false
+      },
+      {
+        "feature": "v3_resp_rate_slope24",
+        "label": "Respiratory rate6h deviation \u00b7 change over24h",
+        "value": -2.1792151927948,
+        "contribution": -0.047596739177203994,
+        "imputed": false
+      },
+      {
+        "feature": "v3_symptom_score_z120",
+        "label": "Symptoms \u00b7 past120h deviation (baseline SD)",
+        "value": 3.6507980823516846,
+        "contribution": 0.04745848541042985,
+        "imputed": false
+      },
+      {
+        "feature": "v3_peak144_minus_now",
+        "label": "144h peak minus current body deviation",
+        "value": 2.9066197872161865,
+        "contribution": -0.03898706072680579,
+        "imputed": false
+      },
+      {
+        "feature": "pm25_mean24",
+        "label": "Historical ambient PM2.5 \u00b7 past24h",
+        "value": 29.412500381469727,
+        "contribution": -0.03772389480240157,
+        "imputed": false
+      },
+      {
+        "feature": "v3_spo2_z120",
+        "label": "SpO\u2082 \u00b7 past120h deviation (baseline SD)",
+        "value": 4.868044853210449,
+        "contribution": -0.029226669098275926,
+        "imputed": false
+      },
+      {
+        "feature": "v3_resp_rate_slope72",
+        "label": "Respiratory rate6h deviation \u00b7 change over72h",
+        "value": -2.2785391807556152,
+        "contribution": -0.027105475283655263,
+        "imputed": false
+      },
+      {
+        "feature": "v3_symptom_score_z6",
+        "label": "Symptoms \u00b7 past6h deviation (baseline SD)",
+        "value": 1.5971695184707642,
+        "contribution": -0.02575443954986396,
+        "imputed": false
+      },
+      {
+        "feature": "v3_heart_rate_z120",
+        "label": "Heart rate \u00b7 past120h deviation (baseline SD)",
+        "value": 2.119919776916504,
+        "contribution": -0.024562239387799265,
+        "imputed": false
+      },
+      {
+        "feature": "pg48_adherence_mean72",
+        "label": "Adherence \u00b7 past72h",
+        "value": 0.6285819411277771,
+        "contribution": -0.021007186809050074,
+        "imputed": false
+      },
+      {
+        "feature": "v3_sleep_hours_z24",
+        "label": "Sleep \u00b7 past24h deviation (baseline SD)",
+        "value": 1.410880208015442,
+        "contribution": 0.020982991996180516,
+        "imputed": false
+      },
+      {
+        "feature": "v3_sleep_hours_z6",
+        "label": "Sleep \u00b7 past6h deviation (baseline SD)",
+        "value": 1.7329490184783936,
+        "contribution": 0.02018730494278484,
+        "imputed": false
+      },
+      {
+        "feature": "pg48_steps_ratio24",
+        "label": "Activity vs72h personal baseline",
+        "value": 0.8626617789268494,
+        "contribution": -0.01976540699264367,
+        "imputed": false
+      },
+      {
+        "feature": "v3_sleep_hours_z72",
+        "label": "Sleep \u00b7 past72h deviation (baseline SD)",
+        "value": 1.7972536087036133,
+        "contribution": -0.013046881852153282,
+        "imputed": false
+      },
+      {
+        "feature": "v3_resp_rate_z72",
+        "label": "Respiratory rate \u00b7 past72h deviation (baseline SD)",
+        "value": 2.8397908210754395,
+        "contribution": -0.012844182522248799,
+        "imputed": false
+      },
+      {
+        "feature": "v3_resp_rate_z6",
+        "label": "Respiratory rate \u00b7 past6h deviation (baseline SD)",
+        "value": 1.1530026197433472,
+        "contribution": -0.012673417103214832,
+        "imputed": false
+      },
+      {
+        "feature": "adherence_mean24",
+        "label": "Adherence \u00b7 past24h",
+        "value": 0.833383321762085,
+        "contribution": 0.011453433330083801,
+        "imputed": false
+      },
+      {
+        "feature": "temperature",
+        "label": "Historical ambient temperature",
+        "value": 32.29999923706055,
+        "contribution": 0.010550140361941743,
+        "imputed": false
+      },
+      {
+        "feature": "v3_sleep_hours_slope72",
+        "label": "Sleep6h deviation \u00b7 change over72h",
+        "value": 0.26220887899398804,
+        "contribution": 0.009156148118698974,
+        "imputed": false
+      },
+      {
+        "feature": "ozone",
+        "label": "Historical ambient ozone",
+        "value": 184.0,
+        "contribution": 0.008675560769258637,
+        "imputed": false
+      },
+      {
+        "feature": "v3_sleep_hours_slope24",
+        "label": "Sleep6h deviation \u00b7 change over24h",
+        "value": -0.7369989156723022,
+        "contribution": -0.00857251817686251,
+        "imputed": false
+      },
+      {
+        "feature": "v3_peak72_minus_now",
+        "label": "72h peak minus current body deviation",
+        "value": 2.9066197872161865,
+        "contribution": -0.007442656338848192,
+        "imputed": false
+      },
+      {
+        "feature": "pg48_pm25_mean72",
+        "label": "Historical ambient PM2.5 \u00b7 past72h",
+        "value": 41.968055725097656,
+        "contribution": 0.006766023715351885,
+        "imputed": false
+      },
+      {
+        "feature": "v3_symptom_score_z24",
+        "label": "Symptoms \u00b7 past24h deviation (baseline SD)",
+        "value": 3.028892755508423,
+        "contribution": 0.006558507505938282,
+        "imputed": false
+      },
+      {
+        "feature": "v3_resp_rate_z120",
+        "label": "Respiratory rate \u00b7 past120h deviation (baseline SD)",
+        "value": 2.6034395694732666,
+        "contribution": -0.004764045464927061,
+        "imputed": false
+      },
+      {
+        "feature": "v3_body_index24",
+        "label": "Mean standardized body deviation \u00b724h",
+        "value": 2.455138683319092,
+        "contribution": 0.004163280786541719,
+        "imputed": false
+      },
+      {
+        "feature": "v3_heart_rate_z24",
+        "label": "Heart rate \u00b7 past24h deviation (baseline SD)",
+        "value": 1.7327544689178467,
+        "contribution": 0.004005699654111451,
+        "imputed": false
+      },
+      {
+        "feature": "v3_body_index6",
+        "label": "Mean standardized body deviation \u00b76h",
+        "value": 1.427676796913147,
+        "contribution": -0.0034002057363414456,
+        "imputed": false
+      },
+      {
+        "feature": "prior_exacerbations",
+        "label": "Prior synthetic exacerbations",
+        "value": 2.0,
+        "contribution": -0.0032517106542256746,
+        "imputed": false
+      },
+      {
+        "feature": "v3_resp_rate_z24",
+        "label": "Respiratory rate \u00b7 past24h deviation (baseline SD)",
+        "value": 1.9820916652679443,
+        "contribution": 0.0028355132252929054,
+        "imputed": false
+      },
+      {
+        "feature": "v3_heart_rate_slope72",
+        "label": "Heart rate6h deviation \u00b7 change over72h",
+        "value": -2.37862229347229,
+        "contribution": -0.0027406344228330997,
+        "imputed": false
+      },
+      {
+        "feature": "v3_now_minus_min72",
+        "label": "Current minus72h minimum body deviation",
+        "value": 0.11430403590202332,
+        "contribution": 0.0026203132398389312,
+        "imputed": false
+      },
+      {
+        "feature": "v3_heart_rate_z72",
+        "label": "Heart rate \u00b7 past72h deviation (baseline SD)",
+        "value": 2.3295626640319824,
+        "contribution": 0.0022619629234971886,
+        "imputed": false
+      },
+      {
+        "feature": "v3_heart_rate_z6",
+        "label": "Heart rate \u00b7 past6h deviation (baseline SD)",
+        "value": 0.14039985835552216,
+        "contribution": -0.001742803373435654,
+        "imputed": false
+      },
+      {
+        "feature": "v3_spo2_z6",
+        "label": "SpO\u2082 \u00b7 past6h deviation (baseline SD)",
+        "value": 2.5148627758026123,
+        "contribution": -0.00145350635997782,
+        "imputed": false
+      },
+      {
+        "feature": "no2",
+        "label": "Historical ambient NO\u2082",
+        "value": 4.599999904632568,
+        "contribution": -0.0009241206537718267,
+        "imputed": false
+      },
+      {
+        "feature": "v3_spo2_z24",
+        "label": "SpO\u2082 \u00b7 past24h deviation (baseline SD)",
+        "value": 4.1210737228393555,
+        "contribution": -0.0008591874315936859,
+        "imputed": false
+      },
+      {
+        "feature": "pm25_change6",
+        "label": "Historical ambient PM2.5 change \u00b76h",
+        "value": 1.600000023841858,
+        "contribution": -6.028724818720191e-05,
+        "imputed": false
+      },
+      {
+        "feature": "humidity",
+        "label": "Historical ambient humidity",
+        "value": 60.0,
+        "contribution": 0.0,
+        "imputed": false
+      }
+    ],
+    "model_version": "pg48-v3-multiseed",
+    "caveat": "Associational model explanation, not causation or clinical advice. Sigmoid(base + contributions) equals the revised probability."
+  },
+  "warnings": [
+    "Experimental synthetic model; low sensitivity. Not a diagnosis, emergency alert or clinical threshold.",
+    "Recomputed for this saved replay state. Old history,24h/72h, alerts and scenarios remain v1; no v3 history was backfilled.",
+    "Only original synthetic physiology and historical ambient caches are inputs; optional live context/manual/device records are excluded."
+  ]
+}

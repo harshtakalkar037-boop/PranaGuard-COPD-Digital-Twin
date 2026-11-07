@@ -1,0 +1,757 @@
+{
+  "patient_id": "PG-0071",
+  "observations": [
+    {
+      "hour": 992,
+      "timestamp": "2026-09-11 08:00:00+00:00",
+      "spo2": 92.4215,
+      "heart_rate": 75.8641,
+      "resp_rate": 20.3523,
+      "pm25": 50.1,
+      "symptom_score": 3.0949,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 993,
+      "timestamp": "2026-09-11 09:00:00+00:00",
+      "spo2": 92.2443,
+      "heart_rate": 74.7607,
+      "resp_rate": 22.3146,
+      "pm25": 39.2,
+      "symptom_score": 3.4499,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 994,
+      "timestamp": "2026-09-11 10:00:00+00:00",
+      "spo2": 92.528,
+      "heart_rate": 77.1001,
+      "resp_rate": 21.9818,
+      "pm25": 30.7,
+      "symptom_score": 4.4845,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 995,
+      "timestamp": "2026-09-11 11:00:00+00:00",
+      "spo2": 92.4933,
+      "heart_rate": 77.113,
+      "resp_rate": 22.0178,
+      "pm25": 26.2,
+      "symptom_score": 4.1236,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 996,
+      "timestamp": "2026-09-11 12:00:00+00:00",
+      "spo2": 92.1511,
+      "heart_rate": 79.8831,
+      "resp_rate": 22.4327,
+      "pm25": 17.1,
+      "symptom_score": 3.4894,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 997,
+      "timestamp": "2026-09-11 13:00:00+00:00",
+      "spo2": 92.6337,
+      "heart_rate": 78.9011,
+      "resp_rate": 21.2194,
+      "pm25": 21.3,
+      "symptom_score": 3.2205,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 998,
+      "timestamp": "2026-09-11 14:00:00+00:00",
+      "spo2": 92.4084,
+      "heart_rate": 78.0076,
+      "resp_rate": 21.5649,
+      "pm25": 21.0,
+      "symptom_score": 3.1892,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 999,
+      "timestamp": "2026-09-11 15:00:00+00:00",
+      "spo2": 92.6399,
+      "heart_rate": null,
+      "resp_rate": 19.282,
+      "pm25": 20.0,
+      "symptom_score": 3.1678,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1000,
+      "timestamp": "2026-09-11 16:00:00+00:00",
+      "spo2": 92.7321,
+      "heart_rate": 75.5818,
+      "resp_rate": null,
+      "pm25": 19.6,
+      "symptom_score": 2.8512,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1001,
+      "timestamp": "2026-09-11 17:00:00+00:00",
+      "spo2": 92.2017,
+      "heart_rate": null,
+      "resp_rate": 21.1898,
+      "pm25": 20.2,
+      "symptom_score": 2.329,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1002,
+      "timestamp": "2026-09-11 18:00:00+00:00",
+      "spo2": 92.988,
+      "heart_rate": 71.9649,
+      "resp_rate": 20.317,
+      "pm25": 20.3,
+      "symptom_score": 3.291,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1003,
+      "timestamp": "2026-09-11 19:00:00+00:00",
+      "spo2": 92.4599,
+      "heart_rate": 74.0056,
+      "resp_rate": 21.0501,
+      "pm25": 19.6,
+      "symptom_score": 3.0945,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1004,
+      "timestamp": "2026-09-11 20:00:00+00:00",
+      "spo2": 92.8816,
+      "heart_rate": 75.7837,
+      "resp_rate": 21.189,
+      "pm25": 19.1,
+      "symptom_score": 2.6526,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1005,
+      "timestamp": "2026-09-11 21:00:00+00:00",
+      "spo2": 93.0072,
+      "heart_rate": 73.5595,
+      "resp_rate": null,
+      "pm25": 18.9,
+      "symptom_score": 3.3594,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1006,
+      "timestamp": "2026-09-11 22:00:00+00:00",
+      "spo2": 92.6188,
+      "heart_rate": 68.716,
+      "resp_rate": 20.1323,
+      "pm25": 19.1,
+      "symptom_score": 2.6812,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1007,
+      "timestamp": "2026-09-11 23:00:00+00:00",
+      "spo2": 92.7152,
+      "heart_rate": 73.1442,
+      "resp_rate": 21.7759,
+      "pm25": 18.8,
+      "symptom_score": 3.9053,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1008,
+      "timestamp": "2026-09-12 00:00:00+00:00",
+      "spo2": 92.9238,
+      "heart_rate": 74.6906,
+      "resp_rate": 19.484,
+      "pm25": 17.2,
+      "symptom_score": 3.3773,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1009,
+      "timestamp": "2026-09-12 01:00:00+00:00",
+      "spo2": 92.6183,
+      "heart_rate": 72.8075,
+      "resp_rate": 21.6894,
+      "pm25": 17.4,
+      "symptom_score": 3.4328,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1010,
+      "timestamp": "2026-09-12 02:00:00+00:00",
+      "spo2": 91.5401,
+      "heart_rate": 74.0138,
+      "resp_rate": 21.9523,
+      "pm25": 18.7,
+      "symptom_score": 2.9275,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1011,
+      "timestamp": "2026-09-12 03:00:00+00:00",
+      "spo2": 92.2184,
+      "heart_rate": 73.6666,
+      "resp_rate": 21.0521,
+      "pm25": 19.8,
+      "symptom_score": 3.2351,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1012,
+      "timestamp": "2026-09-12 04:00:00+00:00",
+      "spo2": 92.5871,
+      "heart_rate": 72.1644,
+      "resp_rate": 21.9622,
+      "pm25": 20.1,
+      "symptom_score": 3.0799,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1013,
+      "timestamp": "2026-09-12 05:00:00+00:00",
+      "spo2": 92.8968,
+      "heart_rate": 72.7503,
+      "resp_rate": 21.5505,
+      "pm25": 19.3,
+      "symptom_score": 3.2348,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1014,
+      "timestamp": "2026-09-12 06:00:00+00:00",
+      "spo2": 92.4144,
+      "heart_rate": 72.6309,
+      "resp_rate": 20.1323,
+      "pm25": 18.6,
+      "symptom_score": 2.8104,
+      "risk_24": null,
+      "risk_48": null,
+      "risk_72": null,
+      "version": null
+    },
+    {
+      "hour": 1015,
+      "timestamp": "2026-09-12 07:00:00+00:00",
+      "spo2": 92.0441,
+      "heart_rate": 75.7639,
+      "resp_rate": 21.957,
+      "pm25": 20.0,
+      "symptom_score": 3.1234,
+      "risk_24": 0.01917641358967931,
+      "risk_48": 0.10365903268483999,
+      "risk_72": 0.28370548333200346,
+      "version": 1
+    },
+    {
+      "hour": 1016,
+      "timestamp": "2026-09-12 08:00:00+00:00",
+      "spo2": 92.2536,
+      "heart_rate": 77.9432,
+      "resp_rate": 21.861,
+      "pm25": 21.2,
+      "symptom_score": 3.0969,
+      "risk_24": 0.016923111598478625,
+      "risk_48": 0.10216810115042686,
+      "risk_72": 0.2970292832495505,
+      "version": 2
+    },
+    {
+      "hour": 1017,
+      "timestamp": "2026-09-12 09:00:00+00:00",
+      "spo2": null,
+      "heart_rate": 77.2066,
+      "resp_rate": 20.694,
+      "pm25": 21.3,
+      "symptom_score": 3.2126,
+      "risk_24": 0.01502154024201191,
+      "risk_48": 0.10058375144268387,
+      "risk_72": 0.3070729658278278,
+      "version": 3
+    },
+    {
+      "hour": 1018,
+      "timestamp": "2026-09-12 10:00:00+00:00",
+      "spo2": 92.7596,
+      "heart_rate": 75.9992,
+      "resp_rate": 21.2234,
+      "pm25": 21.6,
+      "symptom_score": 4.1786,
+      "risk_24": 0.03167945819983194,
+      "risk_48": 0.1022228610525841,
+      "risk_72": 0.30440555447202167,
+      "version": 4
+    },
+    {
+      "hour": 1019,
+      "timestamp": "2026-09-12 11:00:00+00:00",
+      "spo2": 92.5207,
+      "heart_rate": 74.8134,
+      "resp_rate": 20.6339,
+      "pm25": 21.4,
+      "symptom_score": 3.4629,
+      "risk_24": 0.021120388637451293,
+      "risk_48": 0.10283435345107479,
+      "risk_72": 0.2906523405216075,
+      "version": 5
+    },
+    {
+      "hour": 1020,
+      "timestamp": "2026-09-12 12:00:00+00:00",
+      "spo2": 92.4113,
+      "heart_rate": 77.5172,
+      "resp_rate": 20.272,
+      "pm25": 20.3,
+      "symptom_score": 3.0951,
+      "risk_24": 0.02129669877923386,
+      "risk_48": 0.10151811816518744,
+      "risk_72": 0.29966596638851967,
+      "version": 6
+    },
+    {
+      "hour": 1021,
+      "timestamp": "2026-09-12 13:00:00+00:00",
+      "spo2": 92.1837,
+      "heart_rate": 78.8157,
+      "resp_rate": 21.683,
+      "pm25": 28.1,
+      "symptom_score": 3.7549,
+      "risk_24": 0.024354361206736935,
+      "risk_48": 0.10326642505112976,
+      "risk_72": 0.28106517655473856,
+      "version": 7
+    },
+    {
+      "hour": 1022,
+      "timestamp": "2026-09-12 14:00:00+00:00",
+      "spo2": 92.2639,
+      "heart_rate": 80.5804,
+      "resp_rate": 22.0198,
+      "pm25": 37.6,
+      "symptom_score": 3.1728,
+      "risk_24": 0.016609814845203377,
+      "risk_48": 0.10106206287998305,
+      "risk_72": 0.29108336905987786,
+      "version": 8
+    },
+    {
+      "hour": 1023,
+      "timestamp": "2026-09-12 15:00:00+00:00",
+      "spo2": 92.1017,
+      "heart_rate": 78.1642,
+      "resp_rate": 19.5596,
+      "pm25": 41.9,
+      "symptom_score": 3.1639,
+      "risk_24": 0.020635512092676746,
+      "risk_48": 0.10172377333615619,
+      "risk_72": 0.2948348057284781,
+      "version": 9
+    },
+    {
+      "hour": 1024,
+      "timestamp": "2026-09-12 16:00:00+00:00",
+      "spo2": 91.9968,
+      "heart_rate": 77.4175,
+      "resp_rate": 21.0954,
+      "pm25": 44.1,
+      "symptom_score": 3.4416,
+      "risk_24": 0.03358823106087292,
+      "risk_48": 0.10353530139495076,
+      "risk_72": 0.28202711414661624,
+      "version": 10
+    },
+    {
+      "hour": 1025,
+      "timestamp": "2026-09-12 17:00:00+00:00",
+      "spo2": 91.9845,
+      "heart_rate": 77.7565,
+      "resp_rate": 21.3469,
+      "pm25": 42.6,
+      "symptom_score": 2.6451,
+      "risk_24": 0.027047106447704458,
+      "risk_48": 0.10308180712290767,
+      "risk_72": 0.28728697261253144,
+      "version": 11
+    },
+    {
+      "hour": 1026,
+      "timestamp": "2026-09-12 18:00:00+00:00",
+      "spo2": 93.1968,
+      "heart_rate": 72.2461,
+      "resp_rate": 20.2932,
+      "pm25": 39.3,
+      "symptom_score": 2.2681,
+      "risk_24": 0.016965374118581154,
+      "risk_48": 0.10142259799816128,
+      "risk_72": 0.2968385159558772,
+      "version": 12
+    },
+    {
+      "hour": 1027,
+      "timestamp": "2026-09-12 19:00:00+00:00",
+      "spo2": 93.3041,
+      "heart_rate": 67.4607,
+      "resp_rate": 18.8737,
+      "pm25": 36.4,
+      "symptom_score": 2.5362,
+      "risk_24": 0.014786191332779152,
+      "risk_48": 0.10245371375959299,
+      "risk_72": 0.29414508506202863,
+      "version": 13
+    },
+    {
+      "hour": 1028,
+      "timestamp": "2026-09-12 20:00:00+00:00",
+      "spo2": 93.5895,
+      "heart_rate": 71.8119,
+      "resp_rate": 20.1457,
+      "pm25": 34.0,
+      "symptom_score": 1.9701,
+      "risk_24": 0.014619478222348227,
+      "risk_48": 0.10086420786007094,
+      "risk_72": 0.29439978071643,
+      "version": 14
+    },
+    {
+      "hour": 1029,
+      "timestamp": "2026-09-12 21:00:00+00:00",
+      "spo2": 93.0159,
+      "heart_rate": 71.7842,
+      "resp_rate": 19.4348,
+      "pm25": 31.7,
+      "symptom_score": 2.134,
+      "risk_24": 0.014422878274668814,
+      "risk_48": 0.10066507662158986,
+      "risk_72": 0.29931102050575326,
+      "version": 15
+    },
+    {
+      "hour": 1030,
+      "timestamp": "2026-09-12 22:00:00+00:00",
+      "spo2": 93.4728,
+      "heart_rate": 67.0494,
+      "resp_rate": 19.4007,
+      "pm25": 29.6,
+      "symptom_score": 2.2571,
+      "risk_24": 0.018854524942919997,
+      "risk_48": 0.10280933751422268,
+      "risk_72": 0.29836529976333315,
+      "version": 16
+    },
+    {
+      "hour": 1031,
+      "timestamp": "2026-09-12 23:00:00+00:00",
+      "spo2": 92.9161,
+      "heart_rate": 67.2572,
+      "resp_rate": 19.8949,
+      "pm25": 28.0,
+      "symptom_score": 2.8234,
+      "risk_24": 0.014824310676043236,
+      "risk_48": 0.1015922938059413,
+      "risk_72": 0.3059474754274423,
+      "version": 17
+    },
+    {
+      "hour": 1032,
+      "timestamp": "2026-09-13 00:00:00+00:00",
+      "spo2": 93.7263,
+      "heart_rate": 69.1615,
+      "resp_rate": 18.8522,
+      "pm25": 24.3,
+      "symptom_score": 2.1322,
+      "risk_24": 0.015419656684805426,
+      "risk_48": 0.10001493766450831,
+      "risk_72": 0.30293289048649236,
+      "version": 18
+    },
+    {
+      "hour": 1033,
+      "timestamp": "2026-09-13 01:00:00+00:00",
+      "spo2": 93.5716,
+      "heart_rate": 70.659,
+      "resp_rate": 19.4649,
+      "pm25": 25.4,
+      "symptom_score": 2.4284,
+      "risk_24": 0.015002888523480204,
+      "risk_48": 0.10072921517175296,
+      "risk_72": 0.31138900979226586,
+      "version": 19
+    },
+    {
+      "hour": 1034,
+      "timestamp": "2026-09-13 02:00:00+00:00",
+      "spo2": 93.8108,
+      "heart_rate": 66.3831,
+      "resp_rate": 19.5113,
+      "pm25": 28.5,
+      "symptom_score": 2.0164,
+      "risk_24": 0.014848674451125948,
+      "risk_48": 0.10183230884843048,
+      "risk_72": 0.29927105882599386,
+      "version": 20
+    },
+    {
+      "hour": 1035,
+      "timestamp": "2026-09-13 03:00:00+00:00",
+      "spo2": 94.0407,
+      "heart_rate": 67.5243,
+      "resp_rate": 19.9492,
+      "pm25": 25.6,
+      "symptom_score": 3.1427,
+      "risk_24": 0.022218778988087332,
+      "risk_48": 0.10246414283023694,
+      "risk_72": 0.29244437648399746,
+      "version": 21
+    },
+    {
+      "hour": 1036,
+      "timestamp": "2026-09-13 04:00:00+00:00",
+      "spo2": 94.0696,
+      "heart_rate": 69.9741,
+      "resp_rate": 18.2437,
+      "pm25": 23.8,
+      "symptom_score": 1.195,
+      "risk_24": 0.014923632782379972,
+      "risk_48": 0.0999234760208357,
+      "risk_72": 0.2966167104900249,
+      "version": 22
+    },
+    {
+      "hour": 1037,
+      "timestamp": "2026-09-13 05:00:00+00:00",
+      "spo2": 93.2221,
+      "heart_rate": 68.2353,
+      "resp_rate": 19.5282,
+      "pm25": 25.1,
+      "symptom_score": 2.4419,
+      "risk_24": 0.016051086573628522,
+      "risk_48": 0.10138516892869728,
+      "risk_72": 0.29750325442168574,
+      "version": 23
+    },
+    {
+      "hour": 1038,
+      "timestamp": "2026-09-13 06:00:00+00:00",
+      "spo2": 92.8719,
+      "heart_rate": 65.8321,
+      "resp_rate": 17.2538,
+      "pm25": 27.1,
+      "symptom_score": 1.3334,
+      "risk_24": 0.019986518781808897,
+      "risk_48": 0.1022506742859019,
+      "risk_72": 0.2928111321101421,
+      "version": 24
+    },
+    {
+      "hour": 1039,
+      "timestamp": "2026-09-13 07:00:00+00:00",
+      "spo2": 93.1887,
+      "heart_rate": null,
+      "resp_rate": 21.2192,
+      "pm25": 27.0,
+      "symptom_score": 2.0924,
+      "risk_24": 0.015098282200342369,
+      "risk_48": 0.10111926243216601,
+      "risk_72": 0.29658079216723104,
+      "version": 25
+    }
+  ],
+  "versions": [
+    {
+      "version": 25,
+      "hour": 1039,
+      "timestamp": "2026-09-13 07:00:00+00:00"
+    },
+    {
+      "version": 24,
+      "hour": 1038,
+      "timestamp": "2026-09-13 06:00:00+00:00"
+    },
+    {
+      "version": 23,
+      "hour": 1037,
+      "timestamp": "2026-09-13 05:00:00+00:00"
+    },
+    {
+      "version": 22,
+      "hour": 1036,
+      "timestamp": "2026-09-13 04:00:00+00:00"
+    },
+    {
+      "version": 21,
+      "hour": 1035,
+      "timestamp": "2026-09-13 03:00:00+00:00"
+    },
+    {
+      "version": 20,
+      "hour": 1034,
+      "timestamp": "2026-09-13 02:00:00+00:00"
+    },
+    {
+      "version": 19,
+      "hour": 1033,
+      "timestamp": "2026-09-13 01:00:00+00:00"
+    },
+    {
+      "version": 18,
+      "hour": 1032,
+      "timestamp": "2026-09-13 00:00:00+00:00"
+    },
+    {
+      "version": 17,
+      "hour": 1031,
+      "timestamp": "2026-09-12 23:00:00+00:00"
+    },
+    {
+      "version": 16,
+      "hour": 1030,
+      "timestamp": "2026-09-12 22:00:00+00:00"
+    },
+    {
+      "version": 15,
+      "hour": 1029,
+      "timestamp": "2026-09-12 21:00:00+00:00"
+    },
+    {
+      "version": 14,
+      "hour": 1028,
+      "timestamp": "2026-09-12 20:00:00+00:00"
+    },
+    {
+      "version": 13,
+      "hour": 1027,
+      "timestamp": "2026-09-12 19:00:00+00:00"
+    },
+    {
+      "version": 12,
+      "hour": 1026,
+      "timestamp": "2026-09-12 18:00:00+00:00"
+    },
+    {
+      "version": 11,
+      "hour": 1025,
+      "timestamp": "2026-09-12 17:00:00+00:00"
+    },
+    {
+      "version": 10,
+      "hour": 1024,
+      "timestamp": "2026-09-12 16:00:00+00:00"
+    },
+    {
+      "version": 9,
+      "hour": 1023,
+      "timestamp": "2026-09-12 15:00:00+00:00"
+    },
+    {
+      "version": 8,
+      "hour": 1022,
+      "timestamp": "2026-09-12 14:00:00+00:00"
+    },
+    {
+      "version": 7,
+      "hour": 1021,
+      "timestamp": "2026-09-12 13:00:00+00:00"
+    },
+    {
+      "version": 6,
+      "hour": 1020,
+      "timestamp": "2026-09-12 12:00:00+00:00"
+    },
+    {
+      "version": 5,
+      "hour": 1019,
+      "timestamp": "2026-09-12 11:00:00+00:00"
+    },
+    {
+      "version": 4,
+      "hour": 1018,
+      "timestamp": "2026-09-12 10:00:00+00:00"
+    },
+    {
+      "version": 3,
+      "hour": 1017,
+      "timestamp": "2026-09-12 09:00:00+00:00"
+    },
+    {
+      "version": 2,
+      "hour": 1016,
+      "timestamp": "2026-09-12 08:00:00+00:00"
+    },
+    {
+      "version": 1,
+      "hour": 1015,
+      "timestamp": "2026-09-12 07:00:00+00:00"
+    }
+  ],
+  "risk_history_note": "Null risk values were not persisted/predicted during replay; no fabricated historical predictions."
+}

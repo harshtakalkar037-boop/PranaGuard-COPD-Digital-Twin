@@ -1,0 +1,1153 @@
+{
+  "profile": {
+    "patient_id": "PG-DEMO-24BE5BE35541",
+    "display_name": "Fictional demo \u00b7 Atlas Workflow",
+    "synthetic": true,
+    "city": "Pune",
+    "age": 59,
+    "sex": "Female",
+    "fev1_pct": null,
+    "bmi": null,
+    "prior_exacerbations": null,
+    "smoking_pack_years": null,
+    "environment_source": "Independent city context only; not model input",
+    "source_type": "manual_demo"
+  },
+  "details": {
+    "request_id": "50882aaa567144b4be77d5c94778104b",
+    "fictional_identity_confirmed": true,
+    "demo_alias": "Atlas Workflow",
+    "age": 59,
+    "sex": "Female",
+    "city": "Pune",
+    "copd_history": "Fictional example history for software demonstration only.",
+    "diagnosis_info": "Demo information, not an established diagnosis.",
+    "medications": "Fictional plan placeholder; no prescribing recommendation.",
+    "clinician_alias": "Atlas",
+    "baseline_spo2": 96.0,
+    "baseline_heart_rate": 76.0,
+    "baseline_resp_rate": 18.0,
+    "fev1_pct": null,
+    "bmi": null,
+    "smoking_pack_years": null,
+    "prior_exacerbations": null,
+    "source_type": "manual_demo"
+  },
+  "registered_at": "2026-11-05T14:06:38.506488+00:00",
+  "origin": "manual_demo_registration",
+  "baseline": {
+    "status": "collecting_baseline",
+    "required_hours": 72,
+    "observed_hours": 1,
+    "elapsed_hours": 0.0014,
+    "first_observed_at": "2026-11-05T14:06:40.795848+00:00",
+    "last_observed_at": "2026-11-05T14:06:45.835378+00:00",
+    "complete": false,
+    "means": {
+      "fev1": 1.6,
+      "fvc": 2.9,
+      "heart_rate": 75.325,
+      "resp_rate": 18.7,
+      "spo2": 96.0,
+      "steps": 3.0
+    },
+    "coverage": {
+      "fev1": 1,
+      "fvc": 1,
+      "heart_rate": 1,
+      "resp_rate": 1,
+      "spo2": 1,
+      "steps": 1
+    },
+    "prediction_supported": false,
+    "notice": "72 hourly baseline bins and 72 elapsed hours are necessary, not sufficient. Device-only data lack the compatible full clinical/symptom/adherence/sleep/environment feature frame. No prediction is manufactured."
+  },
+  "model_state": null,
+  "model_history": null,
+  "devices": [
+    {
+      "id": "SIM-7DD6649A704644CA",
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "kind": "portable_spirometer",
+      "label": "Atlas simulated portable_spirometer",
+      "created_at": "2026-11-05T14:06:45.386178+00:00",
+      "status": "disconnected",
+      "is_simulating": false,
+      "interval_seconds": 2,
+      "last_seen_at": "2026-11-05T14:06:45.837719+00:00",
+      "next_due_at": null,
+      "last_error": null,
+      "run_id": "3653cc65824e4b39baa1bee2b366cc22",
+      "sequence": 1,
+      "source_type": "simulated_device",
+      "hardware_connected": false,
+      "freshness": "recent"
+    },
+    {
+      "id": "SIM-2FB3A2D6CD344D6A",
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "kind": "fitness_band",
+      "label": "Atlas simulated fitness_band",
+      "created_at": "2026-11-05T14:06:44.337012+00:00",
+      "status": "disconnected",
+      "is_simulating": false,
+      "interval_seconds": 2,
+      "last_seen_at": "2026-11-05T14:06:44.828285+00:00",
+      "next_due_at": null,
+      "last_error": null,
+      "run_id": "2dc2af6062dd4e268a1b1b249d3563c2",
+      "sequence": 1,
+      "source_type": "simulated_device",
+      "hardware_connected": false,
+      "freshness": "recent"
+    },
+    {
+      "id": "SIM-7A6CFDF163DE4E77",
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "kind": "smartwatch",
+      "label": "Atlas simulated smartwatch",
+      "created_at": "2026-11-05T14:06:43.370237+00:00",
+      "status": "disconnected",
+      "is_simulating": false,
+      "interval_seconds": 2,
+      "last_seen_at": "2026-11-05T14:06:43.818285+00:00",
+      "next_due_at": null,
+      "last_error": null,
+      "run_id": "eb771c0dc18a42d9891320290f5ba1b9",
+      "sequence": 1,
+      "source_type": "simulated_device",
+      "hardware_connected": false,
+      "freshness": "recent"
+    },
+    {
+      "id": "SIM-93AC87A3F643424F",
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "kind": "pulse_oximeter",
+      "label": "Atlas simulated pulse_oximeter",
+      "created_at": "2026-11-05T14:06:39.752186+00:00",
+      "status": "disconnected",
+      "is_simulating": false,
+      "interval_seconds": 2,
+      "last_seen_at": "2026-11-05T14:06:42.809178+00:00",
+      "next_due_at": null,
+      "last_error": null,
+      "run_id": "387b0545ea9941f4914d33b1c24d8955",
+      "sequence": 2,
+      "source_type": "simulated_device",
+      "hardware_connected": false,
+      "freshness": "recent"
+    }
+  ],
+  "readings": [
+    {
+      "id": 56,
+      "event_pk": 26,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-93AC87A3F643424F",
+      "metric": "spo2",
+      "value": 96.1,
+      "unit": "%",
+      "observed_at": "2026-11-05T14:06:40.795848+00:00",
+      "received_at": "2026-11-05T14:06:40.798090+00:00",
+      "source_type": "simulated_device"
+    },
+    {
+      "id": 57,
+      "event_pk": 26,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-93AC87A3F643424F",
+      "metric": "heart_rate",
+      "value": 76.8,
+      "unit": "bpm",
+      "observed_at": "2026-11-05T14:06:40.795848+00:00",
+      "received_at": "2026-11-05T14:06:40.798090+00:00",
+      "source_type": "simulated_device"
+    },
+    {
+      "id": 58,
+      "event_pk": 27,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-93AC87A3F643424F",
+      "metric": "spo2",
+      "value": 95.9,
+      "unit": "%",
+      "observed_at": "2026-11-05T14:06:42.806899+00:00",
+      "received_at": "2026-11-05T14:06:42.809178+00:00",
+      "source_type": "simulated_device"
+    },
+    {
+      "id": 59,
+      "event_pk": 27,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-93AC87A3F643424F",
+      "metric": "heart_rate",
+      "value": 78.4,
+      "unit": "bpm",
+      "observed_at": "2026-11-05T14:06:42.806899+00:00",
+      "received_at": "2026-11-05T14:06:42.809178+00:00",
+      "source_type": "simulated_device"
+    },
+    {
+      "id": 60,
+      "event_pk": 28,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-7A6CFDF163DE4E77",
+      "metric": "heart_rate",
+      "value": 73.1,
+      "unit": "bpm",
+      "observed_at": "2026-11-05T14:06:43.816175+00:00",
+      "received_at": "2026-11-05T14:06:43.818285+00:00",
+      "source_type": "simulated_device"
+    },
+    {
+      "id": 61,
+      "event_pk": 28,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-7A6CFDF163DE4E77",
+      "metric": "resp_rate",
+      "value": 18.7,
+      "unit": "breaths/min",
+      "observed_at": "2026-11-05T14:06:43.816175+00:00",
+      "received_at": "2026-11-05T14:06:43.818285+00:00",
+      "source_type": "simulated_device"
+    },
+    {
+      "id": 62,
+      "event_pk": 28,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-7A6CFDF163DE4E77",
+      "metric": "steps",
+      "value": 3.0,
+      "unit": "steps",
+      "observed_at": "2026-11-05T14:06:43.816175+00:00",
+      "received_at": "2026-11-05T14:06:43.818285+00:00",
+      "source_type": "simulated_device"
+    },
+    {
+      "id": 63,
+      "event_pk": 29,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-2FB3A2D6CD344D6A",
+      "metric": "heart_rate",
+      "value": 73.0,
+      "unit": "bpm",
+      "observed_at": "2026-11-05T14:06:44.825878+00:00",
+      "received_at": "2026-11-05T14:06:44.828285+00:00",
+      "source_type": "simulated_device"
+    },
+    {
+      "id": 64,
+      "event_pk": 29,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-2FB3A2D6CD344D6A",
+      "metric": "steps",
+      "value": 3.0,
+      "unit": "steps",
+      "observed_at": "2026-11-05T14:06:44.825878+00:00",
+      "received_at": "2026-11-05T14:06:44.828285+00:00",
+      "source_type": "simulated_device"
+    },
+    {
+      "id": 65,
+      "event_pk": 30,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-7DD6649A704644CA",
+      "metric": "fev1",
+      "value": 1.6,
+      "unit": "L",
+      "observed_at": "2026-11-05T14:06:45.835378+00:00",
+      "received_at": "2026-11-05T14:06:45.837719+00:00",
+      "source_type": "simulated_device"
+    },
+    {
+      "id": 66,
+      "event_pk": 30,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-7DD6649A704644CA",
+      "metric": "fvc",
+      "value": 2.9,
+      "unit": "L",
+      "observed_at": "2026-11-05T14:06:45.835378+00:00",
+      "received_at": "2026-11-05T14:06:45.837719+00:00",
+      "source_type": "simulated_device"
+    }
+  ],
+  "monitoring_versions": [
+    {
+      "version": 30,
+      "created_at": "2026-11-05T14:06:45.837719+00:00",
+      "snapshot": {
+        "patient_id": "PG-DEMO-24BE5BE35541",
+        "synthetic": true,
+        "current": {
+          "spo2": {
+            "value": 95.9,
+            "unit": "%",
+            "observed_at": "2026-11-05T14:06:42.806899+00:00",
+            "received_at": "2026-11-05T14:06:42.809178+00:00",
+            "device_id": "SIM-93AC87A3F643424F",
+            "source_type": "simulated_device"
+          },
+          "heart_rate": {
+            "value": 73.0,
+            "unit": "bpm",
+            "observed_at": "2026-11-05T14:06:44.825878+00:00",
+            "received_at": "2026-11-05T14:06:44.828285+00:00",
+            "device_id": "SIM-2FB3A2D6CD344D6A",
+            "source_type": "simulated_device"
+          },
+          "resp_rate": {
+            "value": 18.7,
+            "unit": "breaths/min",
+            "observed_at": "2026-11-05T14:06:43.816175+00:00",
+            "received_at": "2026-11-05T14:06:43.818285+00:00",
+            "device_id": "SIM-7A6CFDF163DE4E77",
+            "source_type": "simulated_device"
+          },
+          "steps": {
+            "value": 3.0,
+            "unit": "steps",
+            "observed_at": "2026-11-05T14:06:44.825878+00:00",
+            "received_at": "2026-11-05T14:06:44.828285+00:00",
+            "device_id": "SIM-2FB3A2D6CD344D6A",
+            "source_type": "simulated_device"
+          },
+          "fev1": {
+            "value": 1.6,
+            "unit": "L",
+            "observed_at": "2026-11-05T14:06:45.835378+00:00",
+            "received_at": "2026-11-05T14:06:45.837719+00:00",
+            "device_id": "SIM-7DD6649A704644CA",
+            "source_type": "simulated_device"
+          },
+          "fvc": {
+            "value": 2.9,
+            "unit": "L",
+            "observed_at": "2026-11-05T14:06:45.835378+00:00",
+            "received_at": "2026-11-05T14:06:45.837719+00:00",
+            "device_id": "SIM-7DD6649A704644CA",
+            "source_type": "simulated_device"
+          }
+        },
+        "missing_fields": [],
+        "model_predictions": null,
+        "model_input_eligible": false,
+        "boundary": "Monitoring-only version. Frozen historical risk and features are unchanged."
+      }
+    },
+    {
+      "version": 29,
+      "created_at": "2026-11-05T14:06:44.828285+00:00",
+      "snapshot": {
+        "patient_id": "PG-DEMO-24BE5BE35541",
+        "synthetic": true,
+        "current": {
+          "spo2": {
+            "value": 95.9,
+            "unit": "%",
+            "observed_at": "2026-11-05T14:06:42.806899+00:00",
+            "received_at": "2026-11-05T14:06:42.809178+00:00",
+            "device_id": "SIM-93AC87A3F643424F",
+            "source_type": "simulated_device"
+          },
+          "heart_rate": {
+            "value": 73.0,
+            "unit": "bpm",
+            "observed_at": "2026-11-05T14:06:44.825878+00:00",
+            "received_at": "2026-11-05T14:06:44.828285+00:00",
+            "device_id": "SIM-2FB3A2D6CD344D6A",
+            "source_type": "simulated_device"
+          },
+          "resp_rate": {
+            "value": 18.7,
+            "unit": "breaths/min",
+            "observed_at": "2026-11-05T14:06:43.816175+00:00",
+            "received_at": "2026-11-05T14:06:43.818285+00:00",
+            "device_id": "SIM-7A6CFDF163DE4E77",
+            "source_type": "simulated_device"
+          },
+          "steps": {
+            "value": 3.0,
+            "unit": "steps",
+            "observed_at": "2026-11-05T14:06:44.825878+00:00",
+            "received_at": "2026-11-05T14:06:44.828285+00:00",
+            "device_id": "SIM-2FB3A2D6CD344D6A",
+            "source_type": "simulated_device"
+          }
+        },
+        "missing_fields": [
+          "fev1",
+          "fvc"
+        ],
+        "model_predictions": null,
+        "model_input_eligible": false,
+        "boundary": "Monitoring-only version. Frozen historical risk and features are unchanged."
+      }
+    },
+    {
+      "version": 28,
+      "created_at": "2026-11-05T14:06:43.818285+00:00",
+      "snapshot": {
+        "patient_id": "PG-DEMO-24BE5BE35541",
+        "synthetic": true,
+        "current": {
+          "spo2": {
+            "value": 95.9,
+            "unit": "%",
+            "observed_at": "2026-11-05T14:06:42.806899+00:00",
+            "received_at": "2026-11-05T14:06:42.809178+00:00",
+            "device_id": "SIM-93AC87A3F643424F",
+            "source_type": "simulated_device"
+          },
+          "heart_rate": {
+            "value": 73.1,
+            "unit": "bpm",
+            "observed_at": "2026-11-05T14:06:43.816175+00:00",
+            "received_at": "2026-11-05T14:06:43.818285+00:00",
+            "device_id": "SIM-7A6CFDF163DE4E77",
+            "source_type": "simulated_device"
+          },
+          "resp_rate": {
+            "value": 18.7,
+            "unit": "breaths/min",
+            "observed_at": "2026-11-05T14:06:43.816175+00:00",
+            "received_at": "2026-11-05T14:06:43.818285+00:00",
+            "device_id": "SIM-7A6CFDF163DE4E77",
+            "source_type": "simulated_device"
+          },
+          "steps": {
+            "value": 3.0,
+            "unit": "steps",
+            "observed_at": "2026-11-05T14:06:43.816175+00:00",
+            "received_at": "2026-11-05T14:06:43.818285+00:00",
+            "device_id": "SIM-7A6CFDF163DE4E77",
+            "source_type": "simulated_device"
+          }
+        },
+        "missing_fields": [
+          "fev1",
+          "fvc"
+        ],
+        "model_predictions": null,
+        "model_input_eligible": false,
+        "boundary": "Monitoring-only version. Frozen historical risk and features are unchanged."
+      }
+    },
+    {
+      "version": 27,
+      "created_at": "2026-11-05T14:06:42.809178+00:00",
+      "snapshot": {
+        "patient_id": "PG-DEMO-24BE5BE35541",
+        "synthetic": true,
+        "current": {
+          "spo2": {
+            "value": 95.9,
+            "unit": "%",
+            "observed_at": "2026-11-05T14:06:42.806899+00:00",
+            "received_at": "2026-11-05T14:06:42.809178+00:00",
+            "device_id": "SIM-93AC87A3F643424F",
+            "source_type": "simulated_device"
+          },
+          "heart_rate": {
+            "value": 78.4,
+            "unit": "bpm",
+            "observed_at": "2026-11-05T14:06:42.806899+00:00",
+            "received_at": "2026-11-05T14:06:42.809178+00:00",
+            "device_id": "SIM-93AC87A3F643424F",
+            "source_type": "simulated_device"
+          }
+        },
+        "missing_fields": [
+          "resp_rate",
+          "steps",
+          "fev1",
+          "fvc"
+        ],
+        "model_predictions": null,
+        "model_input_eligible": false,
+        "boundary": "Monitoring-only version. Frozen historical risk and features are unchanged."
+      }
+    },
+    {
+      "version": 26,
+      "created_at": "2026-11-05T14:06:40.798090+00:00",
+      "snapshot": {
+        "patient_id": "PG-DEMO-24BE5BE35541",
+        "synthetic": true,
+        "current": {
+          "spo2": {
+            "value": 96.1,
+            "unit": "%",
+            "observed_at": "2026-11-05T14:06:40.795848+00:00",
+            "received_at": "2026-11-05T14:06:40.798090+00:00",
+            "device_id": "SIM-93AC87A3F643424F",
+            "source_type": "simulated_device"
+          },
+          "heart_rate": {
+            "value": 76.8,
+            "unit": "bpm",
+            "observed_at": "2026-11-05T14:06:40.795848+00:00",
+            "received_at": "2026-11-05T14:06:40.798090+00:00",
+            "device_id": "SIM-93AC87A3F643424F",
+            "source_type": "simulated_device"
+          }
+        },
+        "missing_fields": [
+          "resp_rate",
+          "steps",
+          "fev1",
+          "fvc"
+        ],
+        "model_predictions": null,
+        "model_input_eligible": false,
+        "boundary": "Monitoring-only version. Frozen historical risk and features are unchanged."
+      }
+    }
+  ],
+  "latest_monitoring": {
+    "version": 30,
+    "created_at": "2026-11-05T14:06:45.837719+00:00",
+    "snapshot": {
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "synthetic": true,
+      "current": {
+        "spo2": {
+          "value": 95.9,
+          "unit": "%",
+          "observed_at": "2026-11-05T14:06:42.806899+00:00",
+          "received_at": "2026-11-05T14:06:42.809178+00:00",
+          "device_id": "SIM-93AC87A3F643424F",
+          "source_type": "simulated_device"
+        },
+        "heart_rate": {
+          "value": 73.0,
+          "unit": "bpm",
+          "observed_at": "2026-11-05T14:06:44.825878+00:00",
+          "received_at": "2026-11-05T14:06:44.828285+00:00",
+          "device_id": "SIM-2FB3A2D6CD344D6A",
+          "source_type": "simulated_device"
+        },
+        "resp_rate": {
+          "value": 18.7,
+          "unit": "breaths/min",
+          "observed_at": "2026-11-05T14:06:43.816175+00:00",
+          "received_at": "2026-11-05T14:06:43.818285+00:00",
+          "device_id": "SIM-7A6CFDF163DE4E77",
+          "source_type": "simulated_device"
+        },
+        "steps": {
+          "value": 3.0,
+          "unit": "steps",
+          "observed_at": "2026-11-05T14:06:44.825878+00:00",
+          "received_at": "2026-11-05T14:06:44.828285+00:00",
+          "device_id": "SIM-2FB3A2D6CD344D6A",
+          "source_type": "simulated_device"
+        },
+        "fev1": {
+          "value": 1.6,
+          "unit": "L",
+          "observed_at": "2026-11-05T14:06:45.835378+00:00",
+          "received_at": "2026-11-05T14:06:45.837719+00:00",
+          "device_id": "SIM-7DD6649A704644CA",
+          "source_type": "simulated_device"
+        },
+        "fvc": {
+          "value": 2.9,
+          "unit": "L",
+          "observed_at": "2026-11-05T14:06:45.835378+00:00",
+          "received_at": "2026-11-05T14:06:45.837719+00:00",
+          "device_id": "SIM-7DD6649A704644CA",
+          "source_type": "simulated_device"
+        }
+      },
+      "missing_fields": [],
+      "model_predictions": null,
+      "model_input_eligible": false,
+      "boundary": "Monitoring-only version. Frozen historical risk and features are unchanged."
+    }
+  },
+  "observations": [
+    {
+      "id": 7,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "created_at": "2026-11-05T14:06:39.086519+00:00",
+      "symptom_score": 8,
+      "adherence": 0.4,
+      "note": "Fictional monitoring example only.",
+      "source_type": "manual_demo"
+    }
+  ],
+  "reviews": [
+    {
+      "id": 8,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "kind": "clinical_review",
+      "note": "Reviewed fictional baseline. No clinical care was provided.",
+      "created_at": "2026-11-05T14:06:39.419170+00:00",
+      "state_version": 0
+    }
+  ],
+  "archived_reviews_and_alerts": [],
+  "notifications": [
+    {
+      "id": 66,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "category": "data_quality",
+      "title": "Simulated device stream stopped",
+      "reason": "The user explicitly stopped this synthetic stream. New readings are not being collected; no physical-device disconnection is implied.",
+      "source": "Device simulation control",
+      "source_type": "system_demo",
+      "created_at": "2026-11-05T14:06:46.051827+00:00",
+      "updated_at": "2026-11-05T14:06:46.051827+00:00",
+      "status": "active",
+      "read_at": null,
+      "dedupe_key": "device-stop:SIM-7DD6649A704644CA:3653cc65824e4b39baa1bee2b366cc22",
+      "legacy_alert_id": null,
+      "metadata": {
+        "device_id": "SIM-7DD6649A704644CA"
+      },
+      "unread": true
+    },
+    {
+      "id": 65,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "category": "data_quality",
+      "title": "Simulated device stream stopped",
+      "reason": "The user explicitly stopped this synthetic stream. New readings are not being collected; no physical-device disconnection is implied.",
+      "source": "Device simulation control",
+      "source_type": "system_demo",
+      "created_at": "2026-11-05T14:06:45.053420+00:00",
+      "updated_at": "2026-11-05T14:06:45.053420+00:00",
+      "status": "active",
+      "read_at": null,
+      "dedupe_key": "device-stop:SIM-2FB3A2D6CD344D6A:2dc2af6062dd4e268a1b1b249d3563c2",
+      "legacy_alert_id": null,
+      "metadata": {
+        "device_id": "SIM-2FB3A2D6CD344D6A"
+      },
+      "unread": true
+    },
+    {
+      "id": 64,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "category": "data_quality",
+      "title": "Simulated device stream stopped",
+      "reason": "The user explicitly stopped this synthetic stream. New readings are not being collected; no physical-device disconnection is implied.",
+      "source": "Device simulation control",
+      "source_type": "system_demo",
+      "created_at": "2026-11-05T14:06:44.032690+00:00",
+      "updated_at": "2026-11-05T14:06:44.032690+00:00",
+      "status": "active",
+      "read_at": null,
+      "dedupe_key": "device-stop:SIM-7A6CFDF163DE4E77:eb771c0dc18a42d9891320290f5ba1b9",
+      "legacy_alert_id": null,
+      "metadata": {
+        "device_id": "SIM-7A6CFDF163DE4E77"
+      },
+      "unread": true
+    },
+    {
+      "id": 63,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "category": "data_quality",
+      "title": "Simulated device stream stopped",
+      "reason": "The user explicitly stopped this synthetic stream. New readings are not being collected; no physical-device disconnection is implied.",
+      "source": "Device simulation control",
+      "source_type": "system_demo",
+      "created_at": "2026-11-05T14:06:43.006660+00:00",
+      "updated_at": "2026-11-05T14:06:43.006660+00:00",
+      "status": "active",
+      "read_at": null,
+      "dedupe_key": "device-stop:SIM-93AC87A3F643424F:387b0545ea9941f4914d33b1c24d8955",
+      "legacy_alert_id": null,
+      "metadata": {
+        "device_id": "SIM-93AC87A3F643424F"
+      },
+      "unread": true
+    },
+    {
+      "id": 62,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "category": "patient_monitoring",
+      "title": "Manual demo monitoring rule",
+      "reason": "Fictional symptom score\u22657 or adherence<50% matched an unvalidated demonstration rule. This is not a diagnosis, urgency assessment or model prediction.",
+      "source": "Manual fictional observation",
+      "source_type": "manual_demo",
+      "created_at": "2026-11-05T14:06:39.086965+00:00",
+      "updated_at": "2026-11-05T14:06:39.086965+00:00",
+      "status": "active",
+      "read_at": null,
+      "dedupe_key": "observation:7",
+      "legacy_alert_id": null,
+      "metadata": {
+        "observation_id": 7
+      },
+      "unread": true
+    },
+    {
+      "id": 61,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "category": "data_quality",
+      "title": "New fictional patient \u00b7 baseline incomplete",
+      "reason": "At least 72 real elapsed hours of suitable baseline observations are required. Manual reference values and frequent simulated samples do not create model eligibility.",
+      "source": "Fictional patient registration",
+      "source_type": "manual_demo",
+      "created_at": "2026-11-05T14:06:38.506580+00:00",
+      "updated_at": "2026-11-05T14:06:38.506580+00:00",
+      "status": "active",
+      "read_at": null,
+      "dedupe_key": "registration:PG-DEMO-24BE5BE35541",
+      "legacy_alert_id": null,
+      "metadata": {},
+      "unread": true
+    }
+  ],
+  "model_boundary": "Device/manual monitoring and current city environment are separate context. They do not mutate historical twin risks, TreeSHAP or frozen feature frames.",
+  "metrics": {
+    "spo2": {
+      "label": "SpO\u2082",
+      "unit": "%",
+      "minimum": 50,
+      "maximum": 100
+    },
+    "heart_rate": {
+      "label": "Heart rate",
+      "unit": "bpm",
+      "minimum": 25,
+      "maximum": 240
+    },
+    "resp_rate": {
+      "label": "Respiratory rate",
+      "unit": "breaths/min",
+      "minimum": 5,
+      "maximum": 60
+    },
+    "steps": {
+      "label": "Steps in sample interval",
+      "unit": "steps",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "fev1": {
+      "label": "FEV\u2081",
+      "unit": "L",
+      "minimum": 0.1,
+      "maximum": 8
+    },
+    "fvc": {
+      "label": "FVC",
+      "unit": "L",
+      "minimum": 0.1,
+      "maximum": 10
+    }
+  },
+  "environment": {
+    "city": "Pune",
+    "location": {
+      "latitude": 18.5204,
+      "longitude": 73.8567,
+      "state": "Maharashtra"
+    },
+    "components": {
+      "air": {
+        "values": {
+          "pm2_5": 34.9,
+          "pm10": 36.8,
+          "nitrogen_dioxide": 34.5,
+          "ozone": 63.0,
+          "us_aqi": 84
+        },
+        "units": {
+          "pm2_5": "\u03bcg/m\u00b3",
+          "pm10": "\u03bcg/m\u00b3",
+          "nitrogen_dioxide": "\u03bcg/m\u00b3",
+          "ozone": "\u03bcg/m\u00b3",
+          "us_aqi": "USAQI"
+        },
+        "valid_at": "2026-11-05T14:00:00+00:00",
+        "retrieved_at": "2026-11-05T14:03:56.073223+00:00",
+        "grid_latitude": 18.5,
+        "grid_longitude": 73.90001,
+        "source_url": "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=18.5204&longitude=73.8567&current=pm2_5%2Cpm10%2Cnitrogen_dioxide%2Cozone%2Cus_aqi&timezone=UTC&domains=cams_global",
+        "source": "Open-Meteo / CAMS global",
+        "source_type": "modelled_external",
+        "scope": "city_grid_not_personal",
+        "license": "CC BY 4.0",
+        "license_url": "https://creativecommons.org/licenses/by/4.0/",
+        "historical": false,
+        "city": "Pune",
+        "component": "air",
+        "status": "cached",
+        "freshness": "fresh",
+        "valid_age_seconds": 421,
+        "cache_age_seconds": 185,
+        "last_error": null,
+        "last_attempt_at": "2026-11-05T14:03:55.413421+00:00",
+        "context_only": true,
+        "used_by_frozen_model": false,
+        "metrics": [
+          {
+            "key": "pm2_5",
+            "label": "PM2.5",
+            "value": 34.9,
+            "unit": "\u03bcg/m\u00b3",
+            "missing": false,
+            "source": "Open-Meteo / CAMS global",
+            "source_type": "modelled_external",
+            "valid_at": "2026-11-05T14:00:00+00:00",
+            "retrieved_at": "2026-11-05T14:03:56.073223+00:00",
+            "freshness": "fresh",
+            "scope": "city_grid_not_personal",
+            "patient_id": null,
+            "context_only": true
+          },
+          {
+            "key": "pm10",
+            "label": "PM10",
+            "value": 36.8,
+            "unit": "\u03bcg/m\u00b3",
+            "missing": false,
+            "source": "Open-Meteo / CAMS global",
+            "source_type": "modelled_external",
+            "valid_at": "2026-11-05T14:00:00+00:00",
+            "retrieved_at": "2026-11-05T14:03:56.073223+00:00",
+            "freshness": "fresh",
+            "scope": "city_grid_not_personal",
+            "patient_id": null,
+            "context_only": true
+          },
+          {
+            "key": "nitrogen_dioxide",
+            "label": "NO\u2082",
+            "value": 34.5,
+            "unit": "\u03bcg/m\u00b3",
+            "missing": false,
+            "source": "Open-Meteo / CAMS global",
+            "source_type": "modelled_external",
+            "valid_at": "2026-11-05T14:00:00+00:00",
+            "retrieved_at": "2026-11-05T14:03:56.073223+00:00",
+            "freshness": "fresh",
+            "scope": "city_grid_not_personal",
+            "patient_id": null,
+            "context_only": true
+          },
+          {
+            "key": "ozone",
+            "label": "O\u2083",
+            "value": 63.0,
+            "unit": "\u03bcg/m\u00b3",
+            "missing": false,
+            "source": "Open-Meteo / CAMS global",
+            "source_type": "modelled_external",
+            "valid_at": "2026-11-05T14:00:00+00:00",
+            "retrieved_at": "2026-11-05T14:03:56.073223+00:00",
+            "freshness": "fresh",
+            "scope": "city_grid_not_personal",
+            "patient_id": null,
+            "context_only": true
+          },
+          {
+            "key": "us_aqi",
+            "label": "U.S. AQI",
+            "value": 84,
+            "unit": "USAQI",
+            "missing": false,
+            "source": "Open-Meteo / CAMS global",
+            "source_type": "modelled_external",
+            "valid_at": "2026-11-05T14:00:00+00:00",
+            "retrieved_at": "2026-11-05T14:03:56.073223+00:00",
+            "freshness": "fresh",
+            "scope": "city_grid_not_personal",
+            "patient_id": null,
+            "context_only": true
+          }
+        ],
+        "next_retry_at": "2026-11-05T14:08:55.413486+00:00",
+        "consecutive_failures": 0
+      },
+      "weather": {
+        "values": {
+          "temperature_2m": 27.1,
+          "relative_humidity_2m": 52,
+          "weather_code": 0,
+          "wind_speed_10m": 1.4,
+          "wind_direction_10m": 157
+        },
+        "units": {
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "weather_code": "wmo code",
+          "wind_speed_10m": "km/h",
+          "wind_direction_10m": "\u00b0"
+        },
+        "valid_at": "2026-11-05T14:00:00+00:00",
+        "retrieved_at": "2026-11-05T14:03:55.706909+00:00",
+        "grid_latitude": 18.523726,
+        "grid_longitude": 73.86876,
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=18.5204&longitude=73.8567&current=temperature_2m%2Crelative_humidity_2m%2Cweather_code%2Cwind_speed_10m%2Cwind_direction_10m&timezone=UTC&wind_speed_unit=kmh",
+        "source": "Open-Meteo weather models",
+        "source_type": "modelled_external",
+        "scope": "city_grid_not_personal",
+        "license": "CC BY 4.0",
+        "license_url": "https://creativecommons.org/licenses/by/4.0/",
+        "historical": false,
+        "city": "Pune",
+        "component": "weather",
+        "status": "cached",
+        "freshness": "fresh",
+        "valid_age_seconds": 421,
+        "cache_age_seconds": 185,
+        "last_error": null,
+        "last_attempt_at": "2026-11-05T14:03:55.422347+00:00",
+        "context_only": true,
+        "used_by_frozen_model": false,
+        "metrics": [
+          {
+            "key": "temperature_2m",
+            "label": "Temperature",
+            "value": 27.1,
+            "unit": "\u00b0C",
+            "missing": false,
+            "source": "Open-Meteo weather models",
+            "source_type": "modelled_external",
+            "valid_at": "2026-11-05T14:00:00+00:00",
+            "retrieved_at": "2026-11-05T14:03:55.706909+00:00",
+            "freshness": "fresh",
+            "scope": "city_grid_not_personal",
+            "patient_id": null,
+            "context_only": true
+          },
+          {
+            "key": "relative_humidity_2m",
+            "label": "Relative humidity",
+            "value": 52,
+            "unit": "%",
+            "missing": false,
+            "source": "Open-Meteo weather models",
+            "source_type": "modelled_external",
+            "valid_at": "2026-11-05T14:00:00+00:00",
+            "retrieved_at": "2026-11-05T14:03:55.706909+00:00",
+            "freshness": "fresh",
+            "scope": "city_grid_not_personal",
+            "patient_id": null,
+            "context_only": true
+          },
+          {
+            "key": "weather_code",
+            "label": "Weather code",
+            "value": 0,
+            "unit": "wmo code",
+            "missing": false,
+            "source": "Open-Meteo weather models",
+            "source_type": "modelled_external",
+            "valid_at": "2026-11-05T14:00:00+00:00",
+            "retrieved_at": "2026-11-05T14:03:55.706909+00:00",
+            "freshness": "fresh",
+            "scope": "city_grid_not_personal",
+            "patient_id": null,
+            "context_only": true
+          },
+          {
+            "key": "wind_speed_10m",
+            "label": "Wind speed",
+            "value": 1.4,
+            "unit": "km/h",
+            "missing": false,
+            "source": "Open-Meteo weather models",
+            "source_type": "modelled_external",
+            "valid_at": "2026-11-05T14:00:00+00:00",
+            "retrieved_at": "2026-11-05T14:03:55.706909+00:00",
+            "freshness": "fresh",
+            "scope": "city_grid_not_personal",
+            "patient_id": null,
+            "context_only": true
+          },
+          {
+            "key": "wind_direction_10m",
+            "label": "Wind direction",
+            "value": 157,
+            "unit": "\u00b0",
+            "missing": false,
+            "source": "Open-Meteo weather models",
+            "source_type": "modelled_external",
+            "valid_at": "2026-11-05T14:00:00+00:00",
+            "retrieved_at": "2026-11-05T14:03:55.706909+00:00",
+            "freshness": "fresh",
+            "scope": "city_grid_not_personal",
+            "patient_id": null,
+            "context_only": true
+          }
+        ],
+        "weather_summary": "Clear sky",
+        "next_retry_at": "2026-11-05T14:08:55.422412+00:00",
+        "consecutive_failures": 0
+      }
+    },
+    "metrics": [
+      {
+        "key": "pm2_5",
+        "label": "PM2.5",
+        "value": 34.9,
+        "unit": "\u03bcg/m\u00b3",
+        "missing": false,
+        "source": "Open-Meteo / CAMS global",
+        "source_type": "modelled_external",
+        "valid_at": "2026-11-05T14:00:00+00:00",
+        "retrieved_at": "2026-11-05T14:03:56.073223+00:00",
+        "freshness": "fresh",
+        "scope": "city_grid_not_personal",
+        "patient_id": null,
+        "context_only": true
+      },
+      {
+        "key": "pm10",
+        "label": "PM10",
+        "value": 36.8,
+        "unit": "\u03bcg/m\u00b3",
+        "missing": false,
+        "source": "Open-Meteo / CAMS global",
+        "source_type": "modelled_external",
+        "valid_at": "2026-11-05T14:00:00+00:00",
+        "retrieved_at": "2026-11-05T14:03:56.073223+00:00",
+        "freshness": "fresh",
+        "scope": "city_grid_not_personal",
+        "patient_id": null,
+        "context_only": true
+      },
+      {
+        "key": "nitrogen_dioxide",
+        "label": "NO\u2082",
+        "value": 34.5,
+        "unit": "\u03bcg/m\u00b3",
+        "missing": false,
+        "source": "Open-Meteo / CAMS global",
+        "source_type": "modelled_external",
+        "valid_at": "2026-11-05T14:00:00+00:00",
+        "retrieved_at": "2026-11-05T14:03:56.073223+00:00",
+        "freshness": "fresh",
+        "scope": "city_grid_not_personal",
+        "patient_id": null,
+        "context_only": true
+      },
+      {
+        "key": "ozone",
+        "label": "O\u2083",
+        "value": 63.0,
+        "unit": "\u03bcg/m\u00b3",
+        "missing": false,
+        "source": "Open-Meteo / CAMS global",
+        "source_type": "modelled_external",
+        "valid_at": "2026-11-05T14:00:00+00:00",
+        "retrieved_at": "2026-11-05T14:03:56.073223+00:00",
+        "freshness": "fresh",
+        "scope": "city_grid_not_personal",
+        "patient_id": null,
+        "context_only": true
+      },
+      {
+        "key": "us_aqi",
+        "label": "U.S. AQI",
+        "value": 84,
+        "unit": "USAQI",
+        "missing": false,
+        "source": "Open-Meteo / CAMS global",
+        "source_type": "modelled_external",
+        "valid_at": "2026-11-05T14:00:00+00:00",
+        "retrieved_at": "2026-11-05T14:03:56.073223+00:00",
+        "freshness": "fresh",
+        "scope": "city_grid_not_personal",
+        "patient_id": null,
+        "context_only": true
+      },
+      {
+        "key": "temperature_2m",
+        "label": "Temperature",
+        "value": 27.1,
+        "unit": "\u00b0C",
+        "missing": false,
+        "source": "Open-Meteo weather models",
+        "source_type": "modelled_external",
+        "valid_at": "2026-11-05T14:00:00+00:00",
+        "retrieved_at": "2026-11-05T14:03:55.706909+00:00",
+        "freshness": "fresh",
+        "scope": "city_grid_not_personal",
+        "patient_id": null,
+        "context_only": true
+      },
+      {
+        "key": "relative_humidity_2m",
+        "label": "Relative humidity",
+        "value": 52,
+        "unit": "%",
+        "missing": false,
+        "source": "Open-Meteo weather models",
+        "source_type": "modelled_external",
+        "valid_at": "2026-11-05T14:00:00+00:00",
+        "retrieved_at": "2026-11-05T14:03:55.706909+00:00",
+        "freshness": "fresh",
+        "scope": "city_grid_not_personal",
+        "patient_id": null,
+        "context_only": true
+      },
+      {
+        "key": "weather_code",
+        "label": "Weather code",
+        "value": 0,
+        "unit": "wmo code",
+        "missing": false,
+        "source": "Open-Meteo weather models",
+        "source_type": "modelled_external",
+        "valid_at": "2026-11-05T14:00:00+00:00",
+        "retrieved_at": "2026-11-05T14:03:55.706909+00:00",
+        "freshness": "fresh",
+        "scope": "city_grid_not_personal",
+        "patient_id": null,
+        "context_only": true
+      },
+      {
+        "key": "wind_speed_10m",
+        "label": "Wind speed",
+        "value": 1.4,
+        "unit": "km/h",
+        "missing": false,
+        "source": "Open-Meteo weather models",
+        "source_type": "modelled_external",
+        "valid_at": "2026-11-05T14:00:00+00:00",
+        "retrieved_at": "2026-11-05T14:03:55.706909+00:00",
+        "freshness": "fresh",
+        "scope": "city_grid_not_personal",
+        "patient_id": null,
+        "context_only": true
+      },
+      {
+        "key": "wind_direction_10m",
+        "label": "Wind direction",
+        "value": 157,
+        "unit": "\u00b0",
+        "missing": false,
+        "source": "Open-Meteo weather models",
+        "source_type": "modelled_external",
+        "valid_at": "2026-11-05T14:00:00+00:00",
+        "retrieved_at": "2026-11-05T14:03:55.706909+00:00",
+        "freshness": "fresh",
+        "scope": "city_grid_not_personal",
+        "patient_id": null,
+        "context_only": true
+      }
+    ],
+    "live_requests_enabled": true,
+    "attribution": "Open-Meteo; Copernicus Atmosphere Monitoring Service (CAMS) and weather model providers. Data: CC BY 4.0.",
+    "attribution_url": "https://open-meteo.com/",
+    "aqi_scale": "U.S. AQI, NOT Indian CPCB NAQI",
+    "scope": "City-centre gridded model context, not station observation or personal exposure.",
+    "model_boundary": "Context only. Never enters frozen ML features or changes historical predictions.",
+    "retrieval_policy": {
+      "cache_ttl_seconds": 900,
+      "minimum_retry_seconds": 300
+    },
+    "not_integrated": [
+      "CPCB/Data.gov.in station observations: access/terms not fully verified",
+      "IMD weather: API key required; not configured or integrated"
+    ]
+  }
+}
