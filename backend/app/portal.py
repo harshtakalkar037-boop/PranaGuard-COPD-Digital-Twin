@@ -51,10 +51,8 @@ def current(request: Request, authorization: str | None = Header(default=None)):
     request.state.portal_patient_id=user['linked_patient_id']
     return {key:user[key] for key in ('id','username','role','must_change_password')}
 
-def begin_authorized_write(c,request,user):
-    # Linearize session, account and subsequent record authorization with the
-    # protected write. SQLite serializes other database writers until commit.
-    c.execute('BEGIN IMMEDIATE')
+def validate_session(c,request,user):
+    # Caller establishes a read snapshot or write transaction before this check.
     row=c.execute('SELECT u.id,u.role,u.must_change_password FROM portal_sessions s JOIN portal_users u ON u.id=s.user_id WHERE s.token_hash=? AND s.user_id=? AND s.expires_at>?',
                   (getattr(request.state,'portal_session_hash',None),user['id'],timestamp())).fetchone()
     if not row or row['role']!=user['role']: raise HTTPException(401,'Session expired or invalid')
@@ -62,6 +60,11 @@ def begin_authorized_write(c,request,user):
     if user['role']=='patient':
         link=c.execute('SELECT patient_id FROM patient_user_links WHERE user_id=?',(user['id'],)).fetchone()
         if (link['patient_id'] if link else None)!=request.state.portal_patient_id: raise HTTPException(409,'Patient link changed during request')
+
+def begin_authorized_write(c,request,user):
+    # SQLite serializes other database writers until this transaction commits.
+    c.execute('BEGIN IMMEDIATE')
+    validate_session(c,request,user)
 
 def role(user, expected):
     if user['role'] != expected: raise HTTPException(403, 'Not permitted')
@@ -429,15 +432,20 @@ def validation(request:Request,user=Depends(current)):
 @router.get('/patients/{pid}/explanation')
 def explanation(pid:str,request:Request,horizon:int=72,user=Depends(current)):
     role(user,'doctor')
-    with store(request).connect() as c: access(c,user,pid)
     if horizon not in (24,48,72): raise HTTPException(422,'Horizon must be 24, 48 or 72 hours')
-    return request.app.state.engine.explain(pid,horizon)
+    with store(request).connect() as c:
+        c.execute('BEGIN')
+        authorize_patient(c,request,user,pid)
+        return request.app.state.engine.explain(pid,horizon,conn=c)
+
+def authorize_patient(c,request,user,pid):
+    validate_session(c,request,user)
+    access(c,user,pid)
 
 @router.post('/patients/{pid}/scenarios')
 def scenario(pid:str,body:ScenarioInput,request:Request,user=Depends(current)):
     role(user,'doctor')
-    with store(request).connect() as c: access(c,user,pid)
-    return request.app.state.engine.scenario(pid,body.model_dump())
+    return request.app.state.engine.scenario(pid,body.model_dump(),authorize=lambda c:authorize_patient(c,request,user,pid))
 
 # Daily-care records are patient reported; no clinical rules are inferred from them.
 class SputumInput(Strict):

@@ -1,7 +1,7 @@
 """SQLite persistence, atomic replay transactions and immutable twin-state versions."""
 import hashlib, json, sqlite3
 from datetime import datetime, timezone
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from pathlib import Path
 
 class Store:
@@ -54,18 +54,18 @@ class Store:
     def set_meta(self,key,value):
         with self.connect() as c:c.execute('INSERT OR REPLACE INTO meta VALUES (?,?)',(key,json.dumps(value)))
 
-    def latest(self,pid,version=None):
-        with self.connect() as c:
+    def latest(self,pid,version=None,conn=None):
+        with (nullcontext(conn) if conn is not None else self.connect()) as c:
             row=c.execute('SELECT state FROM states WHERE patient_id=? '+('ORDER BY version DESC LIMIT 1' if version is None else 'AND version=?'),(pid,) if version is None else (pid,version)).fetchone()
             if not row:raise KeyError('Patient or version not found')
             return json.loads(row['state'])
 
-    def versions(self,pid,limit=72):
-        with self.connect() as c:
+    def versions(self,pid,limit=72,conn=None):
+        with (nullcontext(conn) if conn is not None else self.connect()) as c:
             return [dict(r) for r in c.execute('SELECT version,hour,timestamp FROM states WHERE patient_id=? ORDER BY version DESC LIMIT ?',(pid,limit))]
 
-    def history(self,pid,limit=72):
-        with self.connect() as c:
+    def history(self,pid,limit=72,conn=None):
+        with (nullcontext(conn) if conn is not None else self.connect()) as c:
             rows=c.execute('SELECT state FROM states WHERE patient_id=? ORDER BY version DESC LIMIT ?',(pid,limit)).fetchall()
             return [json.loads(r['state']) for r in rows][::-1]
 
@@ -92,6 +92,6 @@ class Store:
                 d=dict(row);d['display_name']=json.loads(d.pop('profile'))['display_name'];d['synthetic']=True;result.append(d)
             return result
 
-    def interventions(self,pid=None):
-        with self.connect() as c:
+    def interventions(self,pid=None,conn=None):
+        with (nullcontext(conn) if conn is not None else self.connect()) as c:
             return [dict(r) for r in c.execute('SELECT * FROM interventions'+(' WHERE patient_id=?' if pid else '')+' ORDER BY id DESC LIMIT 300',(pid,) if pid else ())]

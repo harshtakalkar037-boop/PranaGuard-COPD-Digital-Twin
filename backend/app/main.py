@@ -1,6 +1,6 @@
 """FastAPI application. Offline by default; all patients synthetic."""
 import asyncio, json, os, re
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, contextmanager
 from typing import Literal
 from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect, Depends, Header, Query
 from fastapi.responses import JSONResponse
@@ -10,7 +10,7 @@ from backend.app.config import DB_PATH
 from backend.app.engine import TwinEngine, now
 from backend.app.enhanced.services import Services
 from backend.app.enhanced.routes import make_router
-from backend.app.portal import router as portal_router, current, require_full_historical_assignment
+from backend.app.portal import router as portal_router, current, require_full_historical_assignment, authorize_patient
 
 class StrictModel(BaseModel):model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
 class Step(StrictModel):hours:int=Field(default=1,ge=1,le=72)
@@ -150,6 +150,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
                 if user['role'] != 'doctor':
                     raise HTTPException(403, 'Doctor access required')
                 request.state.research_doctor_id = user['id']
+                request.state.research_user = user
                 # These original twin endpoints operate on one explicit ID only.
                 # Explicit registry, historical and city exceptions follow;
                 # all other original/enhanced routes remain whole-workspace gated.
@@ -243,23 +244,42 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
     def patients(request:Request,q:str='',risk:Literal['all','low','elevated','high']='all',e:TwinEngine=Depends(engine)):
         cohort=doctor_cohort(request,e)['patients']
         return {'patients':[p for p in cohort if (q.lower() in (p['display_name']+p['patient_id']+p['city']).lower()) and (risk=='all' or p['risk_category']==risk)]}
-    @app.get('/api/patients/{pid}')
-    def patient(pid:str,version:int|None=Query(default=None,ge=1),e:TwinEngine=Depends(engine)):return e.patient(pid,version)
-    @app.get('/api/patients/{pid}/history')
-    def history(pid:str,limit:int=Query(default=48,ge=2,le=168),e:TwinEngine=Depends(engine)):return e.history(pid,limit)
-    @app.get('/api/patients/{pid}/versions')
-    def versions(pid:str,e:TwinEngine=Depends(engine)):
-        e.patient(pid);return {'versions':e.store.versions(pid)}
-    @app.get('/api/patients/{pid}/explanation')
-    def explanation(pid:str,horizon:int=Query(default=72),version:int|None=None,e:TwinEngine=Depends(engine)):
-        if horizon not in (24,48,72):raise HTTPException(422,'Horizon must be 24, 48 or 72 hours.')
-        return e.explain(pid,horizon,version)
-    @app.post('/api/patients/{pid}/scenarios',dependencies=[Depends(authorize)])
-    def scenario(pid:str,body:Scenario,e:TwinEngine=Depends(engine)):return e.scenario(pid,body.model_dump())
-    @app.get('/api/patients/{pid}/scenarios')
-    def scenarios(pid:str,e:TwinEngine=Depends(engine)):
-        e.patient(pid)
+    def authorize_historical(c,request,e,pid):
+        user=getattr(request.state,'research_user',None)
+        if user is not None:  # isolated legacy demo deliberately has no portal identity
+            authorize_patient(c,request,user,pid)
+            if e.profiles.get(pid,{}).get('synthetic') is not True:
+                raise HTTPException(404,'Record not found')
+
+    @contextmanager
+    def twin_snapshot(request,e,pid,write=False):
         with e.store.connect() as c:
+            c.execute('BEGIN IMMEDIATE' if write else 'BEGIN')
+            authorize_historical(c,request,e,pid)
+            yield c
+
+    @app.get('/api/patients/{pid}')
+    def patient(pid:str,request:Request,version:int|None=Query(default=None,ge=1),e:TwinEngine=Depends(engine)):
+        with twin_snapshot(request,e,pid) as c:return e.patient(pid,version,conn=c)
+    @app.get('/api/patients/{pid}/history')
+    def history(pid:str,request:Request,limit:int=Query(default=48,ge=2,le=168),e:TwinEngine=Depends(engine)):
+        with twin_snapshot(request,e,pid) as c:return e.history(pid,limit,conn=c)
+    @app.get('/api/patients/{pid}/versions')
+    def versions(pid:str,request:Request,e:TwinEngine=Depends(engine)):
+        with twin_snapshot(request,e,pid) as c:
+            e.patient(pid,conn=c);return {'versions':e.store.versions(pid,conn=c)}
+    @app.get('/api/patients/{pid}/explanation')
+    def explanation(pid:str,request:Request,horizon:int=Query(default=72),version:int|None=None,e:TwinEngine=Depends(engine)):
+        if horizon not in (24,48,72):raise HTTPException(422,'Horizon must be 24, 48 or 72 hours.')
+        with twin_snapshot(request,e,pid) as c:return e.explain(pid,horizon,version,conn=c)
+    @app.post('/api/patients/{pid}/scenarios',dependencies=[Depends(authorize)])
+    def scenario(pid:str,body:Scenario,request:Request,e:TwinEngine=Depends(engine)):
+        check=(lambda c:authorize_historical(c,request,e,pid)) if getattr(request.state,'research_user',None) is not None else None
+        return e.scenario(pid,body.model_dump(),authorize=check)
+    @app.get('/api/patients/{pid}/scenarios')
+    def scenarios(pid:str,request:Request,e:TwinEngine=Depends(engine)):
+        with twin_snapshot(request,e,pid) as c:
+            e.patient(pid,conn=c)
             return {'scenarios':[{'id':r['id'],'state_version':r['state_version'],'created_at':r['created_at'],'assumptions':json.loads(r['assumptions']),'result':json.loads(r['result'])} for r in c.execute('SELECT * FROM scenarios WHERE patient_id=? ORDER BY id DESC LIMIT 20',(pid,))]}
     @app.get('/api/alerts')
     def alerts(request:Request,patient_id:str|None=None,e:TwinEngine=Depends(engine)):
@@ -286,16 +306,17 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True, legacy
         await hub.broadcast({'type':'alert_updated','alert_id':alert_id})
         return {'alert':result}
     @app.get('/api/patients/{pid}/interventions')
-    def interventions(pid:str,e:TwinEngine=Depends(engine)):
-        e.patient(pid);return {'interventions':e.store.interventions(pid)}
+    def interventions(pid:str,request:Request,e:TwinEngine=Depends(engine)):
+        with twin_snapshot(request,e,pid) as c:
+            e.patient(pid,conn=c);return {'interventions':e.store.interventions(pid,conn=c)}
     @app.post('/api/patients/{pid}/interventions',dependencies=[Depends(authorize)])
-    def add_intervention(pid:str,body:Intervention,e:TwinEngine=Depends(engine)):
+    def add_intervention(pid:str,body:Intervention,request:Request,e:TwinEngine=Depends(engine)):
         with e.lock:
-            state=e.patient(pid)
-            with e.store.connect() as c:
+            with twin_snapshot(request,e,pid,write=True) as c:
+                state=e.patient(pid,conn=c)
                 cur=c.execute('INSERT INTO interventions(patient_id,kind,note,created_at,state_version) VALUES (?,?,?,?,?)',(pid,body.kind,body.note,now(),state['version']))
-                iid=cur.lastrowid
-        return {'intervention':next(i for i in e.store.interventions(pid) if i['id']==iid),'notice':'Logged only. This does not change the patient state or imply a treatment effect.'}
+                intervention=dict(c.execute('SELECT * FROM interventions WHERE id=?',(cur.lastrowid,)).fetchone())
+        return {'intervention':intervention,'notice':'Logged only. This does not change the patient state or imply a treatment effect.'}
     @app.get('/api/validation')
     def validation(e:TwinEngine=Depends(engine)):return e.evaluation
     @app.get('/api/status')

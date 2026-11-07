@@ -136,10 +136,10 @@ class TwinEngine:
                 'open_alerts':sum(open_counts.values()),'missing_measurements':sum(len(s['missing_fields']) for s in states)},
                 'replay':self.replay_status(),'model_version':self.bundle['version'],'synthetic':True,'trend':trend}
 
-    def patient(self,pid,version=None):return self.store.latest(pid,version)
+    def patient(self,pid,version=None,conn=None):return self.store.latest(pid,version,conn=conn)
 
-    def history(self,pid,limit=48):
-        s=self.patient(pid); history=self.store.history(pid,limit)
+    def history(self,pid,limit=48,conn=None):
+        s=self.patient(pid,conn=conn); history=self.store.history(pid,limit,conn=conn)
         # Earlier physiology remains available from the observed data; model history only exists for persisted versions.
         rows=self.frame.loc[pid];raw=rows[(rows.hour<=s['hour'])&(rows.hour>s['hour']-limit)]
         risk_by_hour={r['hour']:r for r in history}
@@ -148,11 +148,11 @@ class TwinEngine:
             snap=risk_by_hour.get(int(r.hour))
             obs.append(clean({'hour':int(r.hour),'timestamp':r.timestamp,'spo2':r.spo2,'heart_rate':r.heart_rate,'resp_rate':r.resp_rate,'pm25':r.pm25,'symptom_score':r.symptom_score,
                               'risk_24':snap['risks']['24'] if snap else None,'risk_48':snap['risks']['48'] if snap else None,'risk_72':snap['risks']['72'] if snap else None,'version':snap['version'] if snap else None}))
-        return {'patient_id':pid,'observations':obs,'versions':self.store.versions(pid,limit),'risk_history_note':'Null risk values were not persisted/predicted during replay; no fabricated historical predictions.'}
+        return {'patient_id':pid,'observations':obs,'versions':self.store.versions(pid,limit,conn=conn),'risk_history_note':'Null risk values were not persisted/predicted during replay; no fabricated historical predictions.'}
 
-    def explain(self,pid,horizon=72,version=None):
-        s=self.patient(pid,version);row=pd.DataFrame([s['features']]);e=self.models[horizon].explain(row)
-        previous=self.store.history(pid,2)
+    def explain(self,pid,horizon=72,version=None,conn=None):
+        s=self.patient(pid,version,conn=conn);row=pd.DataFrame([s['features']]);e=self.models[horizon].explain(row)
+        previous=self.store.history(pid,2,conn=conn)
         prev=next((x for x in previous if x['version']<s['version']),None) if version is None else None
         previous_e=self.models[horizon].explain(pd.DataFrame([prev['features']])) if prev else None
         prevcon={d['feature']:d['contribution'] for d in previous_e['drivers']} if previous_e else {}
@@ -167,13 +167,21 @@ class TwinEngine:
                   'missing_fields':s['missing_fields']})
         return clean(e)
 
-    def scenario(self,pid,assumptions):
+    def scenario(self,pid,assumptions,authorize=None):
         """Conditional feature-path sensitivity, not a causal intervention or treatment model.
         Body measurements persist at last observation; environmental/adherence/activity paths
         transition exponentially toward requested assumptions. Past observations never change.
         """
         with self.lock:
-            original=self.patient(pid);before=json.dumps(original,sort_keys=True)
+            if authorize is None:
+                original=self.patient(pid)
+            else:
+                # Keep initial access and the original state in one read snapshot.
+                with self.store.connect() as c:
+                    c.execute('BEGIN')
+                    authorize(c)
+                    original=self.patient(pid,conn=c)
+            before=json.dumps(original,sort_keys=True)
             hour=original['hour']; past=self.raw[(self.raw.patient_id==pid)&(self.raw.hour<=hour)].copy()
             last=past.iloc[-1].copy(); records=[];lastvals=original['current']
             for step in range(1,73):
@@ -210,6 +218,11 @@ class TwinEngine:
                           'warning':'NOT causal, NOT a treatment recommendation. No proven effect of adherence, exposure reduction or activity. Forecasts at projected times extend beyond the original horizon. No future observed records used.',
                           'original_state_preserved':before==json.dumps(self.patient(pid),sort_keys=True)})
             with self.store.connect() as c:
+                if authorize is not None:
+                    # Model calculation is outside the write lock. Revocation or
+                    # unassignment during calculation must prevent persistence.
+                    c.execute('BEGIN IMMEDIATE')
+                    authorize(c)
                 cur=c.execute('INSERT INTO scenarios(patient_id,state_version,created_at,assumptions,result) VALUES (?,?,?,?,?)',(pid,original['version'],now(),json.dumps(assumptions),json.dumps(result)))
                 result['scenario_id']=cur.lastrowid
             return result
