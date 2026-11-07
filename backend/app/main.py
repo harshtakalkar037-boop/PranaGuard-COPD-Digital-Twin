@@ -132,7 +132,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         with e.store.connect() as c:
             return {'scenarios':[{'id':r['id'],'state_version':r['state_version'],'created_at':r['created_at'],'assumptions':json.loads(r['assumptions']),'result':json.loads(r['result'])} for r in c.execute('SELECT * FROM scenarios WHERE patient_id=? ORDER BY id DESC LIMIT 20',(pid,))]}
     @app.get('/api/alerts')
-    def alerts(request:Request,patient_id:str|None=None,e:TwinEngine=Depends(engine)):\n        allowed=request.state.workspace_patient_ids\n        if patient_id is not None and patient_id not in allowed:return {'alerts':[]}\n        return {'alerts':[a for a in e.store.alerts(patient_id) if a['patient_id'] in allowed]}
+    def alerts(request:Request,patient_id:str|None=None,e:TwinEngine=Depends(engine)):\n        allowed=getattr(request.state,'workspace_patient_ids',None)\n        if allowed is None:return {'alerts':e.store.alerts(patient_id)}\n        if patient_id is not None and patient_id not in allowed:return {'alerts':[]}\n        return {'alerts':[a for a in e.store.alerts(patient_id) if a['patient_id'] in allowed]}
     @app.patch('/api/alerts/{alert_id}',dependencies=[Depends(authorize)])
     async def update_alert(alert_id:int,body:AlertUpdate,e:TwinEngine=Depends(engine)):
         with e.store.connect() as c:
