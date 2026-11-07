@@ -197,15 +197,19 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         result=await asyncio.to_thread(perform);await hub.broadcast({'type':'twin_updated','replay':result});return result
     @app.websocket('/api/ws')
     async def websocket(socket:WebSocket):
+        await socket.accept()
         if os.getenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH','0')=='1':
             try:
-                user=socket.app.state.workspace.principal(socket.query_params.get('token'))
+                message=await asyncio.wait_for(socket.receive_text(),timeout=10)
+                if not message.startswith('auth:'):
+                    await socket.close(code=4401);return
+                user=socket.app.state.workspace.principal(message[5:])
                 assigned=socket.app.state.workspace.assigned_ids(user)
                 if user.get('role')!='doctor' or len(assigned)!=len(socket.app.state.engine.profiles):
                     await socket.close(code=4403);return
-            except HTTPException:
+            except (HTTPException,asyncio.TimeoutError,WebSocketDisconnect):
                 await socket.close(code=4401);return
-        await socket.accept();hub.clients.add(socket)
+        hub.clients.add(socket)
         try:
             await socket.send_json({'type':'connected','synthetic':True})
             while True:
