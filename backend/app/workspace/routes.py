@@ -63,6 +63,7 @@ class SputumIn(Strict):
         if t>datetime.now(timezone.utc):raise ValueError('Entry time cannot be in the future.')
         return t.isoformat()
 class SputumReview(Strict):note:str=Field(min_length=3,max_length=1000)
+class FollowupComplete(Strict):note:str=Field(default='',max_length=1000)
 
 def make_workspace_router():
     r=APIRouter(prefix='/api/workspace',tags=['Care workspace (demo auth)'])
@@ -112,6 +113,12 @@ def make_workspace_router():
         return w.list_reviews(u,status,patient_id,page,page_size)
     @r.post('/care/reviews')
     def create_review(body:ReviewCreate,u=Depends(principal),w=Depends(workspace)):return w.create_review(u,body.patient_id,body.note,body.follow_up_at)
+    @r.post('/care/reviews/{rid}/complete-follow-up')
+    def complete_follow_up(rid:int,body:FollowupComplete,u=Depends(principal),w=Depends(workspace)):
+        return w.complete_follow_up(u,rid,body.note)
+    @r.get('/patients/{pid}/follow-up-ledger')
+    def followup_ledger(pid:str,page:int=Query(default=1,ge=1),page_size:int=Query(default=20,ge=1,le=100),u=Depends(principal),w=Depends(workspace)):
+        return w.followup_ledger(u,pid,page,page_size)
     @r.get('/care/reviews/{rid}')
     def review(rid:int,u=Depends(principal),w=Depends(workspace)):return w.review_detail(u,rid)
     @r.patch('/care/reviews/{rid}')
