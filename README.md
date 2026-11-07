@@ -628,8 +628,8 @@ Before any real-world study, the project would require ethics review, informed c
 
 ### Prerequisites
 
-- Python 3.11 or newer (v6 verification used Python 3.13).
-- Node.js 20 or newer and npm.
+- Python 3.13 or newer (matches the repository's `pyproject.toml` requirement).
+- Node.js compatible with Vite 7 (Node 20.19+ or 22.12+) and npm.
 - Git.
 
 ### Install
