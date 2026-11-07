@@ -9,3 +9,5 @@ Phase 1 local results on 2026-11-06: Python 3.13 pinned backend 122 passed; Node
 Phase 2: `npm run test:e2e:patient-management` exercises only an explicitly configured disposable synthetic database, creates a fictional profile, provisions one disposable account and records a follow-up completion. Never run it against production or valuable data. `npm run test:e2e:partial` covers partial/empty doctors. See the application audit for current results, prior failures and remaining verification.
 
 Phase 3: `npm run test:e2e:login-throttle` intentionally locks the explicitly configured disposable synthetic account for the login window; never run against production or valuable accounts. Local backend 130 passed; frontend 71 passed and build/audit passed.
+
+Phase 4: `npm run test:e2e:care-queue` requires an explicitly configured, pre-populated disposable synthetic queue of at least 51 items. It checks pagination, open states, filtering, selection and three automated axe/overflow scans; see the audit for execution results and limitations.
