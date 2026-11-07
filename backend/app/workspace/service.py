@@ -97,7 +97,7 @@ class Workspace:
         if not user or user['username']!=expected_username or user['role']!='doctor':
             raise HTTPException(403,'A current assigned doctor session is required.')
         assigned={r['patient_id'] for r in conn.execute('SELECT patient_id FROM patient_assignments WHERE doctor=?',(user['username'],))}
-        if full_cohort and len(assigned)!=len(self.engine.profiles):
+        if full_cohort and not set(self.engine.profiles).issubset(assigned):
             raise HTTPException(403,'This operation requires assignment to the complete synthetic cohort.')
         if patient_id is not None and patient_id not in assigned:
             raise HTTPException(404,'Synthetic patient not found in this account scope.')
