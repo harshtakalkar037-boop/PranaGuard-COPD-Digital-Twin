@@ -78,7 +78,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     @app.middleware('http')
     async def enforce_workspace_scope(request, call_next):
         path=request.url.path
-        if request.method=='OPTIONS' or not path.startswith('/api/') or path in ('/api/health','/api/workspace/login') or path.startswith('/api/workspace/'):
+        if os.getenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH','0')!='1' or request.method=='OPTIONS' or not path.startswith('/api/') or path in ('/api/health','/api/workspace/login') or path.startswith('/api/workspace/'):
             return await call_next(request)
         authorization=request.headers.get('authorization','')
         token=authorization[7:] if authorization.startswith('Bearer ') else None
