@@ -1,0 +1,89 @@
+{
+  "status": "PASS",
+  "created_at": "2026-11-05T15:48:19.525727+00:00",
+  "passed": 19,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "Original120-patient overview intact",
+      "status": "PASS"
+    },
+    {
+      "name": "Patient48h card matches actual frozen v3 inference",
+      "status": "PASS"
+    },
+    {
+      "name": "Legacy horizons/stored48h/history clearly distinguished",
+      "status": "PASS"
+    },
+    {
+      "name": "Saved-state selection requests the matching v3 version",
+      "status": "PASS"
+    },
+    {
+      "name": "48h explanation uses v3, not old TreeSHAP",
+      "status": "PASS"
+    },
+    {
+      "name": "All feature provenance/imputation and exact calibrated log-odds audit inspectable",
+      "status": "PASS"
+    },
+    {
+      "name": "24h/72h original explanations preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "Scenario model-version boundary explicit",
+      "status": "PASS"
+    },
+    {
+      "name": "Original negative72h evidence retained",
+      "status": "PASS"
+    },
+    {
+      "name": "Fresh audit metrics and all five unchanged gates rendered",
+      "status": "PASS"
+    },
+    {
+      "name": "All six candidates, uncertainty and known-test limitation inspectable",
+      "status": "PASS"
+    },
+    {
+      "name": "Earlier v2 failure stays visible and rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Existing theme/font/layout preserved without desktop overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Registry and simulated-device sections remain reachable",
+      "status": "PASS"
+    },
+    {
+      "name": "Four-city offline fallback remains separate from model inputs",
+      "status": "PASS"
+    },
+    {
+      "name": "390px patient cards/version labels have no viewport overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "390px study tables scroll within the original layout",
+      "status": "PASS"
+    },
+    {
+      "name": "Viewing v3 never mutates persisted v1 predictions/history",
+      "status": "PASS"
+    },
+    {
+      "name": "No JS/console/API failures or external browser assets",
+      "status": "PASS"
+    }
+  ],
+  "browser_errors": [],
+  "failed_requests": [],
+  "external_browser_requests": [],
+  "legacy_probabilities_and_history_unchanged": true,
+  "clinical_validation": false
+}

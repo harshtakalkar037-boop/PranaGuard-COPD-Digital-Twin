@@ -1,0 +1,289 @@
+{
+  "executed_at": "2026-11-05T14:11:19.251896+00:00",
+  "status": "PASS",
+  "protected_files": {
+    "frontend/src/styles.css": {
+      "expected": "bb0c274cfa0aa9dc01dea89dc191b2008bf0cade1c4b1cd4c3e99bc4759d08de",
+      "actual": "bb0c274cfa0aa9dc01dea89dc191b2008bf0cade1c4b1cd4c3e99bc4759d08de"
+    },
+    "frontend/src/components.tsx": {
+      "expected": "d650034a0ee4cccd8bf1b11e699f51b8d80814fe0ce458f735b78000dc7a4180",
+      "actual": "d650034a0ee4cccd8bf1b11e699f51b8d80814fe0ce458f735b78000dc7a4180"
+    },
+    "frontend/tailwind.config.cjs": {
+      "expected": "f797cc454372246efef928cbbe9a9418ff57138d4ffac97f28a1a29d75deb627",
+      "actual": "f797cc454372246efef928cbbe9a9418ff57138d4ffac97f28a1a29d75deb627"
+    },
+    "backend/app/features.py": {
+      "expected": "87f106efb9c4cc2447fe51adf2f2d9e74ba17f928a73677c42941dfad0b3b017",
+      "actual": "87f106efb9c4cc2447fe51adf2f2d9e74ba17f928a73677c42941dfad0b3b017"
+    },
+    "backend/app/ml.py": {
+      "expected": "0aacc5430bfd3d1963e52eb0ab2c73dbda7282ff8d01a3f8e916a6faff642fb3",
+      "actual": "0aacc5430bfd3d1963e52eb0ab2c73dbda7282ff8d01a3f8e916a6faff642fb3"
+    },
+    "backend/app/validation.py": {
+      "expected": "5bbdfe9ce0ac04103f405e4114af027294ce41c21dee8e30c709297369789b2d",
+      "actual": "5bbdfe9ce0ac04103f405e4114af027294ce41c21dee8e30c709297369789b2d"
+    },
+    "artifacts/evaluation.md": {
+      "expected": "7a7de87a695f19169f0a9493e835672a5c3f7c77549d499ce072f55959290f16",
+      "actual": "7a7de87a695f19169f0a9493e835672a5c3f7c77549d499ce072f55959290f16"
+    },
+    "artifacts/evaluation.json": {
+      "expected": "91bac9ae421cf063e3fa17b10a280dfa6ff48ed8142abd145280528848cf2f4a",
+      "actual": "91bac9ae421cf063e3fa17b10a280dfa6ff48ed8142abd145280528848cf2f4a"
+    },
+    "artifacts/test_predictions.csv.gz": {
+      "expected": "7d08af9703f7690f39176b30653d594514035a842137c47557330aae15bafcb5",
+      "actual": "7d08af9703f7690f39176b30653d594514035a842137c47557330aae15bafcb5"
+    },
+    "artifacts/split_manifest.json": {
+      "expected": "737daeaf414cad15e850646dfcd78941b4efd79695ca870ad91edb7254769d38",
+      "actual": "737daeaf414cad15e850646dfcd78941b4efd79695ca870ad91edb7254769d38"
+    },
+    "artifacts/models.joblib": {
+      "expected": "c695efe51148bf8c168c4b2bf51956a0052073145e7ddc12165fed31837868c9",
+      "actual": "c695efe51148bf8c168c4b2bf51956a0052073145e7ddc12165fed31837868c9"
+    },
+    "artifacts/metrics.csv": {
+      "expected": "3998f047ccbbfa3f574dee9565995bcff33262d75672e82e0cfa5628c37847de",
+      "actual": "3998f047ccbbfa3f574dee9565995bcff33262d75672e82e0cfa5628c37847de"
+    },
+    "artifacts/evaluation_verification.json": {
+      "expected": "721c3bdaf796f9b18c4c52328c3c9eefc57bc1bb373d2bcc0c333e1dc2e96551",
+      "actual": "721c3bdaf796f9b18c4c52328c3c9eefc57bc1bb373d2bcc0c333e1dc2e96551"
+    },
+    "artifacts/demo_case.json": {
+      "expected": "d51ec65528a984b44b4d80c21df9ed83d6f5cac9defb26277946d0d96afd991a",
+      "actual": "d51ec65528a984b44b4d80c21df9ed83d6f5cac9defb26277946d0d96afd991a"
+    },
+    "data/synthetic_longitudinal.csv.gz": {
+      "expected": "a9fddac47dfd28548feb336564928b7510b13d35d89a845727b12a54b3e54a5d",
+      "actual": "a9fddac47dfd28548feb336564928b7510b13d35d89a845727b12a54b3e54a5d"
+    },
+    "data/patients.json": {
+      "expected": "2962c52842f46c2f02ed2597bb912cb6a3d750485306aed93ed0be321af8f097",
+      "actual": "2962c52842f46c2f02ed2597bb912cb6a3d750485306aed93ed0be321af8f097"
+    },
+    "data/generation_manifest.json": {
+      "expected": "c44d42d2717c90e548469da37fda384b3243122c743640d361d1d81699699d23",
+      "actual": "c44d42d2717c90e548469da37fda384b3243122c743640d361d1d81699699d23"
+    },
+    "data/environment/delhi_air.json": {
+      "expected": "862c437b82efe5dd1a2d65e76942a9419025ad7cce4c4111c87c1c35e4d40a44",
+      "actual": "862c437b82efe5dd1a2d65e76942a9419025ad7cce4c4111c87c1c35e4d40a44"
+    },
+    "data/environment/bengaluru_weather.json": {
+      "expected": "a14c8d7bba0d5f6316cecf3d4b0444a4221781a7d8d7d3f63f74b2f561a4b658",
+      "actual": "a14c8d7bba0d5f6316cecf3d4b0444a4221781a7d8d7d3f63f74b2f561a4b658"
+    },
+    "data/environment/mumbai_air.json": {
+      "expected": "c7cb81492d999080fd39a912d017dc8d264efc6ec28d7b4e495157537f8f2834",
+      "actual": "c7cb81492d999080fd39a912d017dc8d264efc6ec28d7b4e495157537f8f2834"
+    },
+    "data/environment/bengaluru_air.json": {
+      "expected": "37e1dc3f119178d961867ce0e1da9b78b36abda9e160ba9d0528fb48ef8313b4",
+      "actual": "37e1dc3f119178d961867ce0e1da9b78b36abda9e160ba9d0528fb48ef8313b4"
+    },
+    "data/environment/delhi_weather.json": {
+      "expected": "ee481b329c02eace44b5cd8948aed5f4989d890cddfc70adc274e900ea870729",
+      "actual": "ee481b329c02eace44b5cd8948aed5f4989d890cddfc70adc274e900ea870729"
+    },
+    "data/environment/pune_weather.json": {
+      "expected": "def2f5a9ac3cf5a2f14327caffffebb2e4ffd71a5aa3be7bc574e27afba34a6e",
+      "actual": "def2f5a9ac3cf5a2f14327caffffebb2e4ffd71a5aa3be7bc574e27afba34a6e"
+    },
+    "data/environment/mumbai_weather.json": {
+      "expected": "9c717e4aebe6d23a1bc6bc51346bc932228959bd6fc235011cca0a95ba0a18aa",
+      "actual": "9c717e4aebe6d23a1bc6bc51346bc932228959bd6fc235011cca0a95ba0a18aa"
+    },
+    "data/environment/manifest.json": {
+      "expected": "cb2a60ea40098bd2c14c134cf4526a66badb13157a2ee57c2b9482d1d8955483",
+      "actual": "cb2a60ea40098bd2c14c134cf4526a66badb13157a2ee57c2b9482d1d8955483"
+    },
+    "data/environment/pune_air.json": {
+      "expected": "cfe76e78ecfe9cb26b79713911c3c3e6bd9902e031a812427d67c610c6535f3f",
+      "actual": "cfe76e78ecfe9cb26b79713911c3c3e6bd9902e031a812427d67c610c6535f3f"
+    }
+  },
+  "protected_count": 26,
+  "new_css_colors_are_existing_palette": true,
+  "historical_files_checked": [
+    "docs/ARCHITECTURE.md",
+    "docs/LIMITATIONS.md",
+    "docs/METHODOLOGY.md",
+    "docs/MODEL_CARD.md",
+    "docs/PUBLISHING.md",
+    "docs/PranaGuard_Technical_Report.pdf",
+    "docs/SOURCE_SPECIFICATION.md",
+    "docs/SUBMISSION_CHECKLIST.md",
+    "docs/TECHNICAL_REPORT.md",
+    "docs/THIRD_PARTY_LICENSES.md",
+    "docs/architecture/PranaGuard_Architecture.pdf",
+    "docs/architecture/PranaGuard_Architecture.pptx",
+    "docs/architecture/PranaGuard_Architecture.svg",
+    "docs/demo/DEMO_SCRIPT.md",
+    "docs/demo/RECORDING_GUIDE.md",
+    "docs/demo/UPLOAD_CHECKLIST.md",
+    "docs/demo/VIDEO_STATUS.md",
+    "docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pdf",
+    "docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pptx",
+    "docs/presentation/assets/care_crop.png",
+    "docs/presentation/assets/explain_crop.png",
+    "docs/presentation/assets/overview_crop.png",
+    "docs/presentation/assets/patient_crop.png",
+    "docs/presentation/assets/scenario_crop.png",
+    "docs/screenshots/01_overview.png",
+    "docs/screenshots/02_patient_twin.png",
+    "docs/screenshots/03_explainability.png",
+    "docs/screenshots/04_what_if.png",
+    "docs/screenshots/05_model_validation.png",
+    "docs/screenshots/06_alerts_and_interventions.png",
+    "docs/screenshots/07_system_status.png",
+    "docs/screenshots/08_mobile_patient.png",
+    "docs/verification/PUBLIC_ACCESS.md",
+    "docs/verification/QA_NOTES.md",
+    "docs/verification/artifact-verification.json",
+    "docs/verification/artifact-verification.txt",
+    "docs/verification/backend-junit.xml",
+    "docs/verification/backend-tests.txt",
+    "docs/verification/browser-tests.txt",
+    "docs/verification/browser-verification.json",
+    "docs/verification/cache-integrity.json",
+    "docs/verification/clean-setup.json",
+    "docs/verification/clean-setup.txt",
+    "docs/verification/document-build.txt",
+    "docs/verification/evaluation-recomputed.txt",
+    "docs/verification/exported-twin.json",
+    "docs/verification/first-run-metrics.csv",
+    "docs/verification/first-training-run.txt",
+    "docs/verification/frontend-build.txt",
+    "docs/verification/frontend-junit.xml",
+    "docs/verification/frontend-tests.txt",
+    "docs/verification/npm-production-audit.json",
+    "docs/verification/public-access.json",
+    "docs/verification/reproducibility-tests.txt",
+    "docs/verification/reproducibility.json",
+    "docs/verification/submission-audit.json",
+    "docs/verification/submission-check.txt",
+    "scripts/__init__.py",
+    "scripts/bootstrap.py",
+    "scripts/browser_verify.py",
+    "scripts/build_artifacts.py",
+    "scripts/evaluate.py",
+    "scripts/fetch_environment.py",
+    "scripts/generate_data.py",
+    "scripts/replay.py",
+    "scripts/select_demo.py",
+    "scripts/train.py",
+    "scripts/verify_artifacts.py",
+    "scripts/verify_clean_setup.py",
+    "scripts/verify_reproducibility.py",
+    "scripts/verify_submission.py",
+    "scripts/write_delivery_report.py",
+    "scripts/write_documentation.py"
+  ],
+  "held_out_prediction_regression": {
+    "24": {
+      "saved_predictions": 4699,
+      "max_absolute_difference": 9.71445146547012e-17,
+      "metrics": {
+        "auroc": 0.6915648244833766,
+        "auprc": 0.08824952556055754,
+        "brier": 0.0278640898691064
+      },
+      "confusion_matrix_at_0_35": [
+        [
+          4563,
+          0
+        ],
+        [
+          136,
+          0
+        ]
+      ],
+      "unchanged": true
+    },
+    "48": {
+      "saved_predictions": 4699,
+      "max_absolute_difference": 9.71445146547012e-17,
+      "metrics": {
+        "auroc": 0.6143769386729512,
+        "auprc": 0.09675617680405191,
+        "brier": 0.05573064293960756
+      },
+      "confusion_matrix_at_0_35": [
+        [
+          4439,
+          0
+        ],
+        [
+          260,
+          0
+        ]
+      ],
+      "unchanged": true
+    },
+    "72": {
+      "saved_predictions": 4699,
+      "max_absolute_difference": 9.71445146547012e-17,
+      "metrics": {
+        "auroc": 0.3951458987730373,
+        "auprc": 0.05929082387932489,
+        "brier": 0.08531570202745552
+      },
+      "confusion_matrix_at_0_35": [
+        [
+          4336,
+          0
+        ],
+        [
+          363,
+          0
+        ]
+      ],
+      "unchanged": true
+    }
+  },
+  "preserved_database_original_tables": {
+    "patients": {
+      "rows": 120,
+      "content_sha256": "2cec18e85cc7f88e466c9963cb8924d315d8e2560621efa7f7cb0ea4d01e257b"
+    },
+    "states": {
+      "rows": 3000,
+      "content_sha256": "dd7bac060a7c9eb0e81a31f5765f5c31ec487f42db3bfbdc0b8e2eef79c35e7d"
+    },
+    "alerts": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "interventions": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "scenarios": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "meta": {
+      "rows": 3,
+      "content_sha256": "5c1d8473c0092fbc7b7d626a56661663ab9aef329363aa0f4ef43390c4a9d3f6"
+    }
+  },
+  "migrations": [
+    {
+      "version": 1,
+      "name": "001_enhanced_monitoring.sql",
+      "applied_at": "2026-11-05T13:38:47.944413+00:00"
+    },
+    {
+      "version": 2,
+      "name": "002_environment_backoff.sql",
+      "applied_at": "2026-11-05T14:02:04.725893+00:00"
+    }
+  ],
+  "original_workspace_database_unchanged": true,
+  "no_training_or_historical_evaluation_write": true
+}

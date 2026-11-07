@@ -1,0 +1,22 @@
+{
+  "review": {
+    "id": 1,
+    "patient_id": "PG-0071",
+    "doctor": "dr-atlas",
+    "status": "awaiting_review",
+    "note": "Fixture review for the demo workspace.",
+    "follow_up_at": null,
+    "state_version": 1,
+    "created_at": "2026-11-07T02:22:57.234332+00:00",
+    "updated_at": "2026-11-07T02:22:57.234332+00:00"
+  },
+  "timeline": [
+    {
+      "id": 1,
+      "created_at": "2026-11-07T02:22:57.234332+00:00",
+      "event": "created \u2192 awaiting_review",
+      "actor": "dr-atlas",
+      "note": "Fixture review for the demo workspace."
+    }
+  ]
+}

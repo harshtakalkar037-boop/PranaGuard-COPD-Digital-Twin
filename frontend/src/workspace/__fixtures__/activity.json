@@ -1,0 +1,8 @@
+{
+  "series": [],
+  "manual_entries": 0,
+  "device_samples": 0,
+  "latest_monitoring": null,
+  "missing": "Gaps between hand-entered fictional observations are expected; the diary is event-driven, not continuous telemetry.",
+  "sources": "manual fictional review entries + simulated device readings + persisted monitoring snapshots. None are live wearable telemetry."
+}

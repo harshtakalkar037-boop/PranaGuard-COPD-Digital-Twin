@@ -1,0 +1,10 @@
+{
+  "assigned_patients": 120,
+  "pending_reviews": 0,
+  "reviews_in_progress": 0,
+  "completed_reviews": 0,
+  "follow_ups_due": 0,
+  "open_notifications": 0,
+  "recent_reviews": [],
+  "note": "Demo workflow counts from SQLite. Synthetic patients only."
+}

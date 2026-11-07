@@ -1,0 +1,20 @@
+{
+  "seed": 20261105,
+  "patients": 120,
+  "days": 60,
+  "hours_per_patient": 1440,
+  "rows": 172800,
+  "synthetic_events": 261,
+  "eligible_rows": 138224,
+  "environment_sources": [
+    "cached_real_ambient"
+  ],
+  "generator": "Causal stochastic latent burden with probabilistic onsets; all physiology and labels synthetic.",
+  "sha256": "f6fc416897874e619b980284d55ddedda7719ac42f8fb56cb11015c1015b9b88",
+  "start": "2026-08-01T00:00:00Z",
+  "clinical_validity": "NONE; independent synthetic patients, same generator and weather; not external clinical validation",
+  "patient_id_namespace": "AUD48-",
+  "original_generator_sha256": "f49ae916428c8607a74186305263742d5f130c0ebbe8a228b940ddb22ee79c02",
+  "frozen_model_before_generation": "770d1fc36aae4a724e1d1aa96ad1a6930f8ccf3b9e89cdb96aa2fc8c7b9c9b2a",
+  "shared_historical_environment": true
+}

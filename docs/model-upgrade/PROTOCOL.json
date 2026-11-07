@@ -1,0 +1,93 @@
+{
+  "registered_at": "2026-11-05 before fitting any revised candidate or generating the fresh audit cohort",
+  "scope": "Versioned experimental 48h model. Preserve original models/data/evaluations, 24h/72h behavior, stored risks and UI identity. No clinical claims.",
+  "original_enhanced_zip_sha256": "1ddeb618784a3e3fcc35a9f9292d3ddacbfff830d5cbf26549112316a44def6d",
+  "development_source": "Original seed2026 cohort TRAIN patients PG-0001..0072 and hours72..747 only; fit stride3. No original-test patient or audit patient in selection/training.",
+  "selection_folds": [
+    {
+      "train_patient_numbers": [
+        1,
+        36
+      ],
+      "train_hours": [
+        72,
+        371
+      ],
+      "validation_patient_numbers": [
+        37,
+        48
+      ],
+      "validation_hours": [
+        468,
+        747
+      ]
+    },
+    {
+      "train_patient_numbers": [
+        1,
+        48
+      ],
+      "train_hours": [
+        72,
+        467
+      ],
+      "validation_patient_numbers": [
+        49,
+        60
+      ],
+      "validation_hours": [
+        564,
+        747
+      ]
+    },
+    {
+      "train_patient_numbers": [
+        1,
+        60
+      ],
+      "train_hours": [
+        72,
+        563
+      ],
+      "validation_patient_numbers": [
+        61,
+        72
+      ],
+      "validation_hours": [
+        660,
+        747
+      ]
+    }
+  ],
+  "selection_rule": "Highest mean validation AUPRC over three patient/time-disjoint, >=72h-purged folds; deterministic listed-order tie break. Raw margins only; no audit/test selection.",
+  "candidates": [
+    "baseline_tree_35",
+    "original_linear_35",
+    "core_linear_C0.03",
+    "core_linear_C0.3",
+    "trend_linear_C0.03",
+    "trend_linear_C0.3",
+    "trend_linear_C3",
+    "trend_tree_regularized"
+  ],
+  "final_fit": "Refit selected family once on original TRAIN72 patients/hours72..747, stride3; imputation/scaling fit on training only.",
+  "calibration": "Original PG-0073..0084, hours849..1050, stride3. Positive-slope constrained Platt calibration on raw margins; L2 penalty0.5*(slope-1)^2 in summed log-loss.",
+  "threshold_selection": "Original PG-0085..0096, hours849..1050, stride3. Max F1 among cutoffs with >0 TP and FPR<=0.10; highest threshold tie-break. Unvalidated demonstration operating point, never clinical.",
+  "fresh_audit": {
+    "generator": "Unmodified scripts/generate_data.py",
+    "seed": 20261105,
+    "patients": 120,
+    "days": 60,
+    "patient_id_namespace": "AUD48-",
+    "evaluation_hours": [
+      1152,
+      1367
+    ],
+    "eligible": "Original eligibility; >=72h baseline, no active episode; full original 72h follow-up. All eligible hourly audit rows in the specified window.",
+    "environment": "The same protected historical city-grid cache; not new weather/station data. Independent synthetic patients/outcomes only."
+  },
+  "audit_lock": "Generate/evaluate fresh audit cohort only after candidate, fitted pipeline, calibration and threshold have been saved and hashed. One audit, no seed/feature/hyperparameter retries based on its outcomes.",
+  "experimental_availability_gate": "On fresh audit: revised AUPRC >=1.10*original48 AUPRC; revised AUROC>=original48 AUROC; revised Brier<=original48 Brier+0.0001; validation-selected threshold recall>0 and FPR<=0.15. No claim of statistical/clinical superiority merely from point estimates.",
+  "uncertainty": "300 paired patient-cluster bootstrap resamples, seed20261106; 95% intervals and metric differences reported. Known original held-out test is a secondary historical benchmark only.",
+  "integration": "Separate versioned revised48 inference/comparison panel; original saved 24/48/72h risks/history, explanations, scenarios and alerts remain v1 and explicitly labelled. New patient inference still unsupported. No live environment/manual/device data enter either pipeline."
+}

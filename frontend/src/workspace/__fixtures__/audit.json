@@ -1,0 +1,49 @@
+{
+ "events": [
+  {
+   "id": 4,
+   "created_at": "2026-11-07T05:50:02.167054+00:00",
+   "actor": "dr-atlas",
+   "role": "doctor",
+   "action": "seeded",
+   "entity": "document",
+   "entity_id": "demo",
+   "before_json": null,
+   "after_json": "{\"title\": \"Demo COPD action plan summary (fictional)\", \"seeded_demo\": true}"
+  },
+  {
+   "id": 3,
+   "created_at": "2026-11-07T05:50:02.167054+00:00",
+   "actor": "pat-pg0071",
+   "role": "patient",
+   "action": "created",
+   "entity": "daily_log",
+   "entity_id": "3",
+   "before_json": null,
+   "after_json": "{\"entry_date\": \"2026-11-05\", \"seeded_demo\": true}"
+  },
+  {
+   "id": 2,
+   "created_at": "2026-11-07T05:50:02.167054+00:00",
+   "actor": "pat-pg0071",
+   "role": "patient",
+   "action": "created",
+   "entity": "daily_log",
+   "entity_id": "2",
+   "before_json": null,
+   "after_json": "{\"entry_date\": \"2026-11-06\", \"seeded_demo\": true}"
+  },
+  {
+   "id": 1,
+   "created_at": "2026-11-07T05:50:02.167054+00:00",
+   "actor": "pat-pg0071",
+   "role": "patient",
+   "action": "created",
+   "entity": "daily_log",
+   "entity_id": "1",
+   "before_json": null,
+   "after_json": "{\"entry_date\": \"2026-11-07\", \"seeded_demo\": true}"
+  }
+ ],
+ "note": "Immutable demo audit trail. Original submissions and timestamps are preserved in snapshots."
+}

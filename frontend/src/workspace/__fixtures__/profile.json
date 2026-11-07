@@ -1,0 +1,72 @@
+{
+  "patient_id": "PG-0071",
+  "profile": {
+    "patient_id": "PG-0071",
+    "display_name": "Synthetic twin 071",
+    "synthetic": true,
+    "city": "Delhi",
+    "age": 48,
+    "fev1_pct": 74.9,
+    "prior_exacerbations": 2,
+    "smoking_pack_years": 55.2,
+    "bmi": 31.2,
+    "sex": "Male",
+    "environment_source": "cached_real_ambient"
+  },
+  "details": {
+    "copd_history": "Synthetic cohort attributes from the frozen generator; not a diagnosed clinical record.",
+    "diagnosis_info": "No individual diagnosis document was supplied.",
+    "medications": "No manually recorded demo plan.",
+    "clinician_alias": "Not assigned",
+    "source_type": "synthetic_cohort"
+  },
+  "origin": "original_synthetic_cohort",
+  "baseline": {
+    "status": "historical_baseline",
+    "required_hours": 72,
+    "observed_hours": 72,
+    "elapsed_hours": 72,
+    "complete": true,
+    "means": {
+      "spo2": 94.4059,
+      "heart_rate": 67.14115,
+      "resp_rate": 18.1466,
+      "symptom_score": 1.3347,
+      "steps": 278.11154999999997
+    },
+    "coverage": {},
+    "prediction_supported": true,
+    "notice": "Original first 72h historical baseline. New device streams never replace this baseline or alter frozen predictions."
+  },
+  "model_state": {
+    "version": 1,
+    "risks": {
+      "24": 0.015098282200342369,
+      "48": 0.10111926243216601,
+      "72": 0.29658079216723104
+    },
+    "risk_category": "elevated",
+    "timestamp": "2026-09-13 07:00:00+00:00",
+    "prediction_supported": true,
+    "model_version": "pg-synthetic-v1"
+  },
+  "observations": [],
+  "monitoring": {
+    "latest": null,
+    "versions": []
+  },
+  "reviews": [],
+  "care_plan": null,
+  "sputum_recent": [],
+  "notifications": {
+    "notifications": [],
+    "counts": {
+      "unread": 0,
+      "total": 0,
+      "open": 0
+    },
+    "demo_only": true,
+    "limit": 30
+  },
+  "caution": "Synthetic/fictional patient. Model scores are research probabilities, not diagnoses or urgency."
+}

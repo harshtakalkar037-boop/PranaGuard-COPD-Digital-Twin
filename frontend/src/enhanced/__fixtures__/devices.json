@@ -1,0 +1,152 @@
+{
+  "devices": [
+    {
+      "id": "SIM-7DD6649A704644CA",
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "kind": "portable_spirometer",
+      "label": "Atlas simulated portable_spirometer",
+      "created_at": "2026-11-05T14:06:45.386178+00:00",
+      "status": "disconnected",
+      "is_simulating": false,
+      "interval_seconds": 2,
+      "last_seen_at": "2026-11-05T14:06:45.837719+00:00",
+      "next_due_at": null,
+      "last_error": null,
+      "run_id": "3653cc65824e4b39baa1bee2b366cc22",
+      "sequence": 1,
+      "source_type": "simulated_device",
+      "hardware_connected": false,
+      "freshness": "recent"
+    },
+    {
+      "id": "SIM-2FB3A2D6CD344D6A",
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "kind": "fitness_band",
+      "label": "Atlas simulated fitness_band",
+      "created_at": "2026-11-05T14:06:44.337012+00:00",
+      "status": "disconnected",
+      "is_simulating": false,
+      "interval_seconds": 2,
+      "last_seen_at": "2026-11-05T14:06:44.828285+00:00",
+      "next_due_at": null,
+      "last_error": null,
+      "run_id": "2dc2af6062dd4e268a1b1b249d3563c2",
+      "sequence": 1,
+      "source_type": "simulated_device",
+      "hardware_connected": false,
+      "freshness": "recent"
+    },
+    {
+      "id": "SIM-7A6CFDF163DE4E77",
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "kind": "smartwatch",
+      "label": "Atlas simulated smartwatch",
+      "created_at": "2026-11-05T14:06:43.370237+00:00",
+      "status": "disconnected",
+      "is_simulating": false,
+      "interval_seconds": 2,
+      "last_seen_at": "2026-11-05T14:06:43.818285+00:00",
+      "next_due_at": null,
+      "last_error": null,
+      "run_id": "eb771c0dc18a42d9891320290f5ba1b9",
+      "sequence": 1,
+      "source_type": "simulated_device",
+      "hardware_connected": false,
+      "freshness": "recent"
+    },
+    {
+      "id": "SIM-93AC87A3F643424F",
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "kind": "pulse_oximeter",
+      "label": "Atlas simulated pulse_oximeter",
+      "created_at": "2026-11-05T14:06:39.752186+00:00",
+      "status": "disconnected",
+      "is_simulating": false,
+      "interval_seconds": 2,
+      "last_seen_at": "2026-11-05T14:06:42.809178+00:00",
+      "next_due_at": null,
+      "last_error": null,
+      "run_id": "387b0545ea9941f4914d33b1c24d8955",
+      "sequence": 2,
+      "source_type": "simulated_device",
+      "hardware_connected": false,
+      "freshness": "recent"
+    }
+  ],
+  "catalog": [
+    {
+      "kind": "pulse_oximeter",
+      "label": "Generic pulse oximeter",
+      "metrics": [
+        "spo2",
+        "heart_rate"
+      ]
+    },
+    {
+      "kind": "smartwatch",
+      "label": "Generic smartwatch",
+      "metrics": [
+        "heart_rate",
+        "resp_rate",
+        "steps"
+      ]
+    },
+    {
+      "kind": "fitness_band",
+      "label": "Generic fitness band",
+      "metrics": [
+        "heart_rate",
+        "steps"
+      ]
+    },
+    {
+      "kind": "portable_spirometer",
+      "label": "Generic portable spirometer",
+      "metrics": [
+        "fev1",
+        "fvc"
+      ]
+    }
+  ],
+  "metrics": {
+    "spo2": {
+      "label": "SpO\u2082",
+      "unit": "%",
+      "minimum": 50,
+      "maximum": 100
+    },
+    "heart_rate": {
+      "label": "Heart rate",
+      "unit": "bpm",
+      "minimum": 25,
+      "maximum": 240
+    },
+    "resp_rate": {
+      "label": "Respiratory rate",
+      "unit": "breaths/min",
+      "minimum": 5,
+      "maximum": 60
+    },
+    "steps": {
+      "label": "Steps in sample interval",
+      "unit": "steps",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "fev1": {
+      "label": "FEV\u2081",
+      "unit": "L",
+      "minimum": 0.1,
+      "maximum": 8
+    },
+    "fvc": {
+      "label": "FVC",
+      "unit": "L",
+      "minimum": 0.1,
+      "maximum": 10
+    }
+  },
+  "hardware_supported": false,
+  "authentication": "Per-device HMAC token; backend-owned simulator. Provisioning real hardware is not implemented.",
+  "persistent_device_secret_configured": false
+}

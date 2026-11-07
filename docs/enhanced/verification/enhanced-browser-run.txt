@@ -1,0 +1,39 @@
+PASS Patient registry navigation and original cohort available
+PASS ID search backed by registry API
+PASS Patient registry empty state
+PASS Explicit fictional-data confirmation required
+PASS Validated fictional registration, server ID and SQLite persistence
+PASS Manual baseline values do not bypass72h warm-up or fabricate predictions
+PASS Correct selected fictional-profile JSON export
+PASS Persistent manual symptoms/adherence and demo monitoring rule
+PASS Profile review extends existing intervention ledger
+PASS Actual backend simulation and ingestion: pulse_oximeter
+PASS Actual backend simulation and ingestion: smartwatch
+PASS Actual backend simulation and ingestion: fitness_band
+PASS Actual backend simulation and ingestion: portable_spirometer
+PASS Explicit Start/Stop and all4 generic capability types
+PASS Stopped simulation does not create further readings
+PASS Patient trends render actual persisted ingestion data
+PASS Monitoring state versions and missingness isolated from model outputs
+PASS Persisted monitoring version selection
+PASS Registration, readings, observation and review survive browser reload
+PASS Patient/category notification filtering
+PASS Demonstrable test notification and unread/read persistence
+PASS Active→acknowledged→under_review→resolved→closed with append-only history
+PASS Disabled email records honest not-sent status; no patient email
+PASS Actual/cached provider context and honest timestamps: Pune
+PASS Actual/cached provider context and honest timestamps: Mumbai
+PASS Actual/cached provider context and honest timestamps: Delhi
+PASS Actual/cached provider context and honest timestamps: Bengaluru
+PASS Dedicated record-level provenance/classification/missingness section
+PASS Backend provenance JSON export contains selected patient records
+PASS Original model twin, probabilities, features and baseline unchanged after enhancements
+PASS Original sidebar theme/font retained across new sections
+PASS Desktop new views have no viewport overflow
+PASS 390px responsive navigation/layout: Patients
+PASS 390px responsive navigation/layout: Device integration
+PASS 390px responsive navigation/layout: Environment
+PASS 390px responsive navigation/layout: Notifications
+PASS 390px responsive navigation/layout: Data sources
+PASS No external browser assets, JS/console errors or failed browser API calls
+{"passed": 38, "failed": 0}

@@ -1,0 +1,394 @@
+{
+  "checked_at": "2026-10-18T10:09:16.102777+00:00",
+  "submission_ready": false,
+  "summary": {
+    "PASS": 20,
+    "FAIL": 0,
+    "PENDING": 6
+  },
+  "checklist": [
+    {
+      "item": "Public GitHub repository URL verified",
+      "status": "PENDING",
+      "evidence": "No actual public repository URL supplied; authorized publication unavailable in this build."
+    },
+    {
+      "item": "Root README exists and is complete",
+      "status": "PASS",
+      "evidence": "53 local links checked; 12/12 mandatory sections present. External completion remains pending."
+    },
+    {
+      "item": "Team details included or explicitly marked pending",
+      "status": "PENDING",
+      "evidence": "Actual team/member identities pending; clearly labelled placeholders are present."
+    },
+    {
+      "item": "College/incubator information included or explicitly marked pending",
+      "status": "PENDING",
+      "evidence": "Actual institution pending; placeholder present."
+    },
+    {
+      "item": "Project title included",
+      "status": "PASS",
+      "evidence": "Verified explicit README section and corresponding implementation/report."
+    },
+    {
+      "item": "Problem statement included",
+      "status": "PASS",
+      "evidence": "Verified explicit README section and corresponding implementation/report."
+    },
+    {
+      "item": "Healthcare use case included",
+      "status": "PASS",
+      "evidence": "Verified explicit README section and corresponding implementation/report."
+    },
+    {
+      "item": "Technical stack included",
+      "status": "PASS",
+      "evidence": "Verified explicit README section and corresponding implementation/report."
+    },
+    {
+      "item": "AI/ML model/framework details included",
+      "status": "PASS",
+      "evidence": "Verified explicit README section and corresponding implementation/report."
+    },
+    {
+      "item": "Actual 15\u201320 minute Unlisted YouTube video uploaded",
+      "status": "PENDING",
+      "evidence": "Actual recording, Unlisted upload and signed-out playback evidence absent."
+    },
+    {
+      "item": "Final video URL inserted into README",
+      "status": "PENDING",
+      "evidence": "No actual YouTube URL yet; placeholder text is not counted as completion."
+    },
+    {
+      "item": "Open-source license details included",
+      "status": "PASS",
+      "evidence": "MIT code license; environmental CC BY4.0 and synthetic CC0 attribution documented separately."
+    },
+    {
+      "item": "Actual license file committed",
+      "status": "PASS",
+      "evidence": "Verified MIT LICENSE content in local HEAD."
+    },
+    {
+      "item": "Architecture diagram exported as PDF",
+      "status": "PASS",
+      "evidence": "Parsed OOXML, actual PDF exports, page/text/bounds/image verification and rendered QA; see artifact-verification.json. Public access is a separate pending gate."
+    },
+    {
+      "item": "Architecture diagram available in PPT/PPTX-compatible format",
+      "status": "PASS",
+      "evidence": "Parsed OOXML, actual PDF exports, page/text/bounds/image verification and rendered QA; see artifact-verification.json. Public access is a separate pending gate."
+    },
+    {
+      "item": "Presentation exported as PDF",
+      "status": "PASS",
+      "evidence": "Parsed OOXML, actual PDF exports, page/text/bounds/image verification and rendered QA; see artifact-verification.json. Public access is a separate pending gate."
+    },
+    {
+      "item": "Editable presentation available as PPTX",
+      "status": "PASS",
+      "evidence": "Parsed OOXML, actual PDF exports, page/text/bounds/image verification and rendered QA; see artifact-verification.json. Public access is a separate pending gate."
+    },
+    {
+      "item": "Presentation covers project details and actual outcomes",
+      "status": "PASS",
+      "evidence": "16 slides; actual screenshots, executed metrics/ablations, negative72h findings, false-positive demo and safety/pending items verified."
+    },
+    {
+      "item": "All referenced artifacts committed and linked",
+      "status": "PASS",
+      "evidence": "Required local artifact bytes match HEAD and README links resolve."
+    },
+    {
+      "item": "Public links tested without additional permissions",
+      "status": "PENDING",
+      "evidence": "Unauthenticated repository/raw-file and human signed-out video checks must all pass; no local preview substituted."
+    },
+    {
+      "item": "React frontend tested",
+      "status": "PASS",
+      "evidence": "14 Vitest/RTL tests; browser checks 18 passing, no page/API errors in final run."
+    },
+    {
+      "item": "FastAPI backend tested",
+      "status": "PASS",
+      "evidence": "41 pytest tests; 0 failures/errors. One upstream Starlette/httpx deprecation warning."
+    },
+    {
+      "item": "Model and twin workflows tested",
+      "status": "PASS",
+      "evidence": "Actual inference consistency, replay, persistence, causal features, SHAP additivity, state-preserving scenarios, alert lifecycle and metric recomputation; full reproduction matches exactly."
+    },
+    {
+      "item": "README setup instructions verified",
+      "status": "PASS",
+      "evidence": "Clean local clone + new venv + pinned pip install + npm ci + bootstrap + API startup + backend/frontend tests + build; see clean-setup.json."
+    },
+    {
+      "item": "No Docker or Streamlit dependency",
+      "status": "PASS",
+      "evidence": "Python venv/npm/SQLite workflow; prohibited dependency/config scan clean."
+    },
+    {
+      "item": "No fabricated metrics or links",
+      "status": "PASS",
+      "evidence": "15 experiments executed twice; saved predictions independently recomputed; production has no test-fixture import; GitHub/video URLs remain absent, not invented."
+    }
+  ],
+  "readme_sections": {
+    "Team details": true,
+    "College/incubator information": true,
+    "Project title": true,
+    "Problem statement": true,
+    "Healthcare use case": true,
+    "Technical stack": true,
+    "AI/ML model or framework details": true,
+    "Actual 15\u201320 minute demo video link": true,
+    "Open-source license details": true,
+    "Architecture diagram in PDF/PPT format": true,
+    "Presentation in PDF/PPT format": true,
+    "Confirmation that referenced files and links are publicly accessible": true
+  },
+  "local_link_checks": [
+    {
+      "link": "submission_metadata.json",
+      "exists": true
+    },
+    {
+      "link": "docs/SOURCE_SPECIFICATION.md",
+      "exists": true
+    },
+    {
+      "link": "docs/ARCHITECTURE.md",
+      "exists": true
+    },
+    {
+      "link": "docs/API.md",
+      "exists": true
+    },
+    {
+      "link": "docs/METHODOLOGY.md",
+      "exists": true
+    },
+    {
+      "link": "docs/LIMITATIONS.md",
+      "exists": true
+    },
+    {
+      "link": "docs/architecture/PranaGuard_Architecture.pdf",
+      "exists": true
+    },
+    {
+      "link": "docs/architecture/PranaGuard_Architecture.pptx",
+      "exists": true
+    },
+    {
+      "link": "docs/architecture/PranaGuard_Architecture.svg",
+      "exists": true
+    },
+    {
+      "link": "docs/architecture/PranaGuard_Architecture.svg",
+      "exists": true
+    },
+    {
+      "link": "docs/DATA_PROVENANCE.md",
+      "exists": true
+    },
+    {
+      "link": "data/environment/manifest.json",
+      "exists": true
+    },
+    {
+      "link": "data/generation_manifest.json",
+      "exists": true
+    },
+    {
+      "link": "docs/THIRD_PARTY_LICENSES.md",
+      "exists": true
+    },
+    {
+      "link": "artifacts/split_manifest.json",
+      "exists": true
+    },
+    {
+      "link": "artifacts/evaluation.md",
+      "exists": true
+    },
+    {
+      "link": "artifacts/evaluation.json",
+      "exists": true
+    },
+    {
+      "link": "artifacts/metrics.csv",
+      "exists": true
+    },
+    {
+      "link": "artifacts/test_predictions.csv.gz",
+      "exists": true
+    },
+    {
+      "link": "artifacts/evaluation_verification.json",
+      "exists": true
+    },
+    {
+      "link": "docs/verification/reproducibility.json",
+      "exists": true
+    },
+    {
+      "link": "docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pptx",
+      "exists": true
+    },
+    {
+      "link": "docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pdf",
+      "exists": true
+    },
+    {
+      "link": "docs/TECHNICAL_REPORT.md",
+      "exists": true
+    },
+    {
+      "link": "docs/PranaGuard_Technical_Report.pdf",
+      "exists": true
+    },
+    {
+      "link": "docs/verification/artifact-verification.json",
+      "exists": true
+    },
+    {
+      "link": "docs/demo/DEMO_SCRIPT.md",
+      "exists": true
+    },
+    {
+      "link": "docs/demo/RECORDING_GUIDE.md",
+      "exists": true
+    },
+    {
+      "link": "docs/demo/UPLOAD_CHECKLIST.md",
+      "exists": true
+    },
+    {
+      "link": "docs/demo/VIDEO_STATUS.md",
+      "exists": true
+    },
+    {
+      "link": "requirements-lock.txt",
+      "exists": true
+    },
+    {
+      "link": "docs/API.md",
+      "exists": true
+    },
+    {
+      "link": "docs/verification/clean-setup.json",
+      "exists": true
+    },
+    {
+      "link": ".github/workflows/ci.yml",
+      "exists": true
+    },
+    {
+      "link": "docs/verification/backend-tests.txt",
+      "exists": true
+    },
+    {
+      "link": "docs/verification/frontend-tests.txt",
+      "exists": true
+    },
+    {
+      "link": "docs/verification/browser-verification.json",
+      "exists": true
+    },
+    {
+      "link": "docs/screenshots/01_overview.png",
+      "exists": true
+    },
+    {
+      "link": "docs/screenshots/02_patient_twin.png",
+      "exists": true
+    },
+    {
+      "link": "docs/screenshots/03_explainability.png",
+      "exists": true
+    },
+    {
+      "link": "docs/screenshots/04_what_if.png",
+      "exists": true
+    },
+    {
+      "link": "docs/screenshots/05_model_validation.png",
+      "exists": true
+    },
+    {
+      "link": "docs/screenshots/06_alerts_and_interventions.png",
+      "exists": true
+    },
+    {
+      "link": "docs/screenshots/07_system_status.png",
+      "exists": true
+    },
+    {
+      "link": "docs/screenshots/08_mobile_patient.png",
+      "exists": true
+    },
+    {
+      "link": "LICENSE",
+      "exists": true
+    },
+    {
+      "link": "docs/THIRD_PARTY_LICENSES.md",
+      "exists": true
+    },
+    {
+      "link": "data/environment/manifest.json",
+      "exists": true
+    },
+    {
+      "link": "docs/PUBLISHING.md",
+      "exists": true
+    },
+    {
+      "link": "DELIVERY_REPORT.md",
+      "exists": true
+    },
+    {
+      "link": "docs/SUBMISSION_CHECKLIST.md",
+      "exists": true
+    },
+    {
+      "link": "docs/verification/submission-audit.json",
+      "exists": true
+    },
+    {
+      "link": "docs/verification/PUBLIC_ACCESS.md",
+      "exists": true
+    }
+  ],
+  "public_access": {
+    "repository": {
+      "status": "PENDING",
+      "reason": "No actual public repository URL supplied; authorized publication unavailable in this build."
+    },
+    "video": {
+      "status": "PENDING",
+      "reason": "Actual recording, Unlisted upload and signed-out playback evidence absent."
+    },
+    "artifact_urls": [],
+    "authentication_used": false
+  },
+  "backend_tests": {
+    "status": "PASS",
+    "tests": 41,
+    "failures": 0
+  },
+  "frontend_tests": {
+    "status": "PASS",
+    "tests": 14,
+    "failures": 0
+  },
+  "secret_pattern_findings": [],
+  "forbidden_tracked_files": [],
+  "limitations": "Pattern scan is not a guarantee of absence of all secrets. Model/software test success is not clinical validation."
+}

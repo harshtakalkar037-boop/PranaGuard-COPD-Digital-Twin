@@ -1,0 +1,19 @@
+{
+ "items": [
+  {
+   "id": 1,
+   "patient_id": "PG-0071",
+   "title": "Demo COPD action plan summary (fictional)",
+   "doc_type": "action_plan",
+   "doc_date": "2026-11-07",
+   "notes": "Seeded demonstration record. Not real medical advice.",
+   "filename": "demo-action-plan.txt",
+   "media_type": "text/plain",
+   "size": 167,
+   "sha256": "a8e13c38671629b70504befe268921268b843af4ed9bdcbd9d82cafe5e419d1c",
+   "uploaded_by": "dr-atlas",
+   "created_at": "2026-11-07T05:50:02.167054+00:00"
+  }
+ ],
+ "note": "Documents shared with the linked patient only. Metadata carries SHA-256 provenance."
+}

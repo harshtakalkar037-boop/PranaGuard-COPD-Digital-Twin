@@ -1,0 +1,20 @@
+PASS Original120-patient overview intact
+PASS Patient48h card matches actual frozen v3 inference
+PASS Legacy horizons/stored48h/history clearly distinguished
+PASS Saved-state selection requests the matching v3 version
+PASS 48h explanation uses v3, not old TreeSHAP
+PASS All feature provenance/imputation and exact calibrated log-odds audit inspectable
+PASS 24h/72h original explanations preserved
+PASS Scenario model-version boundary explicit
+PASS Original negative72h evidence retained
+PASS Fresh audit metrics and all five unchanged gates rendered
+PASS All six candidates, uncertainty and known-test limitation inspectable
+PASS Earlier v2 failure stays visible and rejected
+PASS Existing theme/font/layout preserved without desktop overflow
+PASS Registry and simulated-device sections remain reachable
+PASS Four-city offline fallback remains separate from model inputs
+PASS 390px patient cards/version labels have no viewport overflow
+PASS 390px study tables scroll within the original layout
+PASS Viewing v3 never mutates persisted v1 predictions/history
+PASS No JS/console/API failures or external browser assets
+{"passed": 19, "failed": 0}

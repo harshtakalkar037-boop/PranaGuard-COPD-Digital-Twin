@@ -1,0 +1,79 @@
+{
+  "id": 67,
+  "patient_id": null,
+  "category": "system",
+  "title": "Test notification \u00b7 synthetic demo",
+  "reason": "User-triggered test of in-app notification persistence. No patient condition or emergency is represented.",
+  "source": "Notification test control",
+  "source_type": "system_demo",
+  "created_at": "2026-11-05T14:06:51.173362+00:00",
+  "updated_at": "2026-11-05T14:06:52.801365+00:00",
+  "status": "closed",
+  "read_at": "2026-11-05T14:06:52.801365+00:00",
+  "dedupe_key": "test:1f31023ae4dc4213984b7eb85da15256",
+  "legacy_alert_id": null,
+  "metadata": {},
+  "unread": false,
+  "history": [
+    {
+      "id": 72,
+      "notification_id": 67,
+      "created_at": "2026-11-05T14:06:51.173362+00:00",
+      "from_status": null,
+      "to_status": "active",
+      "action": "created",
+      "note": "User-triggered test of in-app notification persistence. No patient condition or emergency is represented.",
+      "actor": "demo_service"
+    },
+    {
+      "id": 73,
+      "notification_id": 67,
+      "created_at": "2026-11-05T14:06:51.520172+00:00",
+      "from_status": "active",
+      "to_status": "active",
+      "action": "mark_read",
+      "note": "Read state updated in synthetic demo.",
+      "actor": "demo_workspace"
+    },
+    {
+      "id": 74,
+      "notification_id": 67,
+      "created_at": "2026-11-05T14:06:51.862444+00:00",
+      "from_status": "active",
+      "to_status": "acknowledged",
+      "action": "review",
+      "note": "Synthetic review timeline demonstration.",
+      "actor": "demo_workspace"
+    },
+    {
+      "id": 75,
+      "notification_id": 67,
+      "created_at": "2026-11-05T14:06:52.185433+00:00",
+      "from_status": "acknowledged",
+      "to_status": "under_review",
+      "action": "review",
+      "note": "Demo review recorded: under_review. No clinical action implied.",
+      "actor": "demo_workspace"
+    },
+    {
+      "id": 76,
+      "notification_id": 67,
+      "created_at": "2026-11-05T14:06:52.395785+00:00",
+      "from_status": "under_review",
+      "to_status": "resolved",
+      "action": "review",
+      "note": "Demo review recorded: resolved. No clinical action implied.",
+      "actor": "demo_workspace"
+    },
+    {
+      "id": 77,
+      "notification_id": 67,
+      "created_at": "2026-11-05T14:06:52.801365+00:00",
+      "from_status": "resolved",
+      "to_status": "closed",
+      "action": "review",
+      "note": "Demo review recorded: closed. No clinical action implied.",
+      "actor": "demo_workspace"
+    }
+  ]
+}

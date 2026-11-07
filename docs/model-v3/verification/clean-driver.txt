@@ -1,0 +1,69 @@
+$ /home/user/.cache/pranaguard-model-v3/venv/bin/python -m venv /home/user/.cache/pranaguard-model-v3/.cache/pranaguard-model48-v3-clean-setup/.venv
+$ /home/user/.cache/pranaguard-model-v3/.cache/pranaguard-model48-v3-clean-setup/.venv/bin/python --version
+$ node --version
+$ npm --version
+$ /home/user/.cache/pranaguard-model-v3/.cache/pranaguard-model48-v3-clean-setup/.venv/bin/python -m pip install -r requirements.txt
+$ /home/user/.cache/pranaguard-model-v3/.cache/pranaguard-model48-v3-clean-setup/.venv/bin/python -m pip check
+$ npm --prefix frontend ci --no-audit --no-fund
+$ /home/user/.cache/pranaguard-model-v3/.cache/pranaguard-model48-v3-clean-setup/.venv/bin/python -m scripts.bootstrap
+$ /home/user/.cache/pranaguard-model-v3/.cache/pranaguard-model48-v3-clean-setup/.venv/bin/python -c import hashlib,json,sqlite3
+from fastapi.testclient import TestClient
+from backend.app.main import app
+from backend.app.config import ROOT,DB_PATH
+baseline=json.loads((ROOT/'docs/enhanced/BASELINE_MANIFEST.json').read_text())
+def verify():
+ with sqlite3.connect('file:'+str(DB_PATH)+'?mode=ro',uri=True) as db:
+  for t,expected in baseline['database_before'].items():
+   rows=[tuple(r) for r in db.execute(f'SELECT * FROM {t} ORDER BY rowid')]
+   assert {'rows':len(rows),'content_sha256':hashlib.sha256(json.dumps(rows,sort_keys=True).encode()).hexdigest()}==expected
+  assert not db.execute('PRAGMA foreign_key_check').fetchall()
+verify()
+with TestClient(app) as c:
+ for url in ['/api/health','/api/overview','/api/patients/PG-0071','/api/validation','/api/model48/study','/api/model48/v3/study','/api/model48/v3/patients/PG-0071','/api/enhanced/status','/api/enhanced/registry/patients','/api/enhanced/devices','/api/enhanced/notifications','/api/enhanced/email','/api/enhanced/provenance']:
+  r=c.get(url);assert r.status_code==200,(url,r.status_code);print(url,'200')
+ assert c.get('/api/overview').json()['summary']['total']==120
+ assert c.get('/api/enhanced/registry/patients').json()['total']==120
+ twin=c.get('/api/patients/PG-0071').json();assert twin['synthetic'] and len(twin['risks'])==3
+ for city in ['Pune','Mumbai','Delhi','Bengaluru']:
+  r=c.get('/api/enhanced/environment/'+city);assert r.status_code==200
+  data=r.json();assert not data['live_requests_enabled'];assert all(part['status']=='historical_fallback' for part in data['components'].values())
+ assert c.get('/api/enhanced/email').json()['mode']=='disabled'
+ assert c.get('/api/model48/study').json()['candidate_active'] is False
+ assert c.get('/api/model48/study').json()['study']['status']=='GATE_NOT_PASSED'
+ assert c.get('/api/model48/v3/study').json()['experimental_available']
+ new=c.get('/api/model48/v3/patients/PG-0071').json();assert new['model_version']=='pg48-v3-multiseed' and new['original_risk48']==twin['risks']['48'] and not new['persisted']
+ assert abs(new['explanation']['probability']-new['probability'])<1e-12
+verify()
+print('PASS: actual ASGI lifespan, bundled predictions, 120/3000 preserved, additive migrations, enhanced reads, 4-city offline fallback; no reset or external email.')
+
+$ /home/user/.cache/pranaguard-model-v3/.cache/pranaguard-model48-v3-clean-setup/.venv/bin/python -m scripts.verify_model48_v3
+$ /home/user/.cache/pranaguard-model-v3/.cache/pranaguard-model48-v3-clean-setup/.venv/bin/python -m pytest --junitxml=/home/user/.cache/pranaguard-model-v3/PranaGuard-Enhanced-v3/docs/model-v3/verification/clean-backend-tests.xml
+$ npm --prefix frontend test -- --reporter=default --reporter=json --outputFile=/home/user/.cache/pranaguard-model-v3/PranaGuard-Enhanced-v3/docs/model-v3/verification/clean-frontend-tests.json
+$ npm --prefix frontend run build
+{
+  "status": "PASS",
+  "executed_at": "2026-11-05T15:51:44.819409+00:00",
+  "source": "Actual isolated ZIP-style source copy, not a Git clone of the unmodified base commit. Application file hashes recorded below.",
+  "base_commit": "95a4e2b00fcb2d9df7210c6b87ecba171a0c4e91",
+  "fresh_virtual_environment": true,
+  "pip_check": true,
+  "npm_ci": true,
+  "python": "Python 3.13.16",
+  "node": "v20.20.2",
+  "npm": "10.8.2",
+  "bootstrap_without_reset": true,
+  "asgi_startup_and_frozen_predictions": true,
+  "original_cohort_and_states_unchanged": true,
+  "offline_cities_verified": 4,
+  "backend_tests_passed": 119,
+  "frontend_tests_passed": 50,
+  "production_frontend_build": true,
+  "application_source_count": 118,
+  "total_seconds": 71.202,
+  "not_claimed": [
+    "Fresh external provider calls in this clean check",
+    "Physical hardware",
+    "External inbox delivery",
+    "Enhanced deployment"
+  ]
+}

@@ -1,0 +1,28 @@
+
+> pranaguard-clinician-dashboard@0.1.0 test
+> vitest run --reporter=default --reporter=json --outputFile=../docs/enhanced/verification/frontend-tests.json
+
+
+ RUN  v3.2.7 /home/user/PranaGuard-Enhanced/frontend
+
+ ✓ src/enhanced/Enhanced.test.tsx (22 tests) 4087ms
+   ✓ fictional registry and onboarding > searches server records by ID and reports an honest empty result  677ms
+   ✓ persistent notification review and email honesty > creates a test event and reviews acknowledgement/under-review/resolution/closure  645ms
+   ✓ persistent notification review and email honesty > marks reading independently of review status  463ms
+ ✓ src/App.test.tsx (14 tests) 4845ms
+   ✓ backend-fed dashboard > renders the real captured cohort response and explicit synthetic labels  428ms
+   ✓ backend-fed dashboard > filters patient search without invented rows  574ms
+   ✓ backend-fed dashboard > shows an empty search result honestly  526ms
+   ✓ backend-fed dashboard > loads the patient state, baseline and persisted version control  431ms
+   ✓ backend-fed dashboard > loads real model drivers and switches prediction horizon  418ms
+   ✓ backend-fed dashboard > calls the scenario API and displays the saved calculated result  419ms
+   ✓ backend-fed dashboard > displays executed validation results, including negative findings  347ms
+   ✓ backend-fed dashboard > persists clinician notes using the backend endpoint  579ms
+   ✓ backend-fed dashboard > shows source provenance and saves an optional browser-session token  453ms
+
+ Test Files  2 passed (2)
+      Tests  36 passed (36)
+   Start at  14:08:32
+   Duration  12.57s (transform 813ms, setup 326ms, collect 1.48s, tests 8.93s, environment 1.07s, prepare 408ms)
+
+JSON report written to /home/user/PranaGuard-Enhanced/docs/enhanced/verification/frontend-tests.json
