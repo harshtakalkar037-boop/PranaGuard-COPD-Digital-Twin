@@ -5,7 +5,7 @@ import {useRemote} from '../hooks';
 import {Empty,Loading,Notice,Panel,Pill,time} from '../components';
 import type {DocumentItem} from './types';
 
-const TYPE_LABELS:Record<string,string>={prescription:'Prescription (record)',lab_report:'Lab report',imaging:'Imaging',discharge_summary:'Discharge summary',action_plan:'Action plan',other:'Other'};
+const TYPE_LABELS:Record<string,string>={prescription:'Prescription (PDF)',lab_report:'Lab report',imaging:'Imaging',discharge_summary:'Discharge summary',action_plan:'Action plan',other:'Other'};
 
 export function PatientDocumentsPage(){
  const {data,error}=useRemote<{items:DocumentItem[];note:string}>('/workspace/patient/documents',0);
@@ -31,7 +31,7 @@ export function PatientDocumentsPage(){
     <div className="care-card-top"><strong>{d.title}</strong><Pill tone="blue">{TYPE_LABELS[d.doc_type]||d.doc_type}</Pill></div>
     <p>{d.notes||'No notes.'}</p>
     <small><FileText size={11}/> {d.filename} · {Math.round(d.size/1024)||1} KB · {d.doc_date||'no date'} · shared by Dr. {d.uploaded_by} · {time(d.created_at,true)}</small>
-    <div className="pgx-inline"><button className="button secondary small-button" onClick={()=>download(d)}><Download size={13}/>Download</button><span className="input-help"><ShieldCheck size={11}/> integrity-checked</span></div>
+    <div className="pgx-inline"><button className="button secondary small-button" onClick={()=>download(d)}><Download size={13}/>{d.media_type==='application/pdf'?'Download PDF':'Download file'}</button><span className="input-help"><ShieldCheck size={11}/> integrity-checked</span></div>
    </div>)}</div>:<Empty text="No documents shared yet. When your doctor uploads a prescription or record, it appears here."/>}
   </Panel>
  </div>;
