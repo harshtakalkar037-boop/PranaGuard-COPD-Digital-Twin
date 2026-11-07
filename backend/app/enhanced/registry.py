@@ -14,8 +14,9 @@ def fingerprint(body):return hashlib.sha256(json.dumps(body,sort_keys=True,separ
 
 class Registry:
     def __init__(self,engine,notifications):self.engine=engine;self.store=engine.store;self.notifications=notifications
-    def require(self,pid):
-        with self.store.connect() as c:
+    def require(self,pid,conn=None):
+        from contextlib import nullcontext
+        with (nullcontext(conn) if conn is not None else self.store.connect()) as c:
             row=c.execute('SELECT profile FROM patients WHERE patient_id=?',(pid,)).fetchone()
             if not row:raise HTTPException(404,'Synthetic patient not found.')
             return json.loads(row['profile'])
@@ -72,8 +73,9 @@ class Registry:
         return {'patients':result,'total':len(result),'original_cohort_count':len(self.engine.profiles),'synthetic_only':True}
 
     def detail(self,pid):
-        profile=self.require(pid);historical=pid in self.engine.profiles
+        historical=pid in self.engine.profiles
         with self.store.connect() as c:
+            profile=self.require(pid,conn=c)
             reg=c.execute('SELECT * FROM registrations WHERE patient_id=?',(pid,)).fetchone()
             devices=[public_device(r) for r in c.execute('SELECT * FROM devices WHERE patient_id=? ORDER BY created_at DESC',(pid,))]
             readings=[dict(r) for r in c.execute('SELECT * FROM device_readings WHERE patient_id=? ORDER BY observed_at DESC,id DESC LIMIT 300',(pid,))][::-1]
