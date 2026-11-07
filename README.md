@@ -294,7 +294,7 @@ erDiagram
     PATIENTS ||--o{ CARE_REVIEWS : reviewed
     CARE_REVIEWS ||--o{ CARE_REVIEW_EVENTS : audit_events
     PATIENTS ||--o| CARE_PLANS : has_plan
-    CARE_PLANS ||--o{ CARE_PLAN_REVISIONS : revisions
+    PATIENTS ||--o{ CARE_PLAN_REVISIONS : plan_revision_history
     PATIENTS ||--o{ DAILY_LOGS : reports
     PATIENTS ||--o{ PLAN_MEDICATIONS : has_demo_medications
     PLAN_MEDICATIONS ||--o{ MED_ADHERENCE : adherence_entries
@@ -304,7 +304,7 @@ erDiagram
     CARE_USERS ||--o{ FOLLOW_UPS : creates
     PATIENTS ||--o{ SPUTUM_ENTRIES : reports
     SPUTUM_ENTRIES ||--o{ ATTACHMENTS : may_include
-    PATIENTS ||--o{ REGISTRATIONS : registered_demo
+    PATIENTS ||--o| REGISTRATIONS : registered_demo
     PATIENTS ||--o{ DEVICES : associated_simulated_devices
     DEVICES ||--o{ INGESTION_EVENTS : emits
     INGESTION_EVENTS ||--o{ DEVICE_READINGS : contains
@@ -316,7 +316,6 @@ erDiagram
     NOTIFICATIONS ||--o{ NOTIFICATION_HISTORY : status_history
     PATIENTS ||--o{ AUDIT_EVENTS : activity_audit
     PATIENTS ||--o{ ENHANCED_AUDIT : enhanced_audit
-    ENVIRONMENT_CACHE ||--o{ ENVIRONMENT_ATTEMPTS : retry_state
 
     PATIENTS {
         text patient_id PK
