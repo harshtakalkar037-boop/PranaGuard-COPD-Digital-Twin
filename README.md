@@ -1,172 +1,291 @@
-# PranaGuard — unified COPD digital-twin workspace (advanced submission build)
+# PranaGuard — Patient-Specific COPD Digital-Twin Workspace
 
-PranaGuard is a **synthetic, research-only proof of concept** for post-discharge COPD monitoring:
-patient risk dashboards, replayable digital twins from frozen multiseed models, versioned model-ranking
-evidence with rollups and ablations, and a **complete clinician care workspace** — one signed-in experience
-with a unified patient directory, sputum diaries, care-plan documentation and a persisted Care Action Centre.
+**Happiest Health Digital Twin Challenge 2026 · Engineering prototype and research submission**  
+**Institution:** Pune Institute of Computer Technology (PICT), Pune
 
-**Do not use this project for clinical decisions.** Everything ships with synthetic data only; the frozen
-baseline cohort is read-only research data (120 synthetic patients / 3,000 window states), and live
-environmental data is never model input.
+> PranaGuard is a synthetic-data research prototype combining longitudinal patient-twin replay, experimental multi-horizon risk visibility, model-study evidence, environmental context, and connected doctor–patient care workflows. It makes data coverage, model versions, provenance, assumptions and review actions inspectable; it does not make autonomous clinical decisions.
+
+<p align="center">
+  <a href="https://prana-guard-copd-digital-twin.vercel.app"><strong>Open live demo</strong></a> ·
+  <a href="https://pranaguard-api.onrender.com/api/health"><strong>Backend health</strong></a> ·
+  <a href="https://github.com/harshtakalkar037-boop/PranaGuard-COPD-Digital-Twin"><strong>Source repository</strong></a>
+</p>
+
+> [!CAUTION]
+> **Research demonstration only. Not a medical device. Not clinically validated.** All patient identities and records are synthetic. Model outputs are experimental estimates on generated data and must not be used for diagnosis, triage, prescribing, treatment, emergency decisions, or claims of patient benefit. No real patient, hospital/EHR, or certified medical-device integration is provided.
 
 ---
 
-## What's in this build
+## 1. The problem we are exploring
 
-| Layer | Status |
+COPD status can change over time. A single measurement may not describe the context of a person's symptoms, daily records, baseline, or environmental conditions.
+
+PranaGuard explores whether a patient-specific digital-twin workspace can make longitudinal signals, experimental risk estimates, model evidence, and care-team review easier to inspect in one connected experience. The prototype demonstrates that workflow on a frozen synthetic research cohort; it does not demonstrate reliable prediction of real COPD exacerbations or improved clinical outcomes.
+
+## 2. What makes PranaGuard different
+
+- **Stateful twin, not just a static dashboard:** replayable, versioned patient states and longitudinal history.
+- **Visible research evidence:** model versions, experiment comparisons, evaluation results, limitations, and provenance are surfaced rather than hidden behind one score.
+- **Connected doctor and patient workflows:** patient-submitted records can be reviewed by an assigned doctor; doctor-shared documents and follow-ups appear in the linked patient account.
+- **Server-side access rules:** role and patient-assignment checks are enforced by the API, not only by hiding interface elements.
+- **Honest missing-data handling:** surfaces show coverage, freshness, completeness, and empty states rather than inventing values.
+- **Environmental context is separate from model inference:** optional city context is displayed separately and is not silently inserted into the frozen model inputs.
+- **Additive evolution:** care-workspace and v6 capabilities extend the original twin, replay, alert, and study-explorer experience.
+
+## 3. Live prototype and submission resources
+
+| Resource | Link |
 |---|---|
-| Original hackathon dashboard (baseline, twins, signals, alerts, export) | ✅ preserved — 26/26 original files hash-verified unchanged |
-| Enhanced submission work (registry read-only, notifications, device/environment surfaces, email-engine primitives, hash-guarded provenance, model-ranking study infrastructure) | ✅ preserved and working |
-| Experiment v2 (6-hour personalized) | ❌ rejected — evidence kept, inactive, honestly labelled |
-| Experiment v3 (48-hour early-warning `pg48-v3-multiseed`) | ✅ active experimental model — PASSED frozen gate |
-| Post-v3 analysis artifacts (v4 evidence, gap analysis, final selection report, TreeSHAP cache) | integrity-verified at startup |
-| v5 study explorer (unified results browser: history, gates, rollups, ablations, top-5, leaderboard, scatter, comparison, frozen-vs-active) | ✅ additive, on top of frozen studies |
-| Care workspace | ✅ signed-in workspace, unified directory, multi-step onboarding, Care Action Centre with persisted review workflow, patient 360° profile (overview/sputum/care plan/activity/reviews), doctor-scoped API authorization, honest error taxonomy, grouped navigation |
-| **Doctor + Patient dashboards** | **✅ connected pair on one assigned synthetic record: patient daily wellbeing log + sputum diary + medication adherence (audited corrections), doctor-reviewed flags, clinical document upload/share with SHA-256 provenance, follow-up instructions, patient home summary, uniform audit trail; exactly 3 new patient nav items** |
-| **v6: doctor risk visibility + patient health insights (this build)** | **✅ additive: 24/48/72h risk cards (timestamp, model version, freshness, completeness, review status) on doctor dashboard watchlist, patient profile *Model risk* tab and care-review context; timestamped prediction-history trend (`005_prediction_history` — additive migration, no duplicates, versions identified, raw scores never modified); engine reuse for explanations. Patient side: home summary lines, log-completion/adherence/review-status counts, insights tab with interactive graphs (symptom/breathlessness/cough, replay breathing-rate, sleep, activity, hydration, adherence, wellbeing) with 7/30/90-day + custom range filters and honest empty states. Patients are hard-blocked (403) from every doctor-only prediction endpoint. All outputs labelled "Experimental synthetic-data model estimate. Not clinically validated. Not intended for diagnosis, triage, or treatment decisions."** |
+| Live web application | [PranaGuard dashboard](https://prana-guard-copd-digital-twin.vercel.app) |
+| Backend health endpoint | [API health](https://pranaguard-api.onrender.com/api/health) |
+| FastAPI interactive docs | [API docs](https://pranaguard-api.onrender.com/docs) |
+| Source code | [GitHub repository](https://github.com/harshtakalkar037-boop/PranaGuard-COPD-Digital-Twin) |
+| Doctor–patient delivery report | [DOCTOR_PATIENT_DELIVERY.md](docs/DOCTOR_PATIENT_DELIVERY.md) |
+| v6 implementation report | [ENHANCEMENT_IMPLEMENTATION_REPORT.md](docs/ENHANCEMENT_IMPLEMENTATION_REPORT.md) |
+| v6 acceptance evidence | [V6_ACCEPTANCE.md](docs/v6-verification/V6_ACCEPTANCE.md) |
 
-## Quick start (linear, ~5 minutes)
+The public frontend is hosted on Vercel and the FastAPI backend on Render. The currently audited Render API uses the Free plan and a local SQLite file. **Do not assume user-created demo records survive service restarts, redeployments, or filesystem resets.** This hosting configuration is for demonstration only and must never receive real patient information.
 
-Prerequisites: **Python ≥3.11** and **Node ≥20 / npm**. Copy `.env.example` → `.env` (safe defaults
-already match; secrets are never required for local demo).
+## 4. Jury walkthrough: recommended 5–7 minute flow
 
-```bash
-cd PranaGuard-Platform
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-npm --prefix frontend install
+1. **Start at login.** Explain that the accounts are fictional demo identities and that the app has separate doctor and patient experiences.
+2. **Open the doctor workspace.** Show grouped navigation, the synthetic patient directory, search, and the Care Action Centre.
+3. **Open a patient profile.** Review the twin overview, baseline, historical state, sputum information, care plan, review history, and model-risk context.
+4. **Explain risk evidence carefully.** Show 24/48/72-hour replay-model outputs with timestamps, model version, input completeness, freshness, review status, and explanation limitations. Do not call these clinically validated probabilities.
+5. **Demonstrate the connected patient account.** Sign out and sign in as the linked patient. Add or inspect a daily wellbeing entry, sputum diary, and medication-adherence report.
+6. **Return to the doctor account.** Show the same patient-submitted record, mark it reviewed, and demonstrate the audit trail.
+7. **Show doctor-to-patient actions.** Share a fictional document or follow-up instruction, then show the linked patient view and authorized document access.
+8. **Finish with Insights and Study Explorer.** Highlight date filters, honest missing-data states, experiment comparisons, and explicit model limitations.
+
+### Demo identities
+
+These are public synthetic demonstration credentials, not production credentials. Passwords may be overridden with environment variables before the first database seed.
+
+| Username | Demo password | Experience |
+|---|---|---|
+| `dr-atlas` | `prana-atlas-demo` | Doctor account with synthetic cohort |
+| `dr-nova` | `prana-nova-demo` | Empty doctor panel for assignment/isolation demonstration |
+| `pat-pg0071` | `prana-patient-demo` | Patient account linked to synthetic patient PG-0071 |
+
+Sessions use bearer tokens, PBKDF2 password hashes, and a 12-hour expiry. This is demo-grade authentication, not production identity management.
+
+## 5. Feature set
+
+### 5.1 Original digital-twin and research dashboard
+
+- Frozen synthetic cohort with **120 patient profiles and 3,000 stored twin/window states**.
+- Cohort overview, patient search, risk categories, and patient-specific views.
+- Longitudinal twin-state history, versioned replay, and live dashboard updates through WebSockets.
+- Baseline/current-state inspection, signal trends, and missingness/freshness context.
+- Model inference and explanation surfaces for the frozen baseline pipeline.
+- Scenario studio for conditional PM2.5, adherence, and activity assumptions.
+- Persisted alerts, acknowledgement/resolution workflow, and clinician action notes.
+- Data-integrity checks, cohort/model fingerprints, provenance manifests, and reproducible artifacts.
+
+The frozen cohort is read-only research data. Demo write flows are designed to touch workspace tables, not rewrite the frozen scientific dataset.
+
+### 5.2 Model-study and evidence explorer
+
+- Versioned experiment history, gates, rollups, ablations, top-five summaries, leaderboard, scatter plots, and model comparisons.
+- Experiment v2 (6-hour personalized) is rejected and retained as evidence, not presented as active.
+- Experiment v3 (`pg48-v3-multiseed`) is an active experimental 48-hour early-warning model with its own frozen-gate evidence.
+- v4 evidence, gap analysis, final selection report, and TreeSHAP cache are retained and integrity-checked.
+- v5 study explorer presents frozen-versus-active comparisons without overwriting prior study results.
+
+### 5.3 Clinician workspace and connected patient experience
+
+- Signed-in clinician workspace, unified patient directory, onboarding, patient 360° profile, and persisted Care Action Centre review workflow.
+- Patient daily wellbeing log, sputum diary, and medication adherence with audited corrections.
+- Doctor-reviewed flags, clinical document upload/share with SHA-256 provenance, follow-up instructions, and uniform audit trail.
+- Patient home summary and patient insights for symptoms/breathlessness/cough, replay breathing rate, sleep, activity, hydration, adherence, and wellbeing.
+- 7/30/90-day and custom date filters, with explicit empty states where replay data is unavailable.
+- Exactly three patient navigation items: Patient Home, My Health Records, and Clinical Documents.
+
+### 5.4 v6: doctor risk visibility and patient insights
+
+- Doctor risk cards for 24/48/72-hour horizons, including prediction timestamp, model version, data completeness, freshness, and review status.
+- 72-hour watchlist and patient-profile Model Risk tab, plus timestamped prediction history.
+- Feature-contribution view reuses the existing frozen engine explanation path.
+- Patient insights and home summaries are data-backed and preserve honest missing-data states.
+- Patient sessions are blocked with HTTP 403 from doctor-only prediction endpoints.
+- All risk outputs are labelled as experimental synthetic-data estimates and not intended for diagnosis, triage, or treatment decisions.
+
+## 6. Architecture and technology
+
+| Layer | Technology |
+|---|---|
+| Frontend | React, TypeScript, Vite, Tailwind CSS, Recharts, Lucide React |
+| Backend/API | Python, FastAPI, Uvicorn, Pydantic |
+| Data and ML | pandas, NumPy, scikit-learn, LightGBM, joblib |
+| Persistence | SQLite, WAL, foreign keys, transactional writes, additive migrations |
+| Communication | REST API and WebSockets |
+| Testing | pytest, Vitest, React Testing Library, Playwright Chromium |
+
+```text
+backend/app/
+  main.py, engine.py, store.py      frozen research API and twin engine
+  enhanced/                         registry, alerts, devices, environment, evidence
+  workspace/                        authentication, directory, patient profile, care workflows
+  migrations/                       additive, checksummed database migrations
+models_store/, baseline_outcomes/   frozen model artifacts and baseline evidence
+experiments-v2…v4, docs/model*/      versioned studies and evaluation artifacts
+frontend/src/
+  pages/                            original dashboard and research pages
+  pages-enhanced/                   study and model-science pages
+  workspace/                        login, directory, profile, Care Action Centre
+docs/                               implementation reports and verification evidence
 ```
 
-Terminal 1 — API (serves on **:8000**, also serves `/docs`):
+## 7. Data, model methodology, and interpretation
+
+- The research cohort contains 120 synthetic patient profiles and 3,000 synthetic window states. These records do not represent real people.
+- The frozen baseline model is `pg-synthetic-v1`. Its runtime scores are raw replay-model outputs and must not be described as calibrated clinical probabilities.
+- The separate `pg48-v3-multiseed` experiment is a synthetic-only 48-hour study model. Do not conflate its evaluation with the frozen baseline runtime.
+- The v6 prediction-history feature records timestamped outputs and model/state versions; it does not modify historical raw scores.
+- Environmental context is optional, city-level gridded/modelled information. USAQI is not CPCB/Indian NAQI; environmental context is not a personal exposure measurement and is not a frozen-model input.
+- What-if scenarios are conditional sensitivity analyses, not validated disease trajectories, causal intervention effects, or treatment recommendations.
+- TreeSHAP/model explanations describe model associations, not causation. A lower model score is not evidence that an intervention improves health.
+
+## 8. Validation, tests, and verification evidence
+
+Latest recorded v6 verification (2026-11-07):
+
+| Check | Recorded result |
+|---|---:|
+| Backend pytest suite | **151 passed** |
+| Frontend Vitest suite | **78 passed** |
+| TypeScript check | Clean |
+| Production frontend build | Passed |
+| Doctor–patient real-browser round trip | **14/14 passed** |
+| Workspace browser regression | **15/15 passed** |
+| v6 risk/insights browser verification | **7/7 passed** |
+| Clean extraction setup and test verification | Passed |
+
+Evidence files:
+- [v6 acceptance matrix](docs/v6-verification/V6_ACCEPTANCE.md)
+- [Doctor–patient browser results](docs/doctor-patient-verification/BROWSER_DOCTOR_PATIENT.json)
+- [Workspace browser results](docs/workspace-verification/BROWSER_WORKSPACE.json)
+- [v6 browser results](docs/v6-verification/V6_BROWSER_RESULTS.json)
+
+These are recorded software tests and browser checks on synthetic data. They are **not** independent clinical validation, prospective evaluation, regulatory verification, or evidence of patient benefit. Re-run the suites against the exact commit used for final submission.
+
+## 9. Security, privacy, and limitations
+
+### Implemented demo safeguards
+
+- PBKDF2-hashed demo passwords and expiring bearer sessions.
+- Doctor assignment scoping and patient-own-record scoping enforced in backend services.
+- Doctor-only risk endpoints reject patient sessions.
+- Document type/size/signature checks, SHA-256 provenance, and authorized document downloads.
+- Audited record corrections and actor-attributed workflow actions.
+- Additive, checksummed, transactional database migrations.
+- No real patient records or credentials are included in the project dataset.
+
+### Limitations reviewers should know
+
+- No real patient data, clinician-adjudicated labels, prospective cohort, or external clinical validation.
+- No medical-device certification, hospital/EHR integration, or real wearable telemetry.
+- Demo authentication is not production-grade identity/RBAC or a regulated clinical access system.
+- No claim of HIPAA/GDPR or other healthcare regulatory compliance is made.
+- Current Render Free service uses local SQLite storage; hosted writes are not guaranteed durable. Do not enter real patient information.
+- Environmental sources are gridded/modelled products, not personal exposure measurements.
+- What-if scenarios are noncausal sensitivity analyses; explanations are associations, not causation.
+
+Before any real-world study, the project would require ethics review, informed consent, governed longitudinal COPD data, clinician-adjudicated outcomes, prospective multi-site evaluation, subgroup and calibration assessment, secure identity/access management, clinical oversight, and a validated safety process.
+
+## 10. Local setup
+
+### Prerequisites
+
+- Python 3.11 or newer (v6 verification used Python 3.13).
+- Node.js 20 or newer and npm.
+- Git.
+
+### Install
 
 ```bash
-.venv/bin/python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+git clone https://github.com/harshtakalkar037-boop/PranaGuard-COPD-Digital-Twin.git
+cd PranaGuard-COPD-Digital-Twin
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+cp .env.example .env
+npm --prefix frontend ci
 ```
 
-Terminal 2 — Dashboard (**:5173**, proxies `/api` → :8000):
+### Start the backend
+
+```bash
+.venv/bin/python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
+```
+
+### Start the frontend in a second terminal
 
 ```bash
 npm --prefix frontend run dev
 ```
 
-Open http://localhost:5173 and sign in with a **documented demo identity** (synthetic accounts, seeded on
-first boot; passwords configurable via `PRANAGUARD_DEMO_*` env vars on first boot):
+Open [http://127.0.0.1:5173](http://127.0.0.1:5173). Vite proxies API requests and WebSockets to the local FastAPI service. Use a single Uvicorn worker; distributed replay coordination is not implemented.
 
-| Username | Password | Panel |
-|---|---|---|
-| `dr-atlas` | `prana-atlas-demo` | Doctor — full 120-twin synthetic panel |
-| `dr-nova` | `prana-nova-demo` | Doctor — empty panel (auth/isolation demo) |
-| `pat-pg0071` | `prana-patient-demo` | Patient — own synthetic record only |
-
-Sessions are bearer tokens (PBKDF2-hashed demo passwords, 12-hour expiry, persisted in SQLite).
-
-## Database & migrations
-
-- SQLite WAL at `data/pranaguard.sqlite`, shipped with the frozen cohort (120 patients / 3,000 states;
-  content digests verified at startup; `PRANAGUARD_STRICT_DATA=1` turns tampering into a fatal error).
-- Additive, checksummed migrations in `backend/app/migrations/` (`001` enhanced monitoring,
-  `002` environment backoff, `003` care workspace: users/sessions, assignments, sputum entries+attachments,
-  care plans+revisions, review workflow+timeline, notification reads; `004` doctor+patient records,
-  follow-ups, documents, medication adherence log; `005` prediction history: append-only timestamped captures of
-  frozen-model outputs, unique per (patient, horizon, model version, state version)). Applied automatically on boot;
-  original tables are never erased or rewritten. Failed migrations roll back.
-- `PRANAGUARD_DB=/path/to/copy.sqlite` points the API at a disposable database copy for experiments.
-
-## Testing
+### Useful verification commands
 
 ```bash
-# Backend: 132 tests (original + enhanced + workspace auth/scoping/isolation)
 .venv/bin/python -m pytest backend/tests/ -q
-
-# Frontend: 63 tests across 5 suites (auth gate, directory, profile, care centre, errors, research pages)
 npm --prefix frontend test
-
-# TypeScript + production build
 npm --prefix frontend run build
-
-# Real-browser regression (Playwright + Chromium; disposable DB copy recommended):
-PRANAGUARD_DB=/tmp/pg.sqlite .venv/bin/python -m uvicorn backend.app.main:app --port 8011 &
-API_PROXY_TARGET=http://127.0.0.1:8011 npm --prefix frontend run dev &
 .venv/bin/python -m scripts.browser_verify_workspace
-.venv/bin/python -m scripts.browser_verify_model48_v3   # research-experience browser suite
-.venv/bin/python -m scripts.verify_live_environment     # opt-in live provider check (PRANAGUARD_LIVE_ENV_ENABLED=true)
+.venv/bin/python -m scripts.browser_verify_doctor_patient
+.venv/bin/python -m scripts.browser_verify_v6
 ```
 
-Latest verification evidence: `docs/doctor-patient-verification/BROWSER_DOCTOR_PATIENT.json` (14 round-trip
-checks across the doctor and patient dashboards), `docs/workspace-verification/BROWSER_WORKSPACE.json`
-(15 workspace checks) and `docs/model48-v3/BROWSER_MODEL48_V3_COMPLETED.json` — real-Chromium evidence
-against the shipped code. Backend suite: **141 passed**; frontend suite: **73 passed**.
+Use a disposable database copy for risky tests or reset/bootstrap commands. Never run reset or data-generation commands against a database whose demo actions you need to preserve.
 
-## Production build & deployment
+## 11. Configuration reference
 
-`npm --prefix frontend run build` → `frontend/dist/` static assets. Serve them behind any static host and
-proxy `/api`, `/docs`, `/openapi.json` to the FastAPI process (`vite preview` works locally). No Docker or
-external services are required; the only network dependency is the **opt-in** Open-Meteo free endpoints for
-live environment panels (disabled by default — see below).
+| Variable | Purpose |
+|---|---|
+| `PRANAGUARD_DB` | SQLite database path; use a copy for experiments |
+| `PRANAGUARD_DEMO_DOCTOR_PASSWORD` | First-seed password override for `dr-atlas` |
+| `PRANAGUARD_DEMO_DOCTOR2_PASSWORD` | First-seed password override for `dr-nova` |
+| `PRANAGUARD_DEMO_PATIENT_PASSWORD` | First-seed password override for `pat-pg0071` |
+| `PRANAGUARD_LIVE_ENV_ENABLED` | Opt-in live city environment integration; disabled by default |
+| `PRANAGUARD_ENV_TTL_SECONDS` | Environment cache lifetime |
+| `PRANAGUARD_ENV_RETRY_SECONDS` | Environment provider retry interval |
+| `PRANAGUARD_ENV_TIMEOUT_SECONDS` | Environment provider timeout |
+| `OPEN_METEO_API_KEY` | Optional provider key, if required by the selected provider |
+| `PRANAGUARD_DEVICE_SECRET` | Optional device-simulator secret |
+| `PRANAGUARD_ADMIN_TOKEN` | Optional shared demo admin token for protected legacy write routes |
+| `PRANAGUARD_CORS_ORIGINS` | Comma-separated allowed frontend origins |
 
-## Configuration (`.env`, backend only)
+Set secrets only in the backend environment. Do not commit `.env`, credentials, tokens, or private keys. Demo password overrides apply when demo users are first seeded; changing an environment variable after account creation does not automatically rewrite the stored password.
 
-| Variable | Default | Purpose |
-|---|---|---|
-| `PRANAGUARD_DB` | `data/pranaguard.sqlite` | Database path (use a copy for risky testing) |
-| `PRANAGUARD_DEMO_{ATLAS,NOVA,PATIENT}_PASSWORD` | documented demo values | Demo account passwords on first seed |
-| `PRANAGUARD_TWIN_CACHE_PATH` | `models_store/artifacts/twin/twin_cache.sqlite` | Precomputed twin cache (hash-protected) |
-| `PRANAGUARD_WATCHDOG_ENABLED` | `0` | Auto-recompute twins (never in demo mode) |
-| `PRANAGUARD_LIVE_ENV_ENABLED` | `false` | Opt-in Open-Meteo live air/weather panels |
-| `PRANAGUARD_EMAIL_*`, `PRANAGUARD_WEB_PUSH_PUBLIC_KEY` | unset | Optional notification delivery experiments (local SMTP only; no external email account is shipped) |
+## 12. Team and institution
 
-## Architecture map
+- **Challenge:** Happiest Health Digital Twin Challenge 2026.
+- **Institution:** Pune Institute of Computer Technology (PICT), Pune.
+- **Team lead / original submission repository owner:** Anuja Naik.
+- **Engineering, frontend/backend implementation, and documentation:** Harsh Takalkar.
+- **Clinical advisor:** None claimed.
 
-```
-backend/app/
-  main.py, engine.py, store.py      frozen research API (patients/risk/history/explain/scenario/alerts/export…)
-  enhanced/                         registry CRUD, preferences, alerts, devices, environment, evidence, email
-  workspace/                        NEW: auth+sessions, doctor-scoped directory/overview/profile,
-                                    sputum, care plans, review queue/workflow (state machine + timeline)
-  migrations/                       001–003 additive, checksummed
-models_store/, baseline_outcomes/   frozen trained artifacts; findings/ hold-out finalist registry
-experiments-v2…v4, docs/model*v*/   versioned studies (v3 active experimental; v2/v4 rejected, preserved)
-frontend/src/
-  App.tsx + pages/, components.tsx, styles.css   original experience (hash-protected)
-  pages-enhanced/, Enhanced*.tsx                 v2/v3/v5/model-science pages
-  workspace/                        NEW: Login, Directory+Onboarding tabs, Profile tabs, CareCentre, Workspace.css
-docs/                               UPGRADE_PLAN, IMPLEMENTATION_SUMMARY, DOCTOR_PATIENT_* (plan + delivery), verification evidence
-```
+Please ensure the final challenge submission uses the official complete team roster and role wording agreed by the team.
 
-## Honest limitations (unchanged commitments)
+## 13. Future work
 
-- **Synthetic only** — every patient, vitals source, diary entry and identity is fictional demo data.
-- Research cohort is frozen/read-only; demo write flows touch only workspace tables, never frozen science.
-- Baseline head model performance is below chance on the frozen synthetic test cohort (documented in the UI);
-  the 48-hour v3 model is an experimental, synthetic-only improvement with its own honest evidence page.
-- Live air/weather context is modelled gridded data (Open-Meteo CAMS), optional, informed-consent-free,
-  and **never** an ML input; **USAQI ≠ CPCB/Indian NAQI**. IMD/CPCB feeds are explicitly labelled as
-  *not integrated* where referenced.
-- Device integrations are simulators/sandbox surfaces — presented as such, never as real telemonitoring.
-- ARIMA/LightGBM/CatBoost baselines are honest underground benchmarks; the shipped runtime remains sklearn
-  losses; what-if scenarios are noncausal ranked persistence checks.
-- No external email/push delivery is shipped; notification centre is in-app with opt-in local primitives.
+1. Move hosted writable records to managed persistent storage with backups, migration testing, and controlled access.
+2. Improve identity, authorization, secret management, audit retention, and deployment hardening before any sensitive-data use.
+3. Evaluate model stability on new, pre-registered synthetic cohorts without tuning against the existing test set.
+4. Seek ethically approved access to governed longitudinal COPD data and clinician-adjudicated outcomes.
+5. Conduct prospective, multi-site evaluation of calibration, uncertainty, fairness, missingness, and useful lead time.
+6. Integrate validated devices or EHR systems only with appropriate security, consent, interoperability, and governance.
+7. Develop and validate any mechanistic or causal response model before making intervention-effect claims.
 
-## Provenance
+## 14. License and attribution
 
-Fork lineage and team context: see `README-original-backup.md` (verbatim original) and
-`docs/enhanced/TEAM_INFO.md`. Frozen-cohort digests: `docs/enhanced/BASELINE_MANIFEST.json`.
-Study evidence: `docs/final-submission/CHAMPION_SELECTION.md`, `docs/model48v3/`, `docs/enhanced/results/`.
+Refer to the repository [LICENSE](LICENSE) and [third-party notices](docs/THIRD_PARTY_LICENSES.md) for code, synthetic data, cached environmental products, dependencies, and asset terms. Environmental-provider attribution does not imply endorsement.
 
-### Doctor ↔ patient demo workflow (this build)
+---
 
-1. Sign in as `dr-atlas` → **Patients** → open `PG-0071` → tabs *Daily wellbeing* and *Documents & follow-ups*.
-2. Sign out, then sign in as `pat-pg0071` → the patient shell opens with **three** items only:
-   Patient Home, My Health Records, Clinical Documents. Patient submissions appear in the doctor's view
-   and doctor-shared plans/follow-ups/documents appear in the patient's view (same SQLite record).
-3. Details: `docs/DOCTOR_PATIENT_DELIVERY.md`.
-
-### v6 flows (doctor risk visibility + patient insights)
-
-1. Sign in as `dr-atlas` → **Care action centre** shows the experimental 72h risk watchlist (raw replay-model scores, sorted, with review status; disclaimer inline).
-2. **Patients** → open `PG-0071` → **Model risk** tab: 24/48/72h cards with prediction timestamp / `pg-synthetic-v1` version / data completeness / review status; timestamped prediction-history chart; on-demand 72h feature-contribution table (reuse of the frozen `engine.explain`).
-3. In an open **care review** the same read-only risk cards appear as context — documentation only, never auto-driving treatment.
-4. Sign in as `pat-pg0071` → **Patient Home** shows data-backed summary lines (log completion, adherence counts, doctor review status); **My Health Records → Insights** renders interactive graphs with 7/30/90-day + custom date filters, units, tooltips, and honest empty states. The frozen replay window (currently 12–13 Sep 2026 UTC) is surfaced so gaps are never silently filled.
-5. Patients calling any doctor-only prediction endpoint receive **403** (see `backend/tests/test_v6_risk_insights.py`).
-6. Full evidence: `docs/ENHANCEMENT_IMPLEMENTATION_REPORT.md`, `docs/v6-verification/`.
-
-> PranaGuard · Synthetic proof of concept · pg-synthetic-v1 · no clinical validation
+<p align="center">
+  <strong>PranaGuard</strong><br/>
+  Patient-specific digital-twin research workspace · Synthetic data only · No clinical validation
+</p>
