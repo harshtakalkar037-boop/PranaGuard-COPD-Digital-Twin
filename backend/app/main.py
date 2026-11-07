@@ -111,6 +111,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     @app.patch('/api/alerts/{alert_id}',dependencies=[Depends(authorize)])
     async def update_alert(alert_id:int,body:AlertUpdate,e:TwinEngine=Depends(engine)):
         with e.store.connect() as c:
+            c.execute('BEGIN IMMEDIATE')
             row=c.execute('SELECT * FROM alerts WHERE id=?',(alert_id,)).fetchone()
             if not row:raise HTTPException(404,'Alert not found')
             if row['status']=='resolved':raise HTTPException(409,'Resolved alert is immutable. A later high-risk state may create a new alert.')
