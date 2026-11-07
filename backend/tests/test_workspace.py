@@ -147,3 +147,37 @@ def test_workspace_me_authorization_cors_preflight(client):
     allowed = response.headers.get('access-control-allow-headers', '').lower()
     assert 'authorization' in allowed
     assert 'content-type' in allowed
+
+
+def test_legacy_research_api_uses_workspace_scope_when_enabled(client, monkeypatch):
+    monkeypatch.setenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH', '1')
+    assert client.get('/api/overview').status_code == 401
+
+    doctor = auth(client)
+    overview = client.get('/api/overview', headers=doctor)
+    assert overview.status_code == 200
+    assert overview.json()['summary']['total'] == 120
+
+    empty_doctor = auth(client, 'dr-nova', 'prana-nova-demo')
+    assert client.get('/api/overview', headers=empty_doctor).json()['summary']['total'] == 0
+    assert client.get('/api/patients/PG-0071', headers=empty_doctor).status_code == 404
+    assert client.get('/api/enhanced/notifications', headers=empty_doctor).status_code == 403
+    assert client.get('/api/validation', headers=empty_doctor).status_code == 403
+
+    patient = auth(client, 'pat-pg0071', 'prana-patient-demo')
+    assert client.post(
+        '/api/patients/PG-0071/interventions',
+        headers=patient,
+        json={'kind': 'clinical_review', 'note': 'Should be blocked for patient role'},
+    ).status_code == 403
+
+    preflight = client.options(
+        '/api/overview',
+        headers={
+            'Origin': 'https://prana-guard-copd-digital-twin.vercel.app',
+            'Access-Control-Request-Method': 'GET',
+            'Access-Control-Request-Headers': 'authorization,content-type',
+        },
+    )
+    assert preflight.status_code == 200
+    assert 'authorization' in preflight.headers.get('access-control-allow-headers', '').lower()
