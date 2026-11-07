@@ -210,6 +210,7 @@ class Workspace:
             elif note or follow_up_at is not None:c.execute('INSERT INTO care_review_events(review_id,created_at,event,actor,note) VALUES (?,?,?,?,?)',(rid,at,'note/follow-up updated',user['username'],note or ''))
         return {'review':self.review_detail(user,rid)['review']}
     def complete_follow_up(self,user,rid,note=''):
+        if user.get('role')!='doctor':raise HTTPException(403,'Only a demo doctor can complete a follow-up.')
         at=stamp()
         with self.store.connect() as c:
             c.execute('BEGIN IMMEDIATE')
