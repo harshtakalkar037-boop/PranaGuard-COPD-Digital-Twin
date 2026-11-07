@@ -129,3 +129,21 @@ def test_original_routes_untouched_by_workspace(client):
 
 def test_no_fake_activation(client):
     h=auth(client);assert client.post('/api/workspace/activate-model',headers=h).status_code==404
+
+
+def test_workspace_me_authorization_cors_preflight(client):
+    response = client.options(
+        '/api/workspace/me',
+        headers={
+            'Origin': 'https://prana-guard-copd-digital-twin.vercel.app',
+            'Access-Control-Request-Method': 'GET',
+            'Access-Control-Request-Headers': 'authorization,content-type',
+        },
+    )
+    assert response.status_code == 200, response.text
+    assert response.headers.get('access-control-allow-origin') in (
+        'https://prana-guard-copd-digital-twin.vercel.app', '*'
+    )
+    allowed = response.headers.get('access-control-allow-headers', '').lower()
+    assert 'authorization' in allowed
+    assert 'content-type' in allowed
