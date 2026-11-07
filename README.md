@@ -70,7 +70,7 @@ Sessions are bearer tokens (PBKDF2-hashed demo passwords, 12-hour expiry, persis
 ## Testing
 
 ```bash
-# Backend: 138 tests (original + enhanced + workspace auth/scoping/isolation + follow-up ledger + alert/WebSocket scope)
+# Backend: 139 tests (original + enhanced + workspace auth/scoping/isolation + follow-up ledger + alert/WebSocket scope)
 .venv/bin/python -m pytest backend/tests/ -q
 
 # Frontend: 63 tests across 5 suites (auth gate, directory, profile, care centre, errors, research pages)
