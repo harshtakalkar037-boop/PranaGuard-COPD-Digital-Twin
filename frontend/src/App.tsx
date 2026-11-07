@@ -42,7 +42,7 @@ function App(){
  const {data:overview,error:loadError}=useRemote<Overview>(authState==='ready'?'/workspace/overview':null,revision);
  const refresh=()=>setRevision(r=>r+1);
  useEffect(()=>{if(overview&&!pid)setPid(overview.patients?.[0]?.patient_id||'');},[overview,pid]);
- useEffect(()=>{let ws:WebSocket;try{ws=new WebSocket(websocketUrl());ws.onopen=()=>setSocket(true);ws.onclose=()=>setSocket(false);ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==='twin_updated'||m.type==='alert_updated'||m.type==='enhanced_updated')setRevision(r=>r+1);};}catch{setSocket(false);}const timer=window.setInterval(()=>setRevision(r=>r+1),15000);return ()=>{ws?.close();clearInterval(timer);};},[]);
+ useEffect(()=>{let ws:WebSocket;try{ws=new WebSocket(websocketUrl());ws.onopen=()=>{const session=sessionStorage.getItem('pg-workspace-session');if(session)ws.send(`auth:${session}`);setSocket(true);};ws.onclose=()=>setSocket(false);ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==='twin_updated'||m.type==='alert_updated'||m.type==='enhanced_updated')setRevision(r=>r+1);};}catch{setSocket(false);}const timer=window.setInterval(()=>setRevision(r=>r+1),15000);return ()=>{ws?.close();clearInterval(timer);};},[]);
  useEffect(()=>{if(toast){const timer=setTimeout(()=>setToast(''),4500);return ()=>clearTimeout(timer);}},[toast]);
  function navigate(next:View){setView(next);location.hash=next;setMenu(false);}
  const open=(id:string)=>{setPid(id);navigate('patient');};
