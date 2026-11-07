@@ -220,3 +220,27 @@ def test_alert_id_and_websocket_are_scoped_in_unified_mode(client, engine, monke
     with pytest.raises(Exception):
         with client.websocket_connect('/api/ws?token='+empty_doctor['Authorization'][7:]):
             pass
+
+
+def test_followup_completion_ledger_is_scoped_and_idempotent(client, engine):
+    doctor=auth(client)
+    patient=auth(client,'pat-pg0071','prana-patient-demo')
+    review=client.post('/api/workspace/care/reviews',headers=doctor,json={
+        'patient_id':'PG-0071','note':'Synthetic follow-up ledger test'
+    }).json()['review']
+    rid=review['id']
+    assert client.patch(f'/api/workspace/care/reviews/{rid}',headers=doctor,json={'status':'awaiting_review'}).status_code==200
+    assert client.patch(f'/api/workspace/care/reviews/{rid}',headers=doctor,json={'status':'under_review'}).status_code==200
+    scheduled=client.patch(f'/api/workspace/care/reviews/{rid}',headers=doctor,json={
+        'status':'follow_up_scheduled','follow_up_at':'2099-01-01T10:00:00+00:00'
+    })
+    assert scheduled.status_code==200
+    assert client.post(f'/api/workspace/care/reviews/{rid}/complete-follow-up',headers=patient,json={'note':'patient cannot close clinician follow-up'}).status_code==403
+    completed=client.post(f'/api/workspace/care/reviews/{rid}/complete-follow-up',headers=doctor,json={'note':'Synthetic follow-up completed'})
+    assert completed.status_code==200,completed.text
+    assert completed.json()['review']['status']=='completed'
+    assert completed.json()['completion']['scheduled_for'].startswith('2099-01-01')
+    assert client.post(f'/api/workspace/care/reviews/{rid}/complete-follow-up',headers=doctor,json={}).status_code==409
+    ledger=client.get('/api/workspace/patients/PG-0071/follow-up-ledger',headers=doctor).json()
+    assert ledger['total']==1 and ledger['items'][0]['review_id']==rid
+    assert client.get('/api/workspace/patients/PG-0071/follow-up-ledger',headers=auth(client,'dr-nova','prana-nova-demo')).status_code==403
