@@ -195,3 +195,28 @@ def test_workspace_login_throttle_persists_and_expires(client, engine):
         c.execute('UPDATE care_login_failures SET window_expires_at=? WHERE username_hash=?',
                   ('2000-01-01T00:00:00+00:00', username_hash))
     assert login(client, 'dr-atlas', 'prana-atlas-demo').status_code == 200
+
+
+def test_alert_id_and_websocket_are_scoped_in_unified_mode(client, engine, monkeypatch):
+    from backend.app.engine import now
+    with engine.store.connect() as c:
+        alert_id=c.execute(
+            "INSERT INTO alerts(patient_id,state_version,created_at,risk,horizon,status) VALUES ('PG-0071',1,?,.4,24,'new')",
+            (now(),),
+        ).lastrowid
+    monkeypatch.setenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH', '1')
+    empty_doctor=auth(client, 'dr-nova', 'prana-nova-demo')
+    assert client.patch(
+        f'/api/alerts/{alert_id}', headers=empty_doctor,
+        json={'status':'acknowledged','note':'out of scope'},
+    ).status_code == 404
+    full_doctor=auth(client)
+    assert client.patch(
+        f'/api/alerts/{alert_id}', headers=full_doctor,
+        json={'status':'acknowledged','note':'assigned synthetic alert review'},
+    ).status_code == 200
+    with client.websocket_connect('/api/ws?token='+full_doctor['Authorization'][7:]) as ws:
+        assert ws.receive_json()['type'] == 'connected'
+    with pytest.raises(Exception):
+        with client.websocket_connect('/api/ws?token='+empty_doctor['Authorization'][7:]):
+            pass
