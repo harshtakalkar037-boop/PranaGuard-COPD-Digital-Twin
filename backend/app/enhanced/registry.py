@@ -28,6 +28,8 @@ class Registry:
             if authorize is not None:authorize(c)
             old=c.execute('SELECT * FROM registrations WHERE request_id=?',(body.request_id,)).fetchone()
             if old:
+                if doctor_username is not None and not c.execute('SELECT 1 FROM patient_assignments WHERE patient_id=? AND doctor=?',(old['patient_id'],doctor_username)).fetchone():
+                    raise HTTPException(404,'Registration not found in this account scope.')
                 if old['payload_hash']!=digest:raise HTTPException(409,'Registration request ID was reused with different content.')
                 return {'patient_id':old['patient_id'],'duplicate':True,'prediction_supported':False,'notice':'Existing fictional registration returned; no duplicate patient created.'}
             pid='PG-DEMO-'+uuid.uuid4().hex[:12].upper();at=stamp()
