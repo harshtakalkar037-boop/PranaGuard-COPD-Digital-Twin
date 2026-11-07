@@ -22,6 +22,9 @@ export function PatientHomePage({navigate}:{navigate:(v:'patient-home'|'patient-
    <div className="metric-card"><div className="metric-head"><span>Care plan</span><div className="metric-icon amber"><ShieldCheck size={17}/></div></div><div className="metric-number">{data.care_plan?data.care_plan.status:'None yet'}</div><div className="metric-detail">{data.care_plan?`Updated ${time(data.care_plan.updated_at,true)} by ${data.care_plan.doctor}`:'Your doctor has not added a demo care plan yet'}</div></div>
    <div className="metric-card"><div className="metric-head"><span>Reviewed</span><div className="metric-icon coral"><CheckCircle2 size={17}/></div></div><div className="metric-number">{data.latest_review.reviewed?'Yes':'Not yet'}</div><div className="metric-detail">{data.latest_review.reviewed?`Latest log reviewed by ${data.latest_review.reviewed_by}`:'Your latest log awaits doctor review'}</div></div>
   </div>
+  {data.summary_lines?.length?<Panel title="Recent health summary" subtitle="Based only on your real recorded demo entries">
+   <ul className="summary-lines">{data.summary_lines.map((l,i)=><li key={i}><CheckCircle2 size={13}/> {l}</li>)}</ul>
+  </Panel>:null}
   <div className="two-col">
    <Panel title="Follow-up instructions" subtitle="From your doctor — demo instructions, not automatic treatment changes">
     {(()=>{const all=[...data.overdue_follow_ups,...data.follow_ups];return all.length?all.map(f=><div key={f.id} className="care-card"><div className="care-card-top"><strong>{f.instructions}</strong><Pill tone={data.overdue_follow_ups.some(o=>o.id===f.id)?'coral':'amber'}>{data.overdue_follow_ups.some(o=>o.id===f.id)?'overdue':'scheduled'}</Pill></div><small>{f.due_at?`Due ${time(f.due_at,true)}`: 'No due date'} · Dr. {f.doctor}</small></div>):<Empty text="No upcoming demo follow-ups."/>;})()}

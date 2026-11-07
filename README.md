@@ -22,7 +22,8 @@ environmental data is never model input.
 | Post-v3 analysis artifacts (v4 evidence, gap analysis, final selection report, TreeSHAP cache) | integrity-verified at startup |
 | v5 study explorer (unified results browser: history, gates, rollups, ablations, top-5, leaderboard, scatter, comparison, frozen-vs-active) | ✅ additive, on top of frozen studies |
 | Care workspace | ✅ signed-in workspace, unified directory, multi-step onboarding, Care Action Centre with persisted review workflow, patient 360° profile (overview/sputum/care plan/activity/reviews), doctor-scoped API authorization, honest error taxonomy, grouped navigation |
-| **Doctor + Patient dashboards (this build)** | **✅ connected pair on one assigned synthetic record: patient daily wellbeing log + sputum diary + medication adherence (audited corrections), doctor-reviewed flags, clinical document upload/share with SHA-256 provenance, follow-up instructions, patient home summary, uniform audit trail; exactly 3 new patient nav items** |
+| **Doctor + Patient dashboards** | **✅ connected pair on one assigned synthetic record: patient daily wellbeing log + sputum diary + medication adherence (audited corrections), doctor-reviewed flags, clinical document upload/share with SHA-256 provenance, follow-up instructions, patient home summary, uniform audit trail; exactly 3 new patient nav items** |
+| **v6: doctor risk visibility + patient health insights (this build)** | **✅ additive: 24/48/72h risk cards (timestamp, model version, freshness, completeness, review status) on doctor dashboard watchlist, patient profile *Model risk* tab and care-review context; timestamped prediction-history trend (`005_prediction_history` — additive migration, no duplicates, versions identified, raw scores never modified); engine reuse for explanations. Patient side: home summary lines, log-completion/adherence/review-status counts, insights tab with interactive graphs (symptom/breathlessness/cough, replay breathing-rate, sleep, activity, hydration, adherence, wellbeing) with 7/30/90-day + custom range filters and honest empty states. Patients are hard-blocked (403) from every doctor-only prediction endpoint. All outputs labelled "Experimental synthetic-data model estimate. Not clinically validated. Not intended for diagnosis, triage, or treatment decisions."** |
 
 ## Quick start (linear, ~5 minutes)
 
@@ -64,7 +65,9 @@ Sessions are bearer tokens (PBKDF2-hashed demo passwords, 12-hour expiry, persis
   content digests verified at startup; `PRANAGUARD_STRICT_DATA=1` turns tampering into a fatal error).
 - Additive, checksummed migrations in `backend/app/migrations/` (`001` enhanced monitoring,
   `002` environment backoff, `003` care workspace: users/sessions, assignments, sputum entries+attachments,
-  care plans+revisions, review workflow+timeline, notification reads). Applied automatically on boot;
+  care plans+revisions, review workflow+timeline, notification reads; `004` doctor+patient records,
+  follow-ups, documents, medication adherence log; `005` prediction history: append-only timestamped captures of
+  frozen-model outputs, unique per (patient, horizon, model version, state version)). Applied automatically on boot;
   original tables are never erased or rewritten. Failed migrations roll back.
 - `PRANAGUARD_DB=/path/to/copy.sqlite` points the API at a disposable database copy for experiments.
 
@@ -156,5 +159,14 @@ Study evidence: `docs/final-submission/CHAMPION_SELECTION.md`, `docs/model48v3/`
    Patient Home, My Health Records, Clinical Documents. Patient submissions appear in the doctor's view
    and doctor-shared plans/follow-ups/documents appear in the patient's view (same SQLite record).
 3. Details: `docs/DOCTOR_PATIENT_DELIVERY.md`.
+
+### v6 flows (doctor risk visibility + patient insights)
+
+1. Sign in as `dr-atlas` → **Care action centre** shows the experimental 72h risk watchlist (raw replay-model scores, sorted, with review status; disclaimer inline).
+2. **Patients** → open `PG-0071` → **Model risk** tab: 24/48/72h cards with prediction timestamp / `pg-synthetic-v1` version / data completeness / review status; timestamped prediction-history chart; on-demand 72h feature-contribution table (reuse of the frozen `engine.explain`).
+3. In an open **care review** the same read-only risk cards appear as context — documentation only, never auto-driving treatment.
+4. Sign in as `pat-pg0071` → **Patient Home** shows data-backed summary lines (log completion, adherence counts, doctor review status); **My Health Records → Insights** renders interactive graphs with 7/30/90-day + custom date filters, units, tooltips, and honest empty states. The frozen replay window (currently 12–13 Sep 2026 UTC) is surfaced so gaps are never silently filled.
+5. Patients calling any doctor-only prediction endpoint receive **403** (see `backend/tests/test_v6_risk_insights.py`).
+6. Full evidence: `docs/ENHANCEMENT_IMPLEMENTATION_REPORT.md`, `docs/v6-verification/`.
 
 > PranaGuard · Synthetic proof of concept · pg-synthetic-v1 · no clinical validation

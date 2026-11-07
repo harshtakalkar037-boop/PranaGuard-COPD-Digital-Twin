@@ -507,6 +507,176 @@ class Workspace:
         return {'patient_id':pid,'profile':detail['profile'],'baseline':detail['baseline'],
                 'logged_today':logged_today,'streak_days':streak,'recent_logs':logs[:7],'recent_adherence':adh[:7],
                 'care_plan':plan['plan'],'follow_ups':upcoming,'overdue_follow_ups':overdue,
-                'documents_count':len(docs),'documents_recent':docs[:3],
+                'documents_count':len(docs),'documents_recent':docs[:3],'summary_lines':self.patient_home_summary_lines(user,pid),
                 'latest_review':{'reviewed':bool(latest and latest['reviewed_at']),'reviewed_by':(latest or {}).get('reviewed_by'),'reviewed_at':(latest or {}).get('reviewed_at')} if latest else {'reviewed':False},
                 'note':'Everything here is synthetic demo data shared with the assigned doctor. For emergencies, follow your real clinician-given action plan — this app never overrides it.'}
+    # ---------- risk visibility (doctor-only; raw model outputs, honestly labelled) ----------
+    RISK_DISCLAIMER=('Experimental synthetic-data model estimate. Not clinically validated. '
+                     'Not intended for diagnosis, triage, or treatment decisions.')
+    def _record_prediction_row(self,c,s):
+        """Persist current twin-state predictions once per (state,horizon,model). Never repeats, never rewrites."""
+        supported=bool(s['prediction_supported'])
+        for h,raw in s['risks'].items():
+            c.execute('''INSERT OR IGNORE INTO prediction_history
+                (patient_id,horizon,model_version,risk,state_version,input_timestamp,recorded_at,data_status,provenance)
+                VALUES (?,?,?,?,?,?,?,?,?)''',
+                (s['patient_id'],int(h),s['model_version'],float(raw),s['version'],s['timestamp'],stamp(),
+                 'supported' if supported else 'outside_evaluated',
+                 json.dumps({'pipeline':'frozen LightGBM replay inference','cohort':'120 synthetic patients','calibration':'none — raw model score','recorded_via':'doctor risk view'})))
+    def risk_snapshot(self,user,pid):
+        self.require_doctor(user);self.require_assigned(user,pid)
+        if pid in self.engine.profiles:
+            s=self.engine.patient(pid)
+            with self.store.connect() as c:self._record_prediction_row(c,s)
+            with self.store.connect() as c:
+                latest_review=c.execute('SELECT status,updated_at FROM care_reviews WHERE patient_id=? ORDER BY updated_at DESC LIMIT 1',(pid,)).fetchone()
+                latest_edit=c.execute('SELECT MAX(updated_at) AS t FROM daily_logs WHERE patient_id=?',(pid,)).fetchone()['t']
+            horizons={str(h):{'risk':s['risks'][str(h)],'label':'raw 0–1 score ×100'} for h in (24,48,72)}
+            return {'patient_id':pid,'available':s['prediction_supported'],'source':'frozen replay inference (pg-synthetic-v1)',
+                    'horizons':horizons,'risk_category':s['risk_category'],'model_version':s['model_version'],
+                    'predicted_at':s['timestamp'],'state_version':s['version'],
+                    'input_window':'hourly twin state at '+s['timestamp'],
+                    'data_completeness':('outside evaluated cohort (episode or incomplete follow-up)' if not s['prediction_supported'] else ('supported; note: '+', '.join(s['missing_fields'])+' imputed' if s['missing_fields'] else 'supported')),
+                    'missing_fields':s['missing_fields'],'warnings':s['warnings'],
+                    'freshness':{'state_timestamp':s['timestamp'],'latest_patient_record_update':latest_edit},
+                    'review_status':(dict(latest_review) if latest_review else {'status':'none','updated_at':None}),
+                    'calibration':'none (raw LightGBM score — do not describe as calibrated probability)',
+                    'disclaimer':self.RISK_DISCLAIMER,
+                    'note':'Risk outputs are model-side estimates on synthetic data; a low score never implies safety.'}
+        # registered demo patient without replay: honest unavailability
+        detail=self.services.registry.detail(pid)
+        return {'patient_id':pid,'available':False,'source':'frozen replay inference (pg-synthetic-v1)','horizons':None,
+                'risk_category':'unavailable','model_version':'pg-synthetic-v1','predicted_at':None,'state_version':None,
+                'input_window':None,'data_completeness':f"72h baseline {detail['baseline']['observed_hours']:.0f}/72h — predictions unavailable until the baseline and feature frame exist",
+                'missing_fields':[],'warnings':['No frozen-model prediction: baseline not complete.'],
+                'freshness':{'state_timestamp':None,'latest_patient_record_update':detail['baseline'].get('last_observed_at')},
+                'review_status':{'status':'none','updated_at':None},
+                'calibration':'n/a — no prediction','disclaimer':self.RISK_DISCLAIMER,
+                'note':'Predictions are honestly unavailable for this demo registration; nothing is fabricated.'}
+    def risk_history(self,user,pid,horizon=None,limit=200):
+        self.require_doctor(user);self.require_assigned(user,pid)
+        sql='SELECT id,horizon,model_version,risk,state_version,input_timestamp,recorded_at,data_status,provenance FROM prediction_history WHERE patient_id=?'
+        args=[pid]
+        if horizon:sql+=' AND horizon=?';args.append(int(horizon))
+        sql+=' ORDER BY datetime(input_timestamp) DESC, id DESC LIMIT ?';args.append(limit)
+        with self.store.connect() as c:rows=[dict(r) for r in c.execute(sql,args)]
+        return {'items':rows,'count':len(rows),
+                'note':'Timestamped captures of raw model outputs from the frozen pipeline. Identical predictions are never re-recorded; model versions are never mixed — each row names its version.',
+                'disclaimer':self.RISK_DISCLAIMER}
+    def risk_overview(self,user):
+        self.require_doctor(user)
+        ids=self.assigned_ids(user)
+        full=self.engine.cohort();cohort={p['patient_id']:p for p in full['patients'] if p['patient_id'] in ids}
+        rows=[]
+        with self.store.connect() as c:
+            reviews={r['patient_id']:r['status'] for r in c.execute('SELECT patient_id,status FROM care_reviews WHERE id IN (SELECT MAX(id) FROM care_reviews GROUP BY patient_id)')}
+            last_log={r['patient_id']:r['t'] for r in c.execute('SELECT patient_id,MAX(updated_at) AS t FROM daily_logs GROUP BY patient_id')}
+            for pid in ids:
+                if pid in cohort:
+                    p=cohort[pid]
+                    rows.append({'patient_id':pid,'display_name':p.get('display_name'),'city':p.get('city'),
+                                 'risk24':p['risks']['24'],'risk48':p['risks']['48'],'risk72':p['risks']['72'],
+                                 'risk_category':p['risk_category'],'prediction_supported':p['prediction_supported'],
+                                 'predicted_at':p['timestamp'],'model_version':full['model_version'],'origin':'historical_twin',
+                                 'review_status':reviews.get(pid,'none'),'latest_patient_record_update':last_log.get(pid)})
+                else:
+                    try:detail=self.services.registry.detail(pid);name=detail['profile'].get('display_name');city=detail['profile'].get('city')
+                    except Exception:name=None;city=None
+                    rows.append({'patient_id':pid,'display_name':name,'city':city,'risk24':None,'risk48':None,'risk72':None,
+                                 'risk_category':'unavailable','prediction_supported':False,'predicted_at':None,'model_version':'pg-synthetic-v1',
+                                 'origin':'manual_demo_registration','review_status':reviews.get(pid,'none'),'latest_patient_record_update':last_log.get(pid)})
+        rows.sort(key=lambda r:(r['risk72'] is None,-(r['risk72'] or 0)))
+        return {'items':rows,'assigned':len(ids),'disclaimer':self.RISK_DISCLAIMER,
+                'note':'Raw replay-model scores on synthetic data. Percentages = score ×100. Never drive treatment automatically.'}
+    def risk_explanation(self,user,pid,horizon=72):
+        self.require_doctor(user);self.require_assigned(user,pid)
+        if pid not in self.engine.profiles:
+            return {'patient_id':pid,'horizon':horizon,'available':False,'drivers':[],'method':None,
+                    'note':'Explanation unavailable: this demo registration has no frozen-model prediction.'}
+        e=self.engine.explain(pid,horizon)
+        return {'patient_id':pid,'horizon':horizon,'available':bool(e.get('drivers')),
+                'drivers':e['drivers'][:12],'method':e.get('method','TreeSHAP (raw contributions, uncalibrated)'),
+                'probability':e.get('probability'),'risk_change':e.get('risk_change'),
+                'model_version':'pg-synthetic-v1','relative_deviations':e.get('relative_deviations'),
+                'caution':'Feature contributions are model-side associations for this synthetic cohort — correlation, not causation. Raw TreeSHAP weights are not calibrated outputs.'}
+    # ---------- patient health insights ----------
+    def patient_insights(self,user,start,end):
+        pid=self.own_pid(user)
+        import re as _re
+        for v in (start,end):
+            if not _re.compile(r'^\d{4}-\d{2}-\d{2}$').match(v or ''):raise HTTPException(422,'Dates must be YYYY-MM-DD.')
+        if start>end:raise HTTPException(422,'Start date must not be after end date.')
+        if (datetime.fromisoformat(end)-datetime.fromisoformat(start)).days>400:raise HTTPException(422,'Range limited to 400 days for the demo.')
+        with self.store.connect() as c:
+            logs=[dict(r) for r in c.execute('SELECT * FROM daily_logs WHERE patient_id=? AND entry_date>=? AND entry_date<=? ORDER BY entry_date',(pid,start,end))]
+            sputum=[dict(r) for r in c.execute("SELECT occurred_at,colour,volume,consistency,cough,breathlessness FROM sputum_entries WHERE patient_id=? AND substr(occurred_at,1,10)>=? AND substr(occurred_at,1,10)<=? ORDER BY occurred_at",(pid,start,end))]
+            adh=[dict(r) for r in c.execute('''SELECT a.taken_at,a.as_prescribed,a.missed_reason,m.name AS medication_name FROM med_adherence a JOIN plan_medications m ON m.id=a.medication_id
+                 WHERE a.patient_id=? AND substr(a.taken_at,1,10)>=? AND substr(a.taken_at,1,10)<=? ORDER BY a.taken_at''',(pid,start,end))]
+            vitals=[dict(r) for r in c.execute('''SELECT hour,timestamp,json_extract(state,'$.current.resp_rate') AS resp_rate,
+                 json_extract(state,'$.current.symptom_score') AS symptom_score, json_extract(state,'$.current.steps') AS replay_steps,
+                 json_extract(state,'$.current.sleep_hours') AS replay_sleep
+                 FROM states WHERE patient_id=? AND substr(timestamp,1,10)>=? AND substr(timestamp,1,10)<=? ORDER BY hour''',(pid,start,end))]
+            rw=dict(c.execute("SELECT MIN(substr(timestamp,1,10)) AS first, MAX(substr(timestamp,1,10)) AS last FROM states WHERE patient_id=?",(pid,)).fetchone() or {})
+        # daily aggregation of replay vitals (honest synthetic source)
+        vit_days: dict={}
+        for r in vitals:
+            d=r['timestamp'][:10];b=vit_days.setdefault(d,{'date':d,'resp_values':[],'symptom_values':[],'steps':[]})
+            if r['resp_rate'] is not None:b['resp_values'].append(r['resp_rate'])
+            if r['symptom_score'] is not None:b['symptom_values'].append(r['symptom_score'])
+            if r['replay_steps'] is not None:b['steps'].append(r['replay_steps'])
+        breathing=[{'date':d,'mean':sum(v['resp_values'])/len(v['resp_values']),'min':min(v['resp_values']),'max':max(v['resp_values']),'samples':len(v['resp_values'])}
+                   for d,v in sorted(vit_days.items()) if v['resp_values']]
+        replay_symptoms=[{'date':d,'mean':sum(v['symptom_values'])/len(v['symptom_values']),'samples':len(v['symptom_values'])} for d,v in sorted(vit_days.items()) if v['symptom_values']]
+        logs_by_day={l['entry_date']:l for l in logs}
+        days=[(datetime.fromisoformat(start)+timedelta(days=i)).date().isoformat() for i in range((datetime.fromisoformat(end)-datetime.fromisoformat(start)).days+1)]
+        def bounded(fn):
+            out=[]
+            for d in days:
+                l=logs_by_day.get(d)
+                row={'date':d}
+                if l:
+                    row.update(fn(l))
+                out.append(row)
+            return out
+        sleep=bounded(lambda l:{'value':l['sleep_hours'],'quality':l['sleep_quality']})
+        activity=bounded(lambda l:{'value':l['activity_minutes']})
+        hydration=bounded(lambda l:{'value':l['water_ml']})
+        wellbeing={'better':2,'same':1,'worse':0}
+        wellbeing_series=bounded(lambda l:({'value':wellbeing.get(l['wellbeing']),'label':l['wellbeing']} if l['wellbeing'] else {}))
+        sputum_series=[{'date':s['occurred_at'][:10], 'cough':s['cough'],'breathlessness':s['breathlessness'],'colour':s['colour'],'volume':s['volume']} for s in sputum]
+        adh_series=[{'date':a['taken_at'][:10],'taken':bool(a['as_prescribed']),'name':a['medication_name'],'missed_reason':a['missed_reason']} for a in adh]
+        # ---- summaries: only statements supported by real records ----
+        summary=[]
+        span_days=len(days);logged_days=len(logs)
+        summary.append(f'You recorded daily wellbeing on {logged_days} of the {span_days} day(s) in this range.')
+        taken=sum(1 for a in adh if a['as_prescribed']);missed=len(adh)-taken
+        if adh:summary.append(f'Medication reports this range: {taken} taken as documented, {missed} marked missed.')
+        sleeps=[l['sleep_hours'] for l in logs if l['sleep_hours'] is not None]
+        if len(sleeps)>=2:summary.append(f'Recorded sleep averaged {sum(sleeps)/len(sleeps):.1f} h/night across {len(sleeps)} logged days.')
+        waters=[l['water_ml'] for l in logs if l['water_ml'] is not None]
+        if waters:summary.append(f'Recorded hydration averaged {sum(waters)/len(waters):.0f} ml/day across {len(waters)} logged days.')
+        if sputum_series:summary.append(f'Sputum diary entries this range: {len(sputum_series)} (highest recorded cough {max(s["cough"] for s in sputum_series)}/10, breathlessness {max(s["breathlessness"] for s in sputum_series)}/10).')
+        if breathing:summary.append(f'Simulated replay vitals available for {len(breathing)} day(s) (synthetic 60-day replay, not wearable telemetry).')
+        return {'range':{'start':start,'end':end,'days':span_days},'summary':summary,
+                'daily_logs':logs,'sputum_entries':sputum_series,'adherence':adh_series,
+                'sleep':sleep,'activity':activity,'hydration':hydration,'wellbeing':wellbeing_series,
+                'breathing_rate':breathing,'replay_symptom_score':replay_symptoms,
+                'units':{'water_ml':'ml','activity_minutes':'minutes','sleep_hours':'hours','resp_rate':'breaths/min','symptom_score':'0–10'},
+                'sources':{'daily_logs':'patient-reported demo entries','sputum':'patient/self-reported fictional diary',
+                           'medication':'patient-reported adherence against clinician-documented demo list',
+                           'breathing_rate':'frozen synthetic replay dataset (hourly simulated vitals) — not wearable data',
+                           'replay_symptom_score':'frozen synthetic replay dataset'},
+                'replay_window':{'first':rw.get('first'),'last':rw.get('last'),
+                                 'note':'Frozen synthetic replay timestamps; outside this window no replay vitals exist.'},
+                'note':'Graphs show only real records. Missing dates remain missing; nothing is invented to fill gaps.'}
+    def patient_home_summary_lines(self,user,pid):
+        """Small evidence-based lines for Patient Home (last 14 days window)."""
+        end=stamp()[:10];start=(utcnow()-timedelta(days=13)).date().isoformat()
+        with self.store.connect() as c:
+            logged=c.execute('SELECT COUNT(*) AS n FROM daily_logs WHERE patient_id=? AND entry_date>=?',(pid,start)).fetchone()['n']
+            adh=dict(c.execute('SELECT SUM(as_prescribed) AS taken,COUNT(*) AS total FROM med_adherence WHERE patient_id=? AND substr(taken_at,1,10)>=?',(pid,start)).fetchone() or {})
+            latest_reviewed=c.execute('SELECT entry_date,reviewed_by FROM daily_logs WHERE patient_id=? AND reviewed_at IS NOT NULL ORDER BY reviewed_at DESC LIMIT 1',(pid,)).fetchone()
+        lines=[f'You logged your wellbeing on {logged} of the last 14 days.']
+        if adh.get('total'):lines.append(f"Medication reports in the last 14 days: {adh['taken']} of {adh['total']} taken as documented.")
+        if latest_reviewed:lines.append(f"Last doctor review: {latest_reviewed['entry_date']} entry, by {latest_reviewed['reviewed_by']}.")
+        return lines

@@ -188,6 +188,24 @@ def make_workspace_router():
     def my_documents(u=Depends(principal),w=Depends(workspace)):return w.list_documents(u)
     @r.get('/patient/follow-ups')
     def my_follow_ups(u=Depends(principal),w=Depends(workspace)):return w.list_follow_ups(u)
+    @r.get('/patient/insights')
+    def patient_insights(*,from_:str|None=Query(default=None,alias='from'),to:str|None=Query(default=None),u=Depends(principal),w=Depends(workspace)):
+        from datetime import timedelta
+        end=to or datetime.now(timezone.utc).date().isoformat()
+        start=from_ or (datetime.fromisoformat(end)-timedelta(days=29)).date().isoformat()
+        return w.patient_insights(u,start,end)
+    # ---------- risk visibility (doctor-only) ----------
+    @r.get('/risk-overview')
+    def risk_overview(u=Depends(principal),w=Depends(workspace)):return w.risk_overview(u)
+    @r.get('/patients/{pid}/risk')
+    def risk_snapshot(pid:str,u=Depends(principal),w=Depends(workspace)):return w.risk_snapshot(u,pid)
+    @r.get('/patients/{pid}/risk/history')
+    def risk_history(pid:str,horizon:int|None=Query(default=None),limit:int=Query(default=200,ge=1,le=1000),u=Depends(principal),w=Depends(workspace)):
+        return w.risk_history(u,pid,horizon,limit)
+    @r.get('/patients/{pid}/risk/explanation')
+    def risk_explanation(pid:str,horizon:int=Query(default=72),u=Depends(principal),w=Depends(workspace)):
+        if horizon not in (24,48,72):raise HTTPException(422,'horizon must be 24, 48 or 72.')
+        return w.risk_explanation(u,pid,horizon)
     # ---------- shared, scoped ----------
     @r.get('/patients/{pid}/daily-logs')
     def daily_logs(pid:str,page:int=Query(default=1,ge=1),page_size:int=Query(default=30,ge=1,le=100),u=Depends(principal),w=Depends(workspace)):

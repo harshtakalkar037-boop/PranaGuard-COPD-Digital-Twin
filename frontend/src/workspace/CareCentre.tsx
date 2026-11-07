@@ -1,8 +1,8 @@
 import {useEffect,useMemo,useState} from 'react';
-import {Bell,CalendarClock,CheckCircle2,ChevronLeft,ChevronRight,ClipboardCheck,ClipboardList,Plus,Search,Users} from 'lucide-react';
+import {Bell,CalendarClock,CheckCircle2,ChevronLeft,ChevronRight,ClipboardCheck,ClipboardList,FlaskConical,Plus,Search,Users} from 'lucide-react';
 import {api,explainError} from '../api';
-import {Empty,Loading,Notice,Panel,Pill,time} from '../components';
-import type {CareReview,CareSummary,Directory,ReviewDetail} from './types';
+import {Empty,Loading,Notice,Panel,Pill,pct,time} from '../components';
+import type {CareReview,CareSummary,Directory,ReviewDetail,RiskOverview,RiskSnapshot} from './types';
 
 const STATUSES=['','new','awaiting_review','under_review','follow_up_scheduled','completed','closed'] as const;
 const ACTIONS:Record<string,string[]>={new:['awaiting_review','under_review','closed'],awaiting_review:['under_review','closed'],under_review:['follow_up_scheduled','completed','closed'],follow_up_scheduled:['under_review','completed','closed'],completed:['closed'],closed:[]};
@@ -30,6 +30,7 @@ export function CareCentrePage({revision,notify,openProfile}:{revision:number;no
      {label:'Open notifications',value:summary.open_notifications,icon:<Bell size={17}/>,tone:'blue'}
     ].map(m=><div className="metric-card" key={m.label}><div className="metric-head"><span>{m.label}</span><div className={`metric-icon ${m.tone}`}>{m.icon}</div></div><div className="metric-number">{m.value}</div><div className="metric-detail">Persisted SQLite counts</div></div>)}
   </div>}
+  <RiskWatchlist openProfile={openProfile}/>
   <div className="care-grid">
    <div className="care-left">
     <NewReview revision={revision} onSaved={id=>{refreshAll('Review saved and persisted.');setSelected(id);}}/>
@@ -55,6 +56,26 @@ export function CareCentrePage({revision,notify,openProfile}:{revision:number;no
  </div>;
 }
 
+function RiskWatchlist({openProfile}:{openProfile:(pid:string)=>void}){
+ const [data,setData]=useState<RiskOverview|null>(null);const [error,setError]=useState('');
+ useEffect(()=>{api<RiskOverview>('/workspace/risk-overview').then(d=>{setData(d);setError('');}).catch(e=>setError(explainError(e)));},[]);
+ if(error)return <Notice tone="warning">{error}</Notice>;
+ if(!data||!Array.isArray(data.items))return <Loading/>;
+ const top=data.items.filter(i=>i.risk72!=null).slice(0,8);
+ return <Panel title="72-hour model risk watchlist (experimental)" subtitle={data.note} action={<FlaskConical size={14}/>}>
+  {top.length?<div className="table-scroll"><table className="pgx-table"><thead><tr><th>Patient</th><th>24h</th><th>48h</th><th>72h</th><th>Predicted at</th><th>Review</th><th/></tr></thead>
+   <tbody>{top.map(r=><tr key={r.patient_id}>
+    <td><strong>{r.display_name||r.patient_id}</strong><br/><small className="muted-cell">{r.patient_id} · {r.city||''}</small></td>
+    <td>{pct(r.risk24!)}</td><td>{pct(r.risk48!)}</td>
+    <td><Pill tone={r.risk_category==='high'?'coral':r.risk_category==='elevated'?'elevated':'low'}>{pct(r.risk72!)} · {r.risk_category}</Pill></td>
+    <td><small>{r.predicted_at?time(r.predicted_at,true):'—'}<br/>{r.model_version}</small></td>
+    <td>{r.review_status==='none'?<Pill>no review yet</Pill>:<Pill tone="low">{r.review_status.replaceAll('_',' ')}</Pill>}</td>
+    <td><button className="button secondary small-button" onClick={()=>openProfile(r.patient_id)}>Profile</button></td>
+   </tr>)}</tbody></table></div>:<Empty text="No historical-twin predictions to show."/>}
+  <p className="input-help">{data.disclaimer}</p>
+ </Panel>;
+}
+
 function NewReview({revision,onSaved}:{revision:number;onSaved:(id:number)=>void}){
  const [patients,setPatients]=useState<Directory|null>(null);const [pid,setPid]=useState('');const [note,setNote]=useState('');const [follow,setFollow]=useState('');const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [open,setOpen]=useState(false);
  useEffect(()=>{api<Directory>('/workspace/patients?page_size=50').then(setPatients).catch(()=>setPatients(null));},[revision]);
@@ -74,12 +95,29 @@ function NewReview({revision,onSaved}:{revision:number;onSaved:(id:number)=>void
  </Panel>;
 }
 
+function ReviewRiskContext({pid}:{pid:string}){
+ const [snap,setSnap]=useState<RiskSnapshot|null>(null);const [error,setError]=useState('');
+ useEffect(()=>{api<RiskSnapshot>(`/workspace/patients/${pid}/risk`).then(d=>{setSnap(d);setError('');}).catch(e=>setError(explainError(e)));},[pid]);
+ if(error)return null;
+ if(!snap)return <Loading/>;
+ if(!snap.available||!snap.horizons)return <Notice tone="info">No frozen-model prediction for this registration — recorded honestly, nothing fabricated.</Notice>;
+ return <div className="review-risk-context">
+  <h4 className="subheading"><FlaskConical size={13}/> Experimental model risk (context only)</h4>
+  <div className="metric-grid three">
+   {(['24','48','72']as const).map(h=><div key={h} className="metric-card"><div className="metric-head"><span>{h}h</span></div><div className="metric-number">{snap.horizons![h].risk==null?'n/a':<>{pct(snap.horizons![h].risk)}</>}</div><div className="metric-detail">{snap.model_version} · {snap.predicted_at?time(snap.predicted_at,true):'n/a'}</div></div>)}
+  </div>
+  <p className="input-help">State v{snap.state_version} · {snap.data_completeness} · Review: {snap.review_status.status.replaceAll('_',' ')}</p>
+  <p className="input-help">{snap.disclaimer} Context for documentation only — never auto-drives treatment.</p>
+ </div>;
+}
+
 function ReviewWorkspace({detail,openProfile,onSaved}:{detail:ReviewDetail;openProfile:(pid:string)=>void;onSaved:(msg?:string)=>void}){
  const r=detail.review;const [note,setNote]=useState('');const [follow,setFollow]=useState('');const [busy,setBusy]=useState(false);const [error,setError]=useState('');
  async function move(status:string){setBusy(true);setError('');try{await api(`/workspace/care/reviews/${r.id}`,{method:'PATCH',body:JSON.stringify({status,note:note||undefined,follow_up_at:follow?new Date(follow).toISOString():undefined})});setNote('');setFollow('');onSaved(`Review ${status.replaceAll('_',' ')}.`);}catch(e){setError(explainError(e));}finally{setBusy(false);}}
  return <Panel title={`Review #${r.id} · ${r.patient_id}`} subtitle={`Saved at twin/state version ${r.state_version} · owner ${r.doctor}`} action={<Pill tone={r.status==='completed'||r.status==='closed'?'low':'amber'}>{r.status.replaceAll('_',' ')}</Pill>}>
   <div className="pgx-inline"><button className="text-link" onClick={()=>openProfile(r.patient_id)}>Open patient profile</button></div>
   <p className="care-note">{r.note.split('\n')[0]}</p>
+  <ReviewRiskContext pid={r.patient_id}/>
   {r.follow_up_at&&<p className="input-help">Follow-up scheduled: {time(r.follow_up_at,true)}</p>}
   {ACTIONS[r.status]?.length?<>
    <label className="field-label" htmlFor="rw-note">Add note (optional)</label>

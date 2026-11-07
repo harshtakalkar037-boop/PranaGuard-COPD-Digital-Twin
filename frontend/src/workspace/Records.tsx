@@ -3,6 +3,7 @@ import {CheckCircle2,Droplets,History as HistoryIcon,Moon,Pencil,ShieldCheck} fr
 import {api,explainError,post,put} from '../api';
 import {Empty,Loading,Notice,Panel,Pill,time} from '../components';
 import type {Adherence,DailyLog,DailyLogPage,MedOption,SputumPage} from './types';
+import {InsightsTab} from './Insights';
 
 interface LogForm{entry_date:string;water_ml:string;food_notes:string;activity_minutes:string;sleep_hours:string;sleep_quality:string;wellbeing:string;notes:string}
 const emptyForm:LogForm={entry_date:new Date().toISOString().slice(0,10),water_ml:'',food_notes:'',activity_minutes:'',sleep_hours:'',sleep_quality:'',wellbeing:'',notes:''};
@@ -14,7 +15,7 @@ function toPayload(f:LogForm){
 }
 
 export function PatientRecordsPage(){
- const [tab,setTab]=useState<'daily'|'sputum'|'medication'|'history'>('daily');
+ const [tab,setTab]=useState<'daily'|'sputum'|'medication'|'insights'|'history'>('daily');
  const [logs,setLogs]=useState<DailyLogPage|null>(null);const [meds,setMeds]=useState<MedOption[]>([]);
  const [adh,setAdh]=useState<Adherence[]>([]);const [sputum,setSputum]=useState<SputumPage|null>(null);
  const [form,setForm]=useState<LogForm>(emptyForm);const [editing,setEditing]=useState<DailyLog|null>(null);
@@ -51,7 +52,7 @@ export function PatientRecordsPage(){
  const setF=(k:keyof LogForm)=>(e:React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>)=>setForm(f=>({...f,[k]:e.target.value}));
  return <div className="pgx">
   <Notice>Synthetic demo records for <strong>your own twin only</strong>. Corrections keep the original in the audit trail. Nothing here changes medication — prescriptions come from your doctor.</Notice>
-  <div className="segmented section-tabs">{([['daily','Daily log'],['sputum','Sputum diary'],['medication','Medication'],['history','History & trends']] as const).map(([k,l])=><button key={k} className={tab===k?'selected':''} onClick={()=>setTab(k)}>{l}</button>)}</div>
+  <div className="segmented section-tabs">{([['daily','Daily log'],['sputum','Sputum diary'],['medication','Medication'],['insights','Insights'],['history','History & trends']] as const).map(([k,l])=><button key={k} className={tab===k?'selected':''} onClick={()=>setTab(k)}>{l}</button>)}</div>
   {error&&<div className="error-banner" role="alert">{error}</div>}
   {msg&&<div className="notice info" role="status">{msg}</div>}
   {tab==='daily'&&<div className="two-col">
@@ -99,6 +100,7 @@ export function PatientRecordsPage(){
    <Panel title="Adherence history" subtitle="What you have reported">
     {adh.length?<ol className="care-timeline">{adh.map(a=><li key={a.id}><span className="status-dot"/><div><strong>{a.medication_name}</strong><small>{time(a.taken_at,true)}</small><p>{a.as_prescribed?'Taken as prescribed':`Missed — ${a.missed_reason||'no reason given'}`}{a.note?` · ${a.note}`:''}</p></div></li>)}</ol>:<Empty text="No adherence reports yet."/>}
    </Panel></div>}
+  {tab==='insights'&&<InsightsTab/>}
   {tab==='history'&&<HistoryTab logs={logs} sputum={sputum}/>}
  </div>;
 }

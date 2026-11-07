@@ -1,0 +1,33 @@
+{
+ "passed": 7,
+ "checks": [
+  {
+   "name": "Doctor dashboard shows experimental 24/48/72-watchlist with honest disclaimer",
+   "status": "PASS"
+  },
+  {
+   "name": "Patient profile Model-risk tab: 24/48/72 cards, timestamped history, engine explanation, disclaimers",
+   "status": "PASS"
+  },
+  {
+   "name": "Care review workspace embeds read-only model-risk context for the patient",
+   "status": "PASS"
+  },
+  {
+   "name": "Patient Home shows data-backed recent health summary lines",
+   "status": "PASS"
+  },
+  {
+   "name": "Patient insights tab renders record-backed graphs with honest replay labelling",
+   "status": "PASS"
+  },
+  {
+   "name": "Mobile 390px insights layout has no horizontal overflow",
+   "status": "PASS"
+  },
+  {
+   "name": "No JS/console errors or failed requests during the v6 round trip",
+   "status": "PASS"
+  }
+ ]
+}

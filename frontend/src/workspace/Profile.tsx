@@ -4,8 +4,9 @@ import {CartesianGrid,Line,LineChart,ResponsiveContainer,Tooltip,XAxis,YAxis} fr
 import {api,explainError,patch,post,put} from '../api';
 import {Empty,Loading,Notice,Panel,Pill,number,pct,time} from '../components';
 import type {Activity,Adherence,CarePlan,DailyLogPage,DocumentItem,FollowUp,MedOption,PlanResponse,Profile,SputumPage} from './types';
+import {RiskSection} from './Risk';
 
-const TABS=['Overview','Daily wellbeing','Sputum diary','Care plan','Activity & adherence','Documents & follow-ups','Reviews & notifications'] as const;
+const TABS=['Overview','Daily wellbeing','Sputum diary','Care plan','Activity & adherence','Documents & follow-ups','Reviews & notifications','Model risk'] as const;
 
 export function ProfilePage({pid,revision,notify,openTwin}:{pid:string;revision:number;notify:(s:string)=>void;openTwin:(pid:string)=>void}){
  const [tab,setTab]=useState<typeof TABS[number]>('Overview');
@@ -26,6 +27,7 @@ export function ProfilePage({pid,revision,notify,openTwin}:{pid:string;revision:
   <Notice>{data.caution}</Notice>
   <div className="segmented section-tabs">{TABS.map(t=><button key={t} className={tab===t?'selected':''} onClick={()=>setTab(t)}>{t}</button>)}</div>
   {tab==='Overview'&&<OverviewTab data={data}/>}
+  {tab==='Model risk'&&<RiskSection pid={pid}/>}
   {tab==='Daily wellbeing'&&<WellbeingTab pid={pid} refresh={refresh}/>}
   {tab==='Sputum diary'&&<DiaryTab pid={pid} refresh={refresh} revision={revision}/>}
   {tab==='Care plan'&&<PlanTab pid={pid} refresh={refresh}/>}
