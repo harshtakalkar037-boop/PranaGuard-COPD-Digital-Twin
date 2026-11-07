@@ -77,6 +77,7 @@ function NewReview({revision,onSaved}:{revision:number;onSaved:(id:number)=>void
 function ReviewWorkspace({detail,openProfile,onSaved}:{detail:ReviewDetail;openProfile:(pid:string)=>void;onSaved:(msg?:string)=>void}){
  const r=detail.review;const [note,setNote]=useState('');const [follow,setFollow]=useState('');const [busy,setBusy]=useState(false);const [error,setError]=useState('');
  async function move(status:string){setBusy(true);setError('');try{await api(`/workspace/care/reviews/${r.id}`,{method:'PATCH',body:JSON.stringify({status,note:note||undefined,follow_up_at:follow?new Date(follow).toISOString():undefined})});setNote('');setFollow('');onSaved(`Review ${status.replaceAll('_',' ')}.`);}catch(e){setError(explainError(e));}finally{setBusy(false);}}
+ async function completeFollowup(){setBusy(true);setError('');try{await api(`/workspace/care/reviews/${r.id}/complete-follow-up`,{method:'POST',body:JSON.stringify({note})});setNote('');onSaved('Follow-up completion recorded.');}catch(e){setError(explainError(e));}finally{setBusy(false);}}
  return <Panel title={`Review #${r.id} · ${r.patient_id}`} subtitle={`Saved at twin/state version ${r.state_version} · owner ${r.doctor}`} action={<Pill tone={r.status==='completed'||r.status==='closed'?'low':'amber'}>{r.status.replaceAll('_',' ')}</Pill>}>
   <div className="pgx-inline"><button className="text-link" onClick={()=>openProfile(r.patient_id)}>Open patient profile</button></div>
   <p className="care-note">{r.note.split('\n')[0]}</p>
@@ -88,6 +89,7 @@ function ReviewWorkspace({detail,openProfile,onSaved}:{detail:ReviewDetail;openP
    <input id="rw-follow" type="datetime-local" className="form-input" value={follow} onChange={e=>setFollow(e.target.value)}/>
    {error&&<Notice tone="warning">{error}</Notice>}
    <div className="pgx-inline">{ACTIONS[r.status].map(s=><button key={s} className="button secondary small-button" disabled={busy} onClick={()=>move(s)}>{s.replaceAll('_',' ')}</button>)}</div>
+   {r.status==='follow_up_scheduled'&&<button className="button primary small-button" disabled={busy} onClick={completeFollowup}>Record follow-up completed</button>}
   </>:<Notice tone="info">This review is {r.status.replaceAll('_',' ')}; the workflow keeps closed records immutable.</Notice>}
   <h4 className="subheading">Timeline</h4>
   <ol className="care-timeline">{detail.timeline.map(e=><li key={e.id}><span className="status-dot"/><div><strong>{e.event}</strong><small>{time(e.created_at,true)} · {e.actor}</small>{e.note&&<p>{e.note}</p>}</div></li>)}</ol>
