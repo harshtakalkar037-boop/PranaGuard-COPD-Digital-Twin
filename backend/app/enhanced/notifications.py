@@ -61,9 +61,9 @@ class Notifications:
     def update(self,nid,body,authorize=None):
         with self.store.connect() as c:
             c.execute('BEGIN IMMEDIATE')
-            if authorize is not None:authorize(c)
             row=c.execute('SELECT * FROM notifications WHERE id=?',(nid,)).fetchone()
             if not row:raise HTTPException(404,'Notification not found.')
+            if authorize is not None:authorize(c,row['patient_id'])
             old=row['status'];target=body.status or old;at=stamp()
             if target!=old:
                 if old=='closed' or (old=='resolved' and target!='closed') or target=='active':raise HTTPException(409,'Closed/resolved reviews cannot be reopened; use a new notification for a new event.')
