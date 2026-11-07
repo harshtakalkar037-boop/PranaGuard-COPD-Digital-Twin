@@ -1,5 +1,5 @@
 """Typed REST extension; original REST/WebSocket routes are retained."""
-import asyncio
+import asyncio, os
 from typing import Literal
 from fastapi import APIRouter,Depends,Header,Query,Request
 from backend.app.enhanced.schemas import Registration,AssociateDevice,SimulationControl,Ingestion,Observation,NotificationUpdate,Review,EmptyBody
@@ -11,23 +11,32 @@ def make_router(authorize,hub):
     def services(request:Request):return request.app.state.enhanced
     write=[Depends(authorize)]
     async def changed(kind='enhanced_updated',**kwargs):await hub.broadcast({'type':kind,**kwargs})
+    def mutation_authorizer(request,pid=None):
+        if os.getenv('PRANAGUARD_REQUIRE_WORKSPACE_AUTH','0')!='1':return None
+        user=request.state.workspace_user
+        header=request.headers.get('authorization','')
+        token=header[7:] if header.startswith('Bearer ') else None
+        def check(conn):
+            request.app.state.workspace.authorize_write(conn,token,user['username'],pid,full_cohort=True)
+        return check
     @r.get('/status')
     def status(s=Depends(services)):return s.status()
     @r.get('/registry/patients')
     def patients(q:str=Query(default='',max_length=100),city:str|None=None,status:Literal['historical_twin','baseline_not_started','collecting_baseline','baseline_collected_no_model']|None=None,risk:Literal['low','elevated','high','unavailable']|None=None,sex:Literal['Female','Male','Other','Not specified']|None=None,s=Depends(services)):
         return s.registry.list(q,city,status,risk,sex)
     @r.post('/registry/patients',dependencies=write)
-    async def register(body:Registration,s=Depends(services)):
-        result=await asyncio.to_thread(s.registry.register,body);await changed();return result
+    async def register(body:Registration,request:Request,s=Depends(services)):
+        user=getattr(request.state,'workspace_user',None)
+        result=await asyncio.to_thread(s.registry.register,body,user['username'] if user else None,mutation_authorizer(request));await changed();return result
     @r.get('/registry/patients/{pid}')
     async def patient(pid:str,s=Depends(services)):
         result=await asyncio.to_thread(s.registry.detail,pid);result['environment']=await s.environment.get(result['profile']['city']);return result
     @r.post('/registry/patients/{pid}/observations',dependencies=write)
-    async def observation(pid:str,body:Observation,s=Depends(services)):
-        result=await asyncio.to_thread(s.registry.observation,pid,body);await changed();return result
+    async def observation(pid:str,body:Observation,request:Request,s=Depends(services)):
+        result=await asyncio.to_thread(s.registry.observation,pid,body,mutation_authorizer(request,pid));await changed();return result
     @r.post('/registry/patients/{pid}/reviews',dependencies=write)
-    async def review(pid:str,body:Review,s=Depends(services)):
-        result=await asyncio.to_thread(s.registry.review,pid,body);await changed();return result
+    async def review(pid:str,body:Review,request:Request,s=Depends(services)):
+        result=await asyncio.to_thread(s.registry.review,pid,body,mutation_authorizer(request,pid));await changed();return result
     @r.get('/devices')
     def devices(patient_id:str|None=None,s=Depends(services)):return s.devices.list(patient_id)
     @r.post('/devices',dependencies=write)
@@ -66,8 +75,8 @@ def make_router(authorize,hub):
     @r.get('/notifications/{nid}')
     def notification(nid:int,s=Depends(services)):return s.notifications.detail(nid)
     @r.patch('/notifications/{nid}',dependencies=write)
-    async def update_notification(nid:int,body:NotificationUpdate,s=Depends(services)):
-        result=await asyncio.to_thread(s.notifications.update,nid,body);await changed();return result
+    async def update_notification(nid:int,body:NotificationUpdate,request:Request,s=Depends(services)):
+        result=await asyncio.to_thread(s.notifications.update,nid,body,mutation_authorizer(request));await changed();return result
     @r.get('/email')
     def email(s=Depends(services)):return s.email.history()
     @r.post('/email/test',dependencies=write)
