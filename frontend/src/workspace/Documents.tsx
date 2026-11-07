@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {Download,FileText,ShieldCheck} from 'lucide-react';
-import {explainError} from '../api';
+import {API_BASE,explainError} from '../api';
 import {useRemote} from '../hooks';
 import {Empty,Loading,Notice,Panel,Pill,time} from '../components';
 import type {DocumentItem} from './types';
@@ -14,9 +14,9 @@ export function PatientDocumentsPage(){
    setErr('');setMsg('');
    try{
     const session=sessionStorage.getItem('pg-workspace-session');
-    const r=await fetch(`/api/workspace/documents/${d.id}/file`,{headers:session?{Authorization:`Bearer ${session}`}:{}});
+    const r=await fetch(`${API_BASE}/workspace/documents/${d.id}/file`,{headers:session?{Authorization:`Bearer ${session}`}:{}});
     if(!r.ok){const j=await r.json().catch(()=>({detail:r.statusText}));throw new Error(j.detail||`HTTP ${r.status}`);}
-    const blob=await r.blob();const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=d.filename;a.click();URL.revokeObjectURL(a.href);
+    const blob=await r.blob();const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=d.filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
     setMsg(`Downloaded ${d.filename} — SHA-256 ${d.sha256.slice(0,12)}… verified by the backend.`);
    }catch(e){setErr(String(e));}
  }
