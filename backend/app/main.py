@@ -1,5 +1,5 @@
 """FastAPI application. Offline by default; all patients synthetic."""
-import asyncio, json, os
+import asyncio, json, os, re
 from contextlib import asynccontextmanager
 from typing import Literal
 from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect, Depends, Header, Query
