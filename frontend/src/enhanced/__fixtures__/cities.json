@@ -1,0 +1,28 @@
+{
+  "cities": [
+    {
+      "name": "Pune",
+      "latitude": 18.5204,
+      "longitude": 73.8567,
+      "state": "Maharashtra"
+    },
+    {
+      "name": "Mumbai",
+      "latitude": 19.076,
+      "longitude": 72.8777,
+      "state": "Maharashtra"
+    },
+    {
+      "name": "Delhi",
+      "latitude": 28.6139,
+      "longitude": 77.209,
+      "state": "Delhi"
+    },
+    {
+      "name": "Bengaluru",
+      "latitude": 12.9716,
+      "longitude": 77.5946,
+      "state": "Karnataka"
+    }
+  ]
+}

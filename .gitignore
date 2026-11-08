@@ -1,0 +1,17 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+node_modules/
+frontend/dist/
+.env
+!.env.example
+*.sqlite*
+*.db
+*.log
+.cache/
+.DS_Store
+playwright-report/
+
+*.tsbuildinfo

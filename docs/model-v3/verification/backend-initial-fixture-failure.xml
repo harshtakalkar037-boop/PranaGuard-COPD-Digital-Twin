@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="118" time="12.862" timestamp="2026-11-05T15:33:01.646027+00:00" hostname="e2b.local"><testcase classname="backend.tests.test_api" name="test_read_endpoints[/api/health]" time="0.993" /><testcase classname="backend.tests.test_api" name="test_read_endpoints[/api/overview]" time="0.044" /><testcase classname="backend.tests.test_api" name="test_read_endpoints[/api/patients]" time="0.041" /><testcase classname="backend.tests.test_api" name="test_read_endpoints[/api/status]" time="0.010" /><testcase classname="backend.tests.test_api" name="test_read_endpoints[/api/validation]" time="0.016" /><testcase classname="backend.tests.test_api" name="test_read_endpoints[/api/replay]" time="0.008" /><testcase classname="backend.tests.test_api" name="test_read_endpoints[/openapi.json]" time="0.081" /><testcase classname="backend.tests.test_api" name="test_patient_label_and_predictions" time="0.069" /><testcase classname="backend.tests.test_api" name="test_patient_search" time="0.108" /><testcase classname="backend.tests.test_api" name="test_not_found" time="0.011" /><testcase classname="backend.tests.test_api" name="test_deterministic_replay" time="0.411" /><testcase classname="backend.tests.test_api" name="test_state_persists_restart" time="0.103" /><testcase classname="backend.tests.test_api" name="test_shap_additivity" time="0.135" /><testcase classname="backend.tests.test_api" name="test_scenario_preserves_state_and_has_real_outputs" time="0.157" /><testcase classname="backend.tests.test_api" name="test_scenario_does_not_use_future_records" time="0.267" /><testcase classname="backend.tests.test_api" name="test_no_change_assumptions_match_baseline" time="0.120" /><testcase classname="backend.tests.test_api" name="test_scenario_validation[body0]" time="0.062" /><testcase classname="backend.tests.test_api" name="test_scenario_validation[body1]" time="0.048" /><testcase classname="backend.tests.test_api" name="test_scenario_validation[body2]" time="0.069" /><testcase classname="backend.tests.test_api" name="test_scenario_validation[body3]" time="0.085" /><testcase classname="backend.tests.test_api" name="test_scenario_validation[body4]" time="0.050" /><testcase classname="backend.tests.test_api" name="test_real_model_alert_lifecycle" time="0.101" /><testcase classname="backend.tests.test_api" name="test_intervention_persistence" time="0.060" /><testcase classname="backend.tests.test_api" name="test_replay_endpoints_and_bounds" time="0.392" /><testcase classname="backend.tests.test_api" name="test_websocket" time="0.003" /><testcase classname="backend.tests.test_api" name="test_optional_write_authorization" time="0.095" /><testcase classname="backend.tests.test_api" name="test_causal_features_and_calibration" time="0.095" /><testcase classname="backend.tests.test_api" name="test_split_leakage_guards" time="0.092" /><testcase classname="backend.tests.test_api" name="test_metrics_are_recomputed_from_predictions" time="0.071" /><testcase classname="backend.tests.test_api" name="test_database_transaction_rollback" time="0.048" /><testcase classname="backend.tests.test_api" name="test_missingness_and_freshness_reported" time="0.071" /><testcase classname="backend.tests.test_api" name="test_risk_categories[0-low]" time="0.000" /><testcase classname="backend.tests.test_api" name="test_risk_categories[0.149-low]" time="0.000" /><testcase classname="backend.tests.test_api" name="test_risk_categories[0.15-elevated]" time="0.000" /><testcase classname="backend.tests.test_api" name="test_risk_categories[0.349-elevated]" time="0.000" /><testcase classname="backend.tests.test_api" name="test_risk_categories[0.35-high]" time="0.000" /><testcase classname="backend.tests.test_api" name="test_risk_categories[1-high]" time="0.000" /><testcase classname="backend.tests.test_api" name="test_ingestion_validated_before_features" time="0.230" /><testcase classname="backend.tests.test_api" name="test_ingestion_rejects_duplicate_hours" time="0.051" /><testcase classname="backend.tests.test_api" name="test_ingestion_rejects_misaligned_time" time="0.050" /><testcase classname="backend.tests.test_api" name="test_ingestion_rejects_missing_environment" time="0.051" /><testcase classname="backend.tests.test_enhanced" name="test_migration_is_additive_idempotent_and_checksum_guard" time="0.008" /><testcase classname="backend.tests.test_enhanced" name="test_registration_unique_id_and_original_cohort_preserved" time="0.984" /><testcase classname="backend.tests.test_enhanced" name="test_registration_idempotency_and_conflict" time="0.055" /><testcase classname="backend.tests.test_enhanced" name="test_registration_validation[change0]" time="0.048" /><testcase classname="backend.tests.test_enhanced" name="test_registration_validation[change1]" time="0.047" /><testcase classname="backend.tests.test_enhanced" name="test_registration_validation[change2]" time="0.047" /><testcase classname="backend.tests.test_enhanced" name="test_registration_validation[change3]" time="0.045" /><testcase classname="backend.tests.test_enhanced" name="test_registration_validation[change4]" time="0.046" /><testcase classname="backend.tests.test_enhanced" name="test_registration_validation[change5]" time="0.048" /><testcase classname="backend.tests.test_enhanced" name="test_registration_validation[change6]" time="0.046" /><testcase classname="backend.tests.test_enhanced" name="test_registration_validation[change7]" time="0.047" /><testcase classname="backend.tests.test_enhanced" name="test_patient_filters_and_manual_values_do_not_skip_baseline" time="0.073" /><testcase classname="backend.tests.test_enhanced" name="test_device_capability_catalog_and_association_auth" time="0.073" /><testcase classname="backend.tests.test_enhanced" name="test_ingestion_persists_readings_versions_provenance_and_deduplicates" time="0.074" /><testcase classname="backend.tests.test_enhanced" name="test_ingestion_rejects_invalid_or_backdated_data[bad0]" time="0.057" /><testcase classname="backend.tests.test_enhanced" name="test_ingestion_rejects_invalid_or_backdated_data[bad1]" time="0.057" /><testcase classname="backend.tests.test_enhanced" name="test_ingestion_rejects_invalid_or_backdated_data[bad2]" time="0.058" /><testcase classname="backend.tests.test_enhanced" name="test_ingestion_rejects_invalid_or_backdated_data[bad3]" time="0.058" /><testcase classname="backend.tests.test_enhanced" name="test_ingestion_rejects_invalid_or_backdated_data[bad4]" time="0.059" /><testcase classname="backend.tests.test_enhanced" name="test_ingestion_rejects_invalid_or_backdated_data[bad5]" time="0.056" /><testcase classname="backend.tests.test_enhanced" name="test_ingestion_rejects_invalid_or_backdated_data[bad6]" time="0.056" /><testcase classname="backend.tests.test_enhanced" name="test_ingestion_rejects_invalid_or_backdated_data[bad7]" time="0.056" /><testcase classname="backend.tests.test_enhanced" name="test_association_mismatch_and_stopped_ingestion" time="0.069" /><testcase classname="backend.tests.test_enhanced" name="test_backend_simulator_uses_actual_rest_ingestion_and_stops" time="0.072" /><testcase classname="backend.tests.test_enhanced" name="test_fast_samples_never_become_72_hours" time="0.205" /><testcase classname="backend.tests.test_enhanced" name="test_even_complete_hourly_test_fixture_does_not_manufacture_model_eligibility" time="0.671" /><testcase classname="backend.tests.test_enhanced" name="test_manual_observations_reviews_notification_rule_and_reset_preservation" time="0.110" /><testcase classname="backend.tests.test_enhanced" name="test_legacy_alert_bridge_both_directions_and_review_history" time="0.156" /><testcase classname="backend.tests.test_enhanced" name="test_notification_unread_filters_and_all_review_states" time="0.081" /><testcase classname="backend.tests.test_enhanced" name="test_stale_device_and_sanitized_ingestion_error_notifications" time="0.071" /><testcase classname="backend.tests.test_enhanced" name="test_environment_disabled_uses_real_historical_cache_and_missing_values" time="0.061" /><testcase classname="backend.tests.test_enhanced" name="test_environment_success_cache_throttle_and_context_notification" time="0.061" /><testcase classname="backend.tests.test_enhanced" name="test_environment_failure_partial_data_and_unavailable_without_cache" time="0.064" /><testcase classname="backend.tests.test_enhanced" name="test_stale_cache_failure_never_fabricates_replacement" time="0.062" /><testcase classname="backend.tests.test_enhanced" name="test_provider_validation_and_api_key_redaction" time="0.056" /><testcase classname="backend.tests.test_enhanced" name="test_monitoring_and_current_environment_never_change_frozen_twin" time="0.071" /><testcase classname="backend.tests.test_enhanced" name="test_protected_scientific_and_design_files_are_byte_identical" time="0.011" /><testcase classname="backend.tests.test_enhanced" name="test_email_disabled_preview_recipient_override_and_rate_limit" time="0.060" /><testcase classname="backend.tests.test_enhanced" name="test_actual_local_smtp_acceptance_no_patient_details" time="0.561" /><testcase classname="backend.tests.test_enhanced" name="test_smtp_configuration_failure_redacts_errors" time="0.057" /><testcase classname="backend.tests.test_enhanced" name="test_restart_preserves_registered_data_but_stops_simulation" time="1.760" /><testcase classname="backend.tests.test_enhanced" name="test_provider_backoff_budget_and_retry_after" time="0.072" /><testcase classname="backend.tests.test_enhanced" name="test_http_success_with_old_provider_timestamp_is_explicitly_stale" time="0.056" /><testcase classname="backend.tests.test_enhanced" name="test_backend_settings_clamp_request_rate_and_hide_secrets" time="0.000" /><testcase classname="backend.tests.test_enhanced" name="test_background_service_error_is_sanitized_and_notifies" time="0.051" /><testcase classname="backend.tests.test_enhanced" name="test_simulator_authenticates_through_admin_guard_when_configured" time="0.065" /><testcase classname="backend.tests.test_model48" name="test_research_features_are_past_only" time="0.051" /><testcase classname="backend.tests.test_model48" name="test_future_mutations_do_not_change_prediction" time="0.053" /><testcase classname="backend.tests.test_model48" name="test_labels_onsets_and_eligibility_are_not_predictors" time="0.062" /><testcase classname="backend.tests.test_model48" name="test_original_feature_values_unchanged" time="0.034" /><testcase classname="backend.tests.test_model48" name="test_first72_baseline_and_trailing_means" time="0.023" /><testcase classname="backend.tests.test_model48" name="test_positive_calibrator_cannot_invert_ranking" time="0.001" /><testcase classname="backend.tests.test_model48" name="test_calibration_requires_two_classes" time="0.000" /><testcase classname="backend.tests.test_model48" name="test_candidate_probabilities_finite_and_exact_explanation" time="0.029" /><testcase classname="backend.tests.test_model48" name="test_threshold_constraint_and_no_positive_degeneracy" time="0.006" /><testcase classname="backend.tests.test_model48" name="test_predeclared_fold_separation_and_candidate_selection" time="0.003" /><testcase classname="backend.tests.test_model48" name="test_audit_was_frozen_and_failure_not_hidden" time="0.002" /><testcase classname="backend.tests.test_model48" name="test_research_api_is_read_only_and_retains_old_outputs" time="0.021" /><testcase classname="backend.tests.test_model48" name="test_missing_study_never_breaks_original_model" time="0.009" /><testcase classname="backend.tests.test_model48" name="test_original_scientific_design_and_generator_files_protected" time="0.008" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_features_are_strictly_causal" time="0.118" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_future_measurements_cannot_change_risk" time="0.114" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_hidden_truth_and_identifiers_not_predictors" time="0.104" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_does_not_modify_original_features" time="0.064" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_baseline_sd_and_recovery_calculations" time="0.052" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_exact_calibrated_treeshap" time="0.064" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_missing_inputs_use_fitted_training_imputation" time="0.055"><failure message="TypeError: Invalid value 'nan' for dtype 'int64'">self = &lt;pandas.core.indexing._iLocIndexer object at 0x7f614427bca0&gt;
+loc = np.int64(5), value = nan, plane_indexer = slice(None, None, None)
+
+    def _setitem_single_column(self, loc: int, value, plane_indexer) -&gt; None:
+        """
+    
+        Parameters
+        ----------
+        loc : int
+            Indexer for column position
+        plane_indexer : int, slice, listlike[int]
+            The indexer we use for setitem along axis=0.
+        """
+        pi = plane_indexer
+    
+        is_full_setter = com.is_null_slice(pi) or com.is_full_slice(pi, len(self.obj))
+    
+        is_null_setter = com.is_empty_slice(pi) or (is_array_like(pi) and len(pi) == 0)
+    
+        if is_null_setter:
+            # no-op, don't cast dtype later
+            return
+    
+        elif is_full_setter:
+            try:
+&gt;               self.obj._mgr.column_setitem(
+                    loc, plane_indexer, value, inplace_only=True
+                )
+
+../venv/lib/python3.13/site-packages/pandas/core/indexing.py:2144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../venv/lib/python3.13/site-packages/pandas/core/internals/managers.py:1539: in column_setitem
+    col_mgr.setitem_inplace(idx, value)
+../venv/lib/python3.13/site-packages/pandas/core/internals/managers.py:2241: in setitem_inplace
+    value = np_can_hold_element(arr.dtype, value)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+dtype = dtype('int64'), element = nan
+
+    def np_can_hold_element(dtype: np.dtype, element: Any) -&gt; Any:
+        """
+        Raise if we cannot losslessly set this element into an ndarray with this dtype.
+    
+        Specifically about places where we disagree with numpy.  i.e. there are
+        cases where numpy will raise in doing the setitem that we do not check
+        for here, e.g. setting str "X" into a numeric ndarray.
+    
+        Returns
+        -------
+        Any
+            The element, potentially cast to the dtype.
+    
+        Raises
+        ------
+        ValueError : If we cannot losslessly store this element with this dtype.
+        """
+        if dtype == _dtype_obj:
+            return element
+    
+        tipo = _maybe_infer_dtype_type(element)
+    
+        if dtype.kind in "iu":
+            if isinstance(element, range):
+                if _dtype_can_hold_range(element, dtype):
+                    return element
+                raise LossySetitemError
+    
+            if is_integer(element) or (is_float(element) and element.is_integer()):
+                # e.g. test_setitem_series_int8 if we have a python int 1
+                #  tipo may be np.int32, despite the fact that it will fit
+                #  in smaller int dtypes.
+                info = np.iinfo(dtype)
+                if info.min &lt;= element &lt;= info.max:
+                    return dtype.type(element)
+                raise LossySetitemError
+    
+            if tipo is not None:
+                if tipo.kind not in "iu":
+                    if isinstance(element, np.ndarray) and element.dtype.kind == "f":
+                        # If all can be losslessly cast to integers, then we can hold them
+                        with np.errstate(invalid="ignore"):
+                            # We check afterwards if cast was losslessly, so no need to show
+                            # the warning
+                            casted = element.astype(dtype)
+                        comp = casted == element
+                        if comp.all():
+                            # Return the casted values bc they can be passed to
+                            #  np.putmask, whereas the raw values cannot.
+                            #  see TestSetitemFloatNDarrayIntoIntegerSeries
+                            return casted
+                        raise LossySetitemError
+    
+                    elif isinstance(element, ABCExtensionArray) and isinstance(
+                        element.dtype, CategoricalDtype
+                    ):
+                        # GH#52927 setting Categorical value into non-EA frame
+                        # TODO: general-case for EAs?
+                        try:
+                            casted = element.astype(dtype)
+                        except (ValueError, TypeError) as err:
+                            raise LossySetitemError from err
+                        # Check for cases of either
+                        #  a) lossy overflow/rounding or
+                        #  b) semantic changes like dt64-&gt;int64
+                        comp = casted == element
+                        if not comp.all():
+                            raise LossySetitemError
+                        return casted
+    
+                    # Anything other than integer we cannot hold
+                    raise LossySetitemError
+                if (
+                    dtype.kind == "u"
+                    and isinstance(element, np.ndarray)
+                    and element.dtype.kind == "i"
+                ):
+                    # see test_where_uint64
+                    casted = element.astype(dtype)
+                    if (casted == element).all():
+                        # TODO: faster to check (element &gt;=0).all()?  potential
+                        #  itemsize issues there?
+                        return casted
+                    raise LossySetitemError
+                if dtype.itemsize &lt; tipo.itemsize:
+                    raise LossySetitemError
+                if not isinstance(tipo, np.dtype):
+                    # i.e. nullable IntegerDtype; we can put this into an ndarray
+                    #  losslessly iff it has no NAs
+                    arr = element._values if isinstance(element, ABCSeries) else element
+                    if arr._hasna:
+                        raise LossySetitemError
+                    return element
+    
+                return element
+    
+&gt;           raise LossySetitemError
+E           pandas.errors.LossySetitemError
+
+../venv/lib/python3.13/site-packages/pandas/core/dtypes/cast.py:1750: LossySetitemError
+
+The above exception was the direct cause of the following exception:
+
+raw3 =      patient_id  hour                  timestamp  ...  label_24  label_48  label_72
+0       PG-0001     0  2026-08-01 ...      NaN
+1439    PG-0001  1439  2026-09-29 23:00:00+00:00  ...       NaN       NaN       NaN
+
+[1440 rows x 29 columns]
+model3 = Model48V3(pipeline=Pipeline(steps=[('imputer', SimpleImputer(strategy='median')),
+                ('model',
+          ...libration log-loss +0.5*(slope-1)^2; slope&gt;=0.'}, candidate='tree_context15', kind='tree', version='pg48-v3-multiseed')
+
+    def test_v3_missing_inputs_use_fitted_training_imputation(raw3,model3):
+&gt;       frame=features_v3(raw3);row=frame[frame.hour==200].copy();row.loc[:,model3.features]=np.nan
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_model48_v3.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../venv/lib/python3.13/site-packages/pandas/core/indexing.py:938: in __setitem__
+    iloc._setitem_with_indexer(indexer, value, self.name)
+../venv/lib/python3.13/site-packages/pandas/core/indexing.py:1953: in _setitem_with_indexer
+    self._setitem_with_indexer_split_path(indexer, value, name)
+../venv/lib/python3.13/site-packages/pandas/core/indexing.py:2044: in _setitem_with_indexer_split_path
+    self._setitem_single_column(loc, value, pi)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;pandas.core.indexing._iLocIndexer object at 0x7f614427bca0&gt;
+loc = np.int64(5), value = nan, plane_indexer = slice(None, None, None)
+
+    def _setitem_single_column(self, loc: int, value, plane_indexer) -&gt; None:
+        """
+    
+        Parameters
+        ----------
+        loc : int
+            Indexer for column position
+        plane_indexer : int, slice, listlike[int]
+            The indexer we use for setitem along axis=0.
+        """
+        pi = plane_indexer
+    
+        is_full_setter = com.is_null_slice(pi) or com.is_full_slice(pi, len(self.obj))
+    
+        is_null_setter = com.is_empty_slice(pi) or (is_array_like(pi) and len(pi) == 0)
+    
+        if is_null_setter:
+            # no-op, don't cast dtype later
+            return
+    
+        elif is_full_setter:
+            try:
+                self.obj._mgr.column_setitem(
+                    loc, plane_indexer, value, inplace_only=True
+                )
+            except (ValueError, TypeError, LossySetitemError) as exc:
+                # If we're setting an entire column and we can't do it inplace,
+                #  then we can use value's dtype (or inferred dtype)
+                #  instead of object
+                dtype = self.obj.dtypes.iloc[loc]
+                if dtype not in (np.void, object) and not self.obj.empty:
+                    # - Exclude np.void, as that is a special case for expansion.
+                    #   We want to raise for
+                    #       df = pd.DataFrame({'a': [1, 2]})
+                    #       df.loc[:, 'a'] = .3
+                    #   but not for
+                    #       df = pd.DataFrame({'a': [1, 2]})
+                    #       df.loc[:, 'b'] = .3
+                    # - Exclude `object`, as then no upcasting happens.
+                    # - Exclude empty initial object with enlargement,
+                    #   as then there's nothing to be inconsistent with.
+&gt;                   raise TypeError(
+                        f"Invalid value '{value}' for dtype '{dtype}'"
+                    ) from exc
+E                   TypeError: Invalid value 'nan' for dtype 'int64'
+
+../venv/lib/python3.13/site-packages/pandas/core/indexing.py:2163: TypeError</failure></testcase><testcase classname="backend.tests.test_model48_v3" name="test_v3_protocol_seeds_separation_and_candidate_selection" time="0.001" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_artifact_and_source_frozen_before_audit" time="0.001" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_saved_audit_metrics_and_gates_are_reproducible" time="0.110" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_prior_failed_study_is_not_relabelled" time="0.008" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_readonly_api_preserves_legacy_states_and_history" time="0.147" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_saved_version_not_latest_version_is_explained" time="0.190" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_query_and_new_patient_bounds" time="0.018" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_unsupported_episode_withholds_risk_and_explanation" time="0.105" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_missing_evidence_fails_closed_without_breaking_legacy" time="0.011" /><testcase classname="backend.tests.test_model48_v3" name="test_v3_report_is_versioned_and_read_only" time="0.011" /></testsuite></testsuites>

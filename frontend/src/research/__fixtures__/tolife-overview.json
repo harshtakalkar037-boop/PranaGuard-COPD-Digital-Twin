@@ -1,0 +1,93 @@
+{
+ "model_id": "tolife-longitudinal-probe-v2",
+ "dataset": "TOLIFE Clinical Study A (Zenodo 23263785 v2.0, CC-BY-4.0)",
+ "event_audit": {
+  "total_entries": 80,
+  "unique_participants": 42,
+  "missing_dates": 0,
+  "device_window": {
+   "inside": 50,
+   "outside": 30
+  },
+  "observed_frame": {
+   "inside": 42,
+   "outside": 38
+  },
+  "events_with_valid_measurements_in_prior_7d": 32,
+  "in_frame_events_with_prior_7d_measurements": 30,
+  "note": "Counts reconciled: prior-7d validity is computed against observed participant-days only; many register events fall outside any device/observed window."
+ },
+ "horizons": {
+  "24": {
+   "horizon_hours": 24,
+   "definition": "day d positive iff register event begins in [today d, d+0] using only days <= d-1 features",
+   "prediction_cutoff": "after previous-day measurements (strictly prior-day features)",
+   "n_eval_days": 7195,
+   "n_positive_days": 18,
+   "prevalence": 0.002501737317581654,
+   "n_participants": 76,
+   "n_participants_with_positive": 13,
+   "n_independent_register_events_in_frame": 13,
+   "auroc": 0.35529391729753995,
+   "auroc_ci": [
+    0.2332,
+    0.4718
+   ],
+   "auprc": 0.00198121278719702,
+   "auprc_ci": [
+    0.0011,
+    0.0035
+   ],
+   "brier": 0.19087688761952712,
+   "log_loss": 0.5959969951419363
+  },
+  "48": {
+   "horizon_hours": 48,
+   "definition": "day d positive iff register event begins in [today d, d+1] using only days <= d-1 features",
+   "prediction_cutoff": "after previous-day measurements (strictly prior-day features)",
+   "n_eval_days": 7195,
+   "n_positive_days": 39,
+   "prevalence": 0.00542043085476025,
+   "n_participants": 76,
+   "n_participants_with_positive": 17,
+   "n_independent_register_events_in_frame": 17,
+   "auroc": 0.3893666423012426,
+   "auroc_ci": [
+    0.2436,
+    0.5425
+   ],
+   "auprc": 0.0052406768623918555,
+   "auprc_ci": [
+    0.0024,
+    0.0099
+   ],
+   "brier": 0.21260674373558142,
+   "log_loss": 0.6310995106178388
+  },
+  "72": {
+   "horizon_hours": 72,
+   "definition": "day d positive iff register event begins in [today d, d+2] using only days <= d-1 features",
+   "prediction_cutoff": "after previous-day measurements (strictly prior-day features)",
+   "n_eval_days": 7195,
+   "n_positive_days": 56,
+   "prevalence": 0.00778318276580959,
+   "n_participants": 76,
+   "n_participants_with_positive": 17,
+   "n_independent_register_events_in_frame": 17,
+   "auroc": 0.39335991435375106,
+   "auroc_ci": [
+    0.2762,
+    0.5233
+   ],
+   "auprc": 0.00638221715349162,
+   "auprc_ci": [
+    0.0032,
+    0.0103
+   ],
+   "brier": 0.21840121434444978,
+   "log_loss": 0.6390360019904536
+  }
+ },
+ "corrected_experiment_note": "Leakage-corrected v2 protocol: prior-day-only features, strict in-frame events, model-estimated symptom classes excluded.",
+ "framing": "Research view of an external clinical study. Participants are shown under coded identities only."
+}

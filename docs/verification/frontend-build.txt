@@ -1,0 +1,14 @@
+
+> pranaguard-clinician-dashboard@0.1.0 build
+> tsc -b && vite build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 2201 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.61 kB │ gzip:   0.38 kB
+dist/assets/index-frVYVb7H.css   37.93 kB │ gzip:   8.95 kB
+dist/assets/index-Btk_bpzP.js   270.60 kB │ gzip:  84.25 kB
+dist/assets/charts-UCGEy6vn.js  429.41 kB │ gzip: 116.43 kB
+✓ built in 6.35s

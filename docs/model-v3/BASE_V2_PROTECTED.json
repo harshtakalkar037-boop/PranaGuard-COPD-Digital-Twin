@@ -1,0 +1,18 @@
+{
+  "artifacts/model48_v2/AUDIT_EVALUATION.json": "98acd918d0edd01fcab52a0461e3f24d0fee27962e5074acb48bf8bafc451b21",
+  "artifacts/model48_v2/FROZEN_DEVELOPMENT.json": "94a58c84d08b3d204cd717ddba22a68a18b5853d1c5c7236bb7852d050af565d",
+  "artifacts/model48_v2/audit_predictions.csv.gz": "806a83f3d5297237a021034a8502f4f804eec00f2df1d4af13e1310e47df9306",
+  "artifacts/model48_v2/historical_comparison.csv.gz": "43c7f648d734962d3ea7ed32d72f34d110c6deb2d8191d1f0dccb7dbbba0bd1d",
+  "artifacts/model48_v2/model.joblib": "770d1fc36aae4a724e1d1aa96ad1a6930f8ccf3b9e89cdb96aa2fc8c7b9c9b2a",
+  "backend/app/model48.py": "10d718e71861773fc7c1bde24c1b5f4bbb31cb12da49b9fea4aeabe8f88d0b42",
+  "backend/app/model48_study.py": "784a8d564bd80eab5312d03223dc02caf73b0b782f1511886183d49d8830b8e3",
+  "data/model48_audit/generation_manifest.json": "8752800f315284df27c90e500d0a2f42c6fd2f37db9f92fa30c1f5e54847ce33",
+  "data/model48_audit/patients.json": "b1511b92c925152fbb0346562adf4958bd2c4d4e519333cd16153be13bfd30e2",
+  "docs/model-upgrade/AUDIT_AND_PLAN.md": "74877c2d6babd6252159c2b32a446ba50c48a48e6a1c71abc63827a16c070bfb",
+  "docs/model-upgrade/PROTOCOL.json": "4c734d2872eaf23b6bff21d4955abdee47d6af1a93b80502d2842ef37803140e",
+  "docs/model-upgrade/RESULTS.md": "dbccc04bcf72be0e227f0cceb8c2e3357ef63433a44bb48bf4009b95c9224293",
+  "docs/model-upgrade/VERIFICATION.md": "e6bd7efbc77f44c0174ef7fba07f8877f3b464e98e8294703c14f62e5f5db0be",
+  "scripts/audit_model48.py": "bd93d84434647fabb03616092a1c4aa6a4be3fc49348bc3fc13da8b45929f7a4",
+  "scripts/train_model48.py": "b2c0755e3eb7e10bfbce145b230ef0edd92e32b2801ca52d097f9abd1317f21c",
+  "scripts/verify_model48_study.py": "076eedf9f95e828ab4027fddad0827f4e74924c9cafe51c72cab98efc378f868"
+}

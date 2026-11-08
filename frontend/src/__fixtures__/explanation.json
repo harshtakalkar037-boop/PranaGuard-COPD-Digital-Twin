@@ -1,0 +1,270 @@
+{
+  "method": "LightGBM native TreeSHAP",
+  "units": "uncalibrated raw log-odds",
+  "base_value": -2.4675938885414164,
+  "raw_margin": -4.9990045447711715,
+  "drivers": [
+    {
+      "feature": "age",
+      "value": 48.0,
+      "contribution": -1.5510144671036827,
+      "label": "Age",
+      "contribution_change": -0.010167628591220446
+    },
+    {
+      "feature": "smoking_pack_years",
+      "value": 55.2,
+      "contribution": -0.43221643450869013,
+      "label": "Smoking Pack Years",
+      "contribution_change": -0.02141438125318923
+    },
+    {
+      "feature": "symptom_mean6",
+      "value": 2.0369666666666664,
+      "contribution": 0.22230365933802562,
+      "label": "Symptom Mean6",
+      "contribution_change": -0.009291206875177371
+    },
+    {
+      "feature": "pm25_mean24",
+      "value": 29.412499999999998,
+      "contribution": -0.20930207575897,
+      "label": "24h PM2.5 exposure",
+      "contribution_change": 0.008928467530447376
+    },
+    {
+      "feature": "prior_exacerbations",
+      "value": 2.0,
+      "contribution": -0.1657521144330693,
+      "label": "Prior Exacerbations",
+      "contribution_change": -0.006502681150884787
+    },
+    {
+      "feature": "bmi",
+      "value": 31.2,
+      "contribution": -0.16093756940090134,
+      "label": "Bmi",
+      "contribution_change": -0.004443686361776472
+    },
+    {
+      "feature": "fev1_pct",
+      "value": 74.89,
+      "contribution": -0.14549278824478598,
+      "label": "Fev1 Pct",
+      "contribution_change": 0.006715386402710799
+    },
+    {
+      "feature": "spo2_baseline",
+      "value": 94.4059,
+      "contribution": -0.14102209148831313,
+      "label": "Spo2 Baseline",
+      "contribution_change": -0.023700540659866293
+    },
+    {
+      "feature": "humidity",
+      "value": 60.0,
+      "contribution": 0.07418423095464174,
+      "label": "Humidity",
+      "contribution_change": 0.02040901032807467
+    },
+    {
+      "feature": "temperature",
+      "value": 32.3,
+      "contribution": 0.055818392140409324,
+      "label": "Temperature",
+      "contribution_change": 0.004047315421030463
+    },
+    {
+      "feature": "hr_mean6",
+      "value": 67.58977999999999,
+      "contribution": 0.023762427515012344,
+      "label": "Hr Mean6",
+      "contribution_change": -0.012419668909458306
+    },
+    {
+      "feature": "spo2_change6",
+      "value": -0.38290000000000646,
+      "contribution": 0.022379307828785885,
+      "label": "Spo2 Change6",
+      "contribution_change": -0.025989068538395447
+    },
+    {
+      "feature": "adherence_mean24",
+      "value": 0.8333833333333333,
+      "contribution": -0.021605441409399254,
+      "label": "24h adherence",
+      "contribution_change": 0.005834491734868646
+    },
+    {
+      "feature": "pm10",
+      "value": 31.8,
+      "contribution": -0.02137194013282726,
+      "label": "Pm10",
+      "contribution_change": 0.0077740911284998465
+    },
+    {
+      "feature": "symptom_score",
+      "value": 2.0924,
+      "contribution": -0.020305558106307107,
+      "label": "Symptom burden",
+      "contribution_change": -0.0018036179405147117
+    },
+    {
+      "feature": "spo2_delta",
+      "value": -1.2172000000000054,
+      "contribution": -0.01960376296962963,
+      "label": "SpO\u2082 vs personal baseline",
+      "contribution_change": 0.0020022033689033047
+    },
+    {
+      "feature": "symptom_delta",
+      "value": 0.7577,
+      "contribution": -0.016612349822732363,
+      "label": "Symptoms vs baseline",
+      "contribution_change": 0.001422441417475176
+    },
+    {
+      "feature": "steps",
+      "value": 230.2151,
+      "contribution": 0.015753544243600936,
+      "label": "Steps",
+      "contribution_change": -0.0029369856163814594
+    },
+    {
+      "feature": "pm25",
+      "value": 27.0,
+      "contribution": -0.015060270629509298,
+      "label": "Ambient PM2.5",
+      "contribution_change": 0.006438425789068175
+    },
+    {
+      "feature": "hr_delta",
+      "value": null,
+      "contribution": -0.01248388499762588,
+      "label": "Heart rate vs baseline",
+      "contribution_change": -0.008245986947364415
+    },
+    {
+      "feature": "resp_rate",
+      "value": 21.2192,
+      "contribution": -0.012437360162186589,
+      "label": "Respiratory rate",
+      "contribution_change": -0.013867163557009076
+    },
+    {
+      "feature": "rr_mean6",
+      "value": 19.284233333333333,
+      "contribution": 0.009128303700612793,
+      "label": "Rr Mean6",
+      "contribution_change": 0.007934442229489403
+    },
+    {
+      "feature": "hr_change6",
+      "value": null,
+      "contribution": -0.006277061602492998,
+      "label": "Hr Change6",
+      "contribution_change": 0.0067618616920449995
+    },
+    {
+      "feature": "spo2",
+      "value": 93.1887,
+      "contribution": 0.005062155630778537,
+      "label": "Oxygen saturation",
+      "contribution_change": 0.0006157648664521795
+    },
+    {
+      "feature": "sleep_hours",
+      "value": 6.5903,
+      "contribution": -0.004777953804081646,
+      "label": "Sleep Hours",
+      "contribution_change": 0.0010617491659403568
+    },
+    {
+      "feature": "rr_delta",
+      "value": 3.0726000000000013,
+      "contribution": -0.0034937079706648393,
+      "label": "Respiratory rate vs baseline",
+      "contribution_change": -0.00022356923002699817
+    },
+    {
+      "feature": "pm25_change6",
+      "value": 1.6000000000000014,
+      "contribution": -0.0034669072476876087,
+      "label": "Pm25 Change6",
+      "contribution_change": -0.0011692762334449196
+    },
+    {
+      "feature": "adherence",
+      "value": 0.7912,
+      "contribution": -0.002461345717856919,
+      "label": "Adherence assumption",
+      "contribution_change": -0.0007048062709221503
+    },
+    {
+      "feature": "spo2_mean6",
+      "value": 93.53396666666667,
+      "contribution": 0.002204617088357313,
+      "label": "Spo2 Mean6",
+      "contribution_change": -0.0012616587272597487
+    },
+    {
+      "feature": "ozone",
+      "value": 184.0,
+      "contribution": 0.0012303245985563762,
+      "label": "Ozone",
+      "contribution_change": -0.002738917997895626
+    },
+    {
+      "feature": "hr_baseline",
+      "value": 67.14115,
+      "contribution": 0.0009350129901952716,
+      "label": "Hr Baseline",
+      "contribution_change": -0.000808046001272675
+    },
+    {
+      "feature": "heart_rate",
+      "value": null,
+      "contribution": 0.0007352355782256052,
+      "label": "Heart rate",
+      "contribution_change": 0.0026867124239391732
+    },
+    {
+      "feature": "steps_ratio",
+      "value": 0.8277797164483102,
+      "contribution": 0.0006395823416899092,
+      "label": "Activity vs baseline",
+      "contribution_change": -0.0012471140334352295
+    },
+    {
+      "feature": "rr_baseline",
+      "value": 18.1466,
+      "contribution": 0.00012564232854916192,
+      "label": "Rr Baseline",
+      "contribution_change": 0.002579682091229056
+    },
+    {
+      "feature": "no2",
+      "value": 4.6,
+      "contribution": 2.199300421880068e-05,
+      "label": "No2",
+      "contribution_change": -0.0018421536517318482
+    }
+  ],
+  "caveat": "Contributions explain the uncalibrated tree score, not the final calibrated probability. Association, not causation.",
+  "patient_id": "PG-0071",
+  "version": 25,
+  "horizon": 72,
+  "probability": 0.29658079216723104,
+  "previous_probability": 0.2928111321101421,
+  "risk_change": 0.0037696600570889527,
+  "relative_deviations": {
+    "spo2": -1.2172000000000054,
+    "heart_rate": null,
+    "resp_rate": 3.0726000000000013,
+    "symptom_score": 0.7577,
+    "steps": -47.89644999999996
+  },
+  "missing_fields": [
+    "heart_rate"
+  ]
+}

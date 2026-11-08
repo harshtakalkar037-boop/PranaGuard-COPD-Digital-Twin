@@ -1,0 +1,9 @@
+{
+  "patient_id": "PG-0071",
+  "start_hour": 1039,
+  "focus_hour": 1051,
+  "onset_hour": null,
+  "selected_risk_72": 0.3551213864930386,
+  "selected_label_72": 0,
+  "selection": "Retrospective maximum 72h model score across the synthetic cohort (not a held-out prospective case). Chosen to demonstrate a real model-generated alert, not detection performance. This example is a false positive when selected_label_72=0."
+}

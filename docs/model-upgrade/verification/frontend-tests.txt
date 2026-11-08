@@ -1,0 +1,34 @@
+
+> pranaguard-clinician-dashboard@0.1.0 test
+> vitest run --reporter=default --reporter=json --outputFile=../docs/model-upgrade/verification/frontend-tests.json
+
+
+ RUN  v3.2.7 /home/user/.cache/pranaguard-model-v2/PranaGuard-Enhanced-v2/frontend
+
+ ✓ src/enhanced/Enhanced.test.tsx (22 tests) 5582ms
+   ✓ fictional registry and onboarding > searches server records by ID and reports an honest empty result  962ms
+   ✓ fictional registry and onboarding > requires fictional confirmation before registration and sends no client-selected ID  424ms
+   ✓ fictional registry and onboarding > opens a complete profile without inventing predictions  398ms
+   ✓ fictional registry and onboarding > persists explicitly fictional symptom/adherence input through POST  301ms
+   ✓ generic simulated devices > executes Start/Stop on the backend and renders returned simulation status  433ms
+   ✓ persistent notification review and email honesty > creates a test event and reviews acknowledgement/under-review/resolution/closure  799ms
+   ✓ persistent notification review and email honesty > marks reading independently of review status  341ms
+ ✓ src/App.test.tsx (14 tests) 5830ms
+   ✓ backend-fed dashboard > renders the real captured cohort response and explicit synthetic labels  629ms
+   ✓ backend-fed dashboard > filters patient search without invented rows  788ms
+   ✓ backend-fed dashboard > shows an empty search result honestly  697ms
+   ✓ backend-fed dashboard > paginates the complete backend cohort  495ms
+   ✓ backend-fed dashboard > loads the patient state, baseline and persisted version control  581ms
+   ✓ backend-fed dashboard > loads real model drivers and switches prediction horizon  481ms
+   ✓ backend-fed dashboard > calls the scenario API and displays the saved calculated result  410ms
+   ✓ backend-fed dashboard > displays executed validation results, including negative findings  350ms
+   ✓ backend-fed dashboard > persists clinician notes using the backend endpoint  535ms
+   ✓ backend-fed dashboard > shows source provenance and saves an optional browser-session token  427ms
+ ✓ src/model48/Study.test.tsx (4 tests) 272ms
+
+ Test Files  3 passed (3)
+      Tests  40 passed (40)
+   Start at  14:57:32
+   Duration  17.50s (transform 1.04s, setup 501ms, collect 2.38s, tests 11.68s, environment 1.73s, prepare 527ms)
+
+JSON report written to /home/user/.cache/pranaguard-model-v2/PranaGuard-Enhanced-v2/docs/model-upgrade/verification/frontend-tests.json

@@ -1,0 +1,16 @@
+{
+  "seed": 2026,
+  "patients": 120,
+  "days": 60,
+  "hours_per_patient": 1440,
+  "rows": 172800,
+  "synthetic_events": 263,
+  "eligible_rows": 137833,
+  "environment_sources": [
+    "cached_real_ambient"
+  ],
+  "generator": "Causal stochastic latent burden with probabilistic onsets; all physiology and labels synthetic.",
+  "sha256": "a9fddac47dfd28548feb336564928b7510b13d35d89a845727b12a54b3e54a5d",
+  "start": "2026-08-01T00:00:00Z",
+  "clinical_validity": "NONE; not a validated physiological disease model"
+}

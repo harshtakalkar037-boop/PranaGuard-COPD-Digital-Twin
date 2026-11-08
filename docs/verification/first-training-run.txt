@@ -1,0 +1,16 @@
+LogisticRegression   personalized       24h ROC=0.6619 AP=0.1993 Brier=0.0260
+LogisticRegression   personalized       48h ROC=0.6285 AP=0.1841 Brier=0.0537
+LogisticRegression   personalized       72h ROC=0.6253 AP=0.2281 Brier=0.0800
+LightGBM             static_only        24h ROC=0.2688 AP=0.0214 Brier=0.0292
+LightGBM             static_only        48h ROC=0.2246 AP=0.0390 Brier=0.0565
+LightGBM             static_only        72h ROC=0.2197 AP=0.0550 Brier=0.0816
+LightGBM             body_stream        24h ROC=0.6242 AP=0.0408 Brier=0.0294
+LightGBM             body_stream        48h ROC=0.6160 AP=0.0688 Brier=0.0561
+LightGBM             body_stream        72h ROC=0.6358 AP=0.1086 Brier=0.0815
+LightGBM             full_environment   24h ROC=0.6991 AP=0.0676 Brier=0.0282
+LightGBM             full_environment   48h ROC=0.6613 AP=0.0939 Brier=0.0558
+LightGBM             full_environment   72h ROC=0.3119 AP=0.0514 Brier=0.0816
+LightGBM             personalized       24h ROC=0.6916 AP=0.0882 Brier=0.0279
+LightGBM             personalized       48h ROC=0.6144 AP=0.0968 Brier=0.0557
+LightGBM             personalized       72h ROC=0.3951 AP=0.0593 Brier=0.0853
+Saved all experiments, models, calibration/ROC/PR curves and reproducible demo case.

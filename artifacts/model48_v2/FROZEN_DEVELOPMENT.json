@@ -1,0 +1,455 @@
+{
+  "created_at": "2026-11-05T14:50:51.726287+00:00",
+  "version": "pg48-research-v2-20261105",
+  "protocol_sha256": "4c734d2872eaf23b6bff21d4955abdee47d6af1a93b80502d2842ef37803140e",
+  "source_data_sha256": "a9fddac47dfd28548feb336564928b7510b13d35d89a845727b12a54b3e54a5d",
+  "original_generator_sha256": "f49ae916428c8607a74186305263742d5f130c0ebbe8a228b940ddb22ee79c02",
+  "candidates": [
+    {
+      "candidate": "baseline_tree_35",
+      "features": [
+        "age",
+        "fev1_pct",
+        "prior_exacerbations",
+        "smoking_pack_years",
+        "bmi",
+        "spo2",
+        "heart_rate",
+        "resp_rate",
+        "symptom_score",
+        "adherence",
+        "steps",
+        "sleep_hours",
+        "spo2_mean6",
+        "hr_mean6",
+        "rr_mean6",
+        "symptom_mean6",
+        "spo2_change6",
+        "hr_change6",
+        "adherence_mean24",
+        "pm25",
+        "pm10",
+        "no2",
+        "ozone",
+        "temperature",
+        "humidity",
+        "pm25_mean24",
+        "pm25_change6",
+        "spo2_delta",
+        "hr_delta",
+        "rr_delta",
+        "symptom_delta",
+        "steps_ratio",
+        "spo2_baseline",
+        "hr_baseline",
+        "rr_baseline"
+      ],
+      "folds": [
+        {
+          "auprc": 0.08407319995712534,
+          "auroc": 0.42979867824118445,
+          "train_rows": 3380,
+          "validation_rows": 3074,
+          "validation_positive_rows": 318
+        },
+        {
+          "auprc": 0.2657235462201196,
+          "auroc": 0.729668525878917,
+          "train_rows": 5689,
+          "validation_rows": 1838,
+          "validation_positive_rows": 226
+        },
+        {
+          "auprc": 0.04404570378922384,
+          "auroc": 0.2831179005092049,
+          "train_rows": 8906,
+          "validation_rows": 911,
+          "validation_positive_rows": 60
+        }
+      ],
+      "mean_validation_auprc": 0.1312808166554896
+    },
+    {
+      "candidate": "original_linear_35",
+      "features": [
+        "age",
+        "fev1_pct",
+        "prior_exacerbations",
+        "smoking_pack_years",
+        "bmi",
+        "spo2",
+        "heart_rate",
+        "resp_rate",
+        "symptom_score",
+        "adherence",
+        "steps",
+        "sleep_hours",
+        "spo2_mean6",
+        "hr_mean6",
+        "rr_mean6",
+        "symptom_mean6",
+        "spo2_change6",
+        "hr_change6",
+        "adherence_mean24",
+        "pm25",
+        "pm10",
+        "no2",
+        "ozone",
+        "temperature",
+        "humidity",
+        "pm25_mean24",
+        "pm25_change6",
+        "spo2_delta",
+        "hr_delta",
+        "rr_delta",
+        "symptom_delta",
+        "steps_ratio",
+        "spo2_baseline",
+        "hr_baseline",
+        "rr_baseline"
+      ],
+      "folds": [
+        {
+          "auprc": 0.12458208216165181,
+          "auroc": 0.5571708610601455,
+          "train_rows": 3380,
+          "validation_rows": 3074,
+          "validation_positive_rows": 318
+        },
+        {
+          "auprc": 0.2807990389001192,
+          "auroc": 0.8101352686708098,
+          "train_rows": 5689,
+          "validation_rows": 1838,
+          "validation_positive_rows": 226
+        },
+        {
+          "auprc": 0.04311166152945735,
+          "auroc": 0.25613004308656484,
+          "train_rows": 8906,
+          "validation_rows": 911,
+          "validation_positive_rows": 60
+        }
+      ],
+      "mean_validation_auprc": 0.14949759419707612
+    },
+    {
+      "candidate": "core_linear_C0.03",
+      "features": [
+        "fev1_pct",
+        "pg48_spo2_delta24",
+        "pg48_hr_delta24",
+        "pg48_rr_delta24",
+        "pg48_symptom_delta24",
+        "pg48_sleep_delta24",
+        "adherence_mean24",
+        "pm25_mean24"
+      ],
+      "folds": [
+        {
+          "auprc": 0.12797805420788522,
+          "auroc": 0.5078274045878176,
+          "train_rows": 3380,
+          "validation_rows": 3074,
+          "validation_positive_rows": 318
+        },
+        {
+          "auprc": 0.4181896306413723,
+          "auroc": 0.8127895869474516,
+          "train_rows": 5689,
+          "validation_rows": 1838,
+          "validation_positive_rows": 226
+        },
+        {
+          "auprc": 0.03724207343927615,
+          "auroc": 0.11566784175479827,
+          "train_rows": 8906,
+          "validation_rows": 911,
+          "validation_positive_rows": 60
+        }
+      ],
+      "mean_validation_auprc": 0.19446991942951122
+    },
+    {
+      "candidate": "core_linear_C0.3",
+      "features": [
+        "fev1_pct",
+        "pg48_spo2_delta24",
+        "pg48_hr_delta24",
+        "pg48_rr_delta24",
+        "pg48_symptom_delta24",
+        "pg48_sleep_delta24",
+        "adherence_mean24",
+        "pm25_mean24"
+      ],
+      "folds": [
+        {
+          "auprc": 0.1545441389255291,
+          "auroc": 0.4842424989274402,
+          "train_rows": 3380,
+          "validation_rows": 3074,
+          "validation_positive_rows": 318
+        },
+        {
+          "auprc": 0.45047911030216264,
+          "auroc": 0.8252075144381738,
+          "train_rows": 5689,
+          "validation_rows": 1838,
+          "validation_positive_rows": 226
+        },
+        {
+          "auprc": 0.036896690655370885,
+          "auroc": 0.1154915785350568,
+          "train_rows": 8906,
+          "validation_rows": 911,
+          "validation_positive_rows": 60
+        }
+      ],
+      "mean_validation_auprc": 0.2139733132943542
+    },
+    {
+      "candidate": "trend_linear_C0.03",
+      "features": [
+        "fev1_pct",
+        "pg48_spo2_delta24",
+        "pg48_hr_delta24",
+        "pg48_rr_delta24",
+        "pg48_symptom_delta24",
+        "pg48_sleep_delta24",
+        "adherence_mean24",
+        "pm25_mean24",
+        "prior_exacerbations",
+        "pg48_spo2_delta6",
+        "pg48_hr_delta6",
+        "pg48_rr_delta6",
+        "pg48_symptom_delta6",
+        "pg48_steps_ratio24",
+        "pg48_spo2_slope24",
+        "pg48_hr_slope24",
+        "pg48_symptom_slope24",
+        "pg48_adherence_mean72",
+        "pg48_pm25_mean72",
+        "pg48_symptom_std24",
+        "pg48_spo2_std24"
+      ],
+      "folds": [
+        {
+          "auprc": 0.15137632878070142,
+          "auroc": 0.6322135352484232,
+          "train_rows": 3380,
+          "validation_rows": 3074,
+          "validation_positive_rows": 318
+        },
+        {
+          "auprc": 0.41935327708317344,
+          "auroc": 0.8278041898153231,
+          "train_rows": 5689,
+          "validation_rows": 1838,
+          "validation_positive_rows": 226
+        },
+        {
+          "auprc": 0.038428675846746016,
+          "auroc": 0.1735996866431649,
+          "train_rows": 8906,
+          "validation_rows": 911,
+          "validation_positive_rows": 60
+        }
+      ],
+      "mean_validation_auprc": 0.20305276057020696
+    },
+    {
+      "candidate": "trend_linear_C0.3",
+      "features": [
+        "fev1_pct",
+        "pg48_spo2_delta24",
+        "pg48_hr_delta24",
+        "pg48_rr_delta24",
+        "pg48_symptom_delta24",
+        "pg48_sleep_delta24",
+        "adherence_mean24",
+        "pm25_mean24",
+        "prior_exacerbations",
+        "pg48_spo2_delta6",
+        "pg48_hr_delta6",
+        "pg48_rr_delta6",
+        "pg48_symptom_delta6",
+        "pg48_steps_ratio24",
+        "pg48_spo2_slope24",
+        "pg48_hr_slope24",
+        "pg48_symptom_slope24",
+        "pg48_adherence_mean72",
+        "pg48_pm25_mean72",
+        "pg48_symptom_std24",
+        "pg48_spo2_std24"
+      ],
+      "folds": [
+        {
+          "auprc": 0.1412372994762669,
+          "auroc": 0.5749970333451999,
+          "train_rows": 3380,
+          "validation_rows": 3074,
+          "validation_positive_rows": 318
+        },
+        {
+          "auprc": 0.4456513503779186,
+          "auroc": 0.817472386306243,
+          "train_rows": 5689,
+          "validation_rows": 1838,
+          "validation_positive_rows": 226
+        },
+        {
+          "auprc": 0.037969432338491295,
+          "auroc": 0.1689776733254994,
+          "train_rows": 8906,
+          "validation_rows": 911,
+          "validation_positive_rows": 60
+        }
+      ],
+      "mean_validation_auprc": 0.2082860273975589
+    },
+    {
+      "candidate": "trend_linear_C3",
+      "features": [
+        "fev1_pct",
+        "pg48_spo2_delta24",
+        "pg48_hr_delta24",
+        "pg48_rr_delta24",
+        "pg48_symptom_delta24",
+        "pg48_sleep_delta24",
+        "adherence_mean24",
+        "pm25_mean24",
+        "prior_exacerbations",
+        "pg48_spo2_delta6",
+        "pg48_hr_delta6",
+        "pg48_rr_delta6",
+        "pg48_symptom_delta6",
+        "pg48_steps_ratio24",
+        "pg48_spo2_slope24",
+        "pg48_hr_slope24",
+        "pg48_symptom_slope24",
+        "pg48_adherence_mean72",
+        "pg48_pm25_mean72",
+        "pg48_symptom_std24",
+        "pg48_spo2_std24"
+      ],
+      "folds": [
+        {
+          "auprc": 0.13768686174257702,
+          "auroc": 0.5531909795437742,
+          "train_rows": 3380,
+          "validation_rows": 3074,
+          "validation_positive_rows": 318
+        },
+        {
+          "auprc": 0.44894702642178713,
+          "auroc": 0.8109203100639014,
+          "train_rows": 5689,
+          "validation_rows": 1838,
+          "validation_positive_rows": 226
+        },
+        {
+          "auprc": 0.037937417497168224,
+          "auroc": 0.17015276145710928,
+          "train_rows": 8906,
+          "validation_rows": 911,
+          "validation_positive_rows": 60
+        }
+      ],
+      "mean_validation_auprc": 0.20819043522051076
+    },
+    {
+      "candidate": "trend_tree_regularized",
+      "features": [
+        "fev1_pct",
+        "pg48_spo2_delta24",
+        "pg48_hr_delta24",
+        "pg48_rr_delta24",
+        "pg48_symptom_delta24",
+        "pg48_sleep_delta24",
+        "adherence_mean24",
+        "pm25_mean24",
+        "prior_exacerbations",
+        "pg48_spo2_delta6",
+        "pg48_hr_delta6",
+        "pg48_rr_delta6",
+        "pg48_symptom_delta6",
+        "pg48_steps_ratio24",
+        "pg48_spo2_slope24",
+        "pg48_hr_slope24",
+        "pg48_symptom_slope24",
+        "pg48_adherence_mean72",
+        "pg48_pm25_mean72",
+        "pg48_symptom_std24",
+        "pg48_spo2_std24"
+      ],
+      "folds": [
+        {
+          "auprc": 0.12997079189602706,
+          "auroc": 0.6199835008352274,
+          "train_rows": 3380,
+          "validation_rows": 3074,
+          "validation_positive_rows": 318
+        },
+        {
+          "auprc": 0.30829345321595386,
+          "auroc": 0.8062718219548081,
+          "train_rows": 5689,
+          "validation_rows": 1838,
+          "validation_positive_rows": 226
+        },
+        {
+          "auprc": 0.04690867626570238,
+          "auroc": 0.34173521347434394,
+          "train_rows": 8906,
+          "validation_rows": 911,
+          "validation_positive_rows": 60
+        }
+      ],
+      "mean_validation_auprc": 0.16172430712589445
+    }
+  ],
+  "selected_candidate": "core_linear_C0.3",
+  "selected_features": [
+    "fev1_pct",
+    "pg48_spo2_delta24",
+    "pg48_hr_delta24",
+    "pg48_rr_delta24",
+    "pg48_symptom_delta24",
+    "pg48_sleep_delta24",
+    "adherence_mean24",
+    "pm25_mean24"
+  ],
+  "calibration": {
+    "slope": 1.2237310579565046,
+    "intercept": 1.172025450248666,
+    "direction_preserving": true,
+    "objective": "Summed calibration log-loss +0.5*(slope-1)^2; slope>=0."
+  },
+  "operating_point": {
+    "threshold": 0.2698293804070354,
+    "f1": 0.03007518796992481,
+    "recall": 0.030303030303030304,
+    "precision": 0.029850746268656716,
+    "false_positive_rate": 0.09863429438543247,
+    "confusion_matrix": [
+      [
+        594,
+        65
+      ],
+      [
+        64,
+        2
+      ]
+    ],
+    "validated_clinical_cutoff": false
+  },
+  "development_rows": {
+    "training": 14605,
+    "calibration": 652,
+    "threshold": 725
+  },
+  "model_sha256": "770d1fc36aae4a724e1d1aa96ad1a6930f8ccf3b9e89cdb96aa2fc8c7b9c9b2a",
+  "audit_not_yet_generated_or_evaluated": true,
+  "original_test_used_for_selection": false,
+  "warning": "Synthetic engineering study; no clinical validation."
+}

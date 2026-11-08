@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "created_at": "2026-11-05T15:01:24.591815+00:00",
+  "software_verification_not_model_promotion": true,
+  "model_decision": "REJECT_CANDIDATE_RETAIN_ORIGINAL",
+  "protected_files": 26,
+  "predictions_and_metrics": {
+    "fresh_audit": {
+      "rows": 23278,
+      "patients": 120,
+      "maximum_prediction_error": 9.71445146547012e-17,
+      "metrics_reproduced": true
+    },
+    "historical": {
+      "rows": 4699,
+      "patients": 24,
+      "maximum_prediction_error": 9.71445146547012e-17,
+      "metrics_reproduced": true
+    }
+  },
+  "database_original_tables": {
+    "patients": {
+      "rows": 120,
+      "content_sha256": "2cec18e85cc7f88e466c9963cb8924d315d8e2560621efa7f7cb0ea4d01e257b"
+    },
+    "states": {
+      "rows": 3000,
+      "content_sha256": "dd7bac060a7c9eb0e81a31f5765f5c31ec487f42db3bfbdc0b8e2eef79c35e7d"
+    },
+    "alerts": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "interventions": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "scenarios": {
+      "rows": 0,
+      "content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "meta": {
+      "rows": 3,
+      "content_sha256": "5c1d8473c0092fbc7b7d626a56661663ab9aef329363aa0f4ef43390c4a9d3f6"
+    }
+  },
+  "model_sha256": "770d1fc36aae4a724e1d1aa96ad1a6930f8ccf3b9e89cdb96aa2fc8c7b9c9b2a",
+  "protocol_sha256": "4c734d2872eaf23b6bff21d4955abdee47d6af1a93b80502d2842ef37803140e",
+  "original_dataset_and_evaluation_unmodified": true,
+  "no_training_new_audit_or_reset": true
+}

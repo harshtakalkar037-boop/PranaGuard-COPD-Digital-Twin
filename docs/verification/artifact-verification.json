@@ -1,0 +1,55 @@
+{
+  "created_at": "2026-10-18T10:05:23.425352+00:00",
+  "reports": [
+    {
+      "pptx": "docs/architecture/PranaGuard_Architecture.pptx",
+      "pdf": "docs/architecture/PranaGuard_Architecture.pdf",
+      "slides": 1,
+      "pages": 1,
+      "ooxml_zip_integrity": true,
+      "native_editable_text_verified": true,
+      "minimum_rendered_font_pt": 8.107000350952148,
+      "shapes_outside_slide": [],
+      "text_missing_from_pdf_export": [],
+      "pdf_spans_outside_page": [],
+      "status": "PASS"
+    },
+    {
+      "pptx": "docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pptx",
+      "pdf": "docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pdf",
+      "slides": 16,
+      "pages": 16,
+      "ooxml_zip_integrity": true,
+      "native_editable_text_verified": true,
+      "minimum_rendered_font_pt": 7.99399995803833,
+      "shapes_outside_slide": [],
+      "text_missing_from_pdf_export": [],
+      "pdf_spans_outside_page": [],
+      "status": "PASS"
+    },
+    {
+      "pdf": "docs/PranaGuard_Technical_Report.pdf",
+      "pages": 5,
+      "metric_text_verified": true,
+      "status": "PASS"
+    }
+  ],
+  "screenshots_decoded": [
+    "docs/screenshots/01_overview.png",
+    "docs/screenshots/05_model_validation.png",
+    "docs/screenshots/06_alerts_and_interventions.png",
+    "docs/screenshots/03_explainability.png",
+    "docs/screenshots/04_what_if.png",
+    "docs/screenshots/02_patient_twin.png",
+    "docs/screenshots/07_system_status.png",
+    "docs/screenshots/08_mobile_patient.png"
+  ],
+  "all_pass": true,
+  "visual_review": "Render review required in addition to these automated checks; see QA notes.",
+  "notes": [
+    "PPTX parsed with python-pptx and ZIP integrity checked.",
+    "PDFs are actual LibreOffice exports, not separately invented slide content.",
+    "Every substantial native paragraph/table cell checked against the corresponding exported PDF text.",
+    "Bounds check detects page overflow, not every possible semantic layout issue."
+  ]
+}

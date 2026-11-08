@@ -1,0 +1,19 @@
+PASS React loads backend cohort
+PASS Actual cohort count 120 and synthetic provenance displayed
+PASS Patient search
+PASS Patient digital twin integrated
+PASS Persisted historical version selection
+PASS Snapshot JSON export
+PASS Explainability endpoint and horizon switch
+PASS Backend scenario response, persistence and state isolation
+PASS Actual evaluation, diagnostics and ablations
+PASS Timed replay start/pause with WebSocket refresh
+PASS Replay raises actual model-generated false-positive alert
+PASS Persisted alert acknowledgement
+PASS Persisted clinician intervention log
+PASS Alert resolution and intervention survive browser reload
+PASS System status and cache provenance
+PASS Offline runtime: external browser HTTP requests blocked; no external requests attempted
+PASS No browser JavaScript errors or failed API responses
+PASS 390px mobile layout and navigation without viewport overflow
+{"passed": 18, "failed": 0}

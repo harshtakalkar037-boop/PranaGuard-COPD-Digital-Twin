@@ -1,0 +1,11 @@
+{
+  "user": {
+    "username": "dr-atlas",
+    "display_name": "Dr. Asha Atlas (demo)",
+    "role": "doctor",
+    "patient_id": null,
+    "assigned_patients": 120
+  },
+  "demo": true,
+  "disclaimer": "Local synthetic demo identity. Not production authentication."
+}

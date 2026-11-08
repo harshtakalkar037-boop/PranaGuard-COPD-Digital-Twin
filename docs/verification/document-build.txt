@@ -1,0 +1,7 @@
+Warning: failed to launch javaldx - java may not function correctly
+convert /home/user/PranaGuard-COPD-Digital-Twin/docs/architecture/PranaGuard_Architecture.pptx as a Impress document -> /home/user/PranaGuard-COPD-Digital-Twin/docs/architecture/PranaGuard_Architecture.pdf using filter : impress_pdf_Export
+Overwriting: /home/user/PranaGuard-COPD-Digital-Twin/docs/architecture/PranaGuard_Architecture.pdf
+Warning: failed to launch javaldx - java may not function correctly
+convert /home/user/PranaGuard-COPD-Digital-Twin/docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pptx as a Impress document -> /home/user/PranaGuard-COPD-Digital-Twin/docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pdf using filter : impress_pdf_Export
+Overwriting: /home/user/PranaGuard-COPD-Digital-Twin/docs/presentation/PranaGuard_Digital_Twin_Challenge_2026.pdf
+Created editable16-slide deck and separate editable architecture.

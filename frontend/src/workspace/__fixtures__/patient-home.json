@@ -1,0 +1,163 @@
+{
+ "patient_id": "PG-0071",
+ "profile": {
+  "patient_id": "PG-0071",
+  "display_name": "Synthetic twin 071",
+  "synthetic": true,
+  "city": "Delhi",
+  "age": 48,
+  "fev1_pct": 74.9,
+  "prior_exacerbations": 2,
+  "smoking_pack_years": 55.2,
+  "bmi": 31.2,
+  "sex": "Male",
+  "environment_source": "cached_real_ambient"
+ },
+ "baseline": {
+  "status": "historical_baseline",
+  "required_hours": 72,
+  "observed_hours": 72,
+  "elapsed_hours": 72,
+  "complete": true,
+  "means": {
+   "spo2": 94.4059,
+   "heart_rate": 67.14115,
+   "resp_rate": 18.1466,
+   "symptom_score": 1.3347,
+   "steps": 278.11154999999997
+  },
+  "coverage": {},
+  "prediction_supported": true,
+  "notice": "Original first 72h historical baseline. New device streams never replace this baseline or alter frozen predictions."
+ },
+ "logged_today": true,
+ "streak_days": 3,
+ "recent_logs": [
+  {
+   "id": 1,
+   "patient_id": "PG-0071",
+   "entry_date": "2026-11-07",
+   "water_ml": 1800,
+   "food_notes": "Dal, rice, cooked veg; reduced salt",
+   "activity_minutes": 20,
+   "sleep_hours": 7.5,
+   "sleep_quality": "good",
+   "wellbeing": "better",
+   "notes": "Walked without stopping today. Slept well.",
+   "edited": 0,
+   "created_by": "pat-pg0071",
+   "created_at": "2026-11-07T05:50:02.167054+00:00",
+   "updated_at": "2026-11-07T05:50:02.167054+00:00",
+   "reviewed_by": null,
+   "reviewed_at": null,
+   "review_note": null
+  },
+  {
+   "id": 2,
+   "patient_id": "PG-0071",
+   "entry_date": "2026-11-06",
+   "water_ml": 1600,
+   "food_notes": "Khichdi, soup, fruit",
+   "activity_minutes": 10,
+   "sleep_hours": 7.0,
+   "sleep_quality": "fair",
+   "wellbeing": "same",
+   "notes": "Usual breathlessness in the morning.",
+   "edited": 0,
+   "created_by": "pat-pg0071",
+   "created_at": "2026-11-07T05:50:02.167054+00:00",
+   "updated_at": "2026-11-07T05:50:02.167054+00:00",
+   "reviewed_by": null,
+   "reviewed_at": null,
+   "review_note": null
+  },
+  {
+   "id": 3,
+   "patient_id": "PG-0071",
+   "entry_date": "2026-11-05",
+   "water_ml": 1700,
+   "food_notes": "Rice, dal, yoghurt",
+   "activity_minutes": 15,
+   "sleep_hours": 6.5,
+   "sleep_quality": "fair",
+   "wellbeing": "same",
+   "notes": "Slightly more cough than usual.",
+   "edited": 0,
+   "created_by": "pat-pg0071",
+   "created_at": "2026-11-07T05:50:02.167054+00:00",
+   "updated_at": "2026-11-07T05:50:02.167054+00:00",
+   "reviewed_by": null,
+   "reviewed_at": null,
+   "review_note": null
+  }
+ ],
+ "recent_adherence": [
+  {
+   "id": 1,
+   "patient_id": "PG-0071",
+   "medication_id": 1,
+   "as_prescribed": 1,
+   "taken_at": "2026-11-07T05:50:02.167354+00:00",
+   "missed_reason": null,
+   "note": null,
+   "created_by": "pat-pg0071",
+   "created_at": "2026-11-07T05:50:02.167354+00:00",
+   "medication_name": "Inhaled bronchodilator (demo label)",
+   "dose": "2 puffs",
+   "frequency": "twice daily"
+  },
+  {
+   "id": 2,
+   "patient_id": "PG-0071",
+   "medication_id": 1,
+   "as_prescribed": 1,
+   "taken_at": "2026-11-06T05:50:02.167387+00:00",
+   "missed_reason": null,
+   "note": null,
+   "created_by": "pat-pg0071",
+   "created_at": "2026-11-06T05:50:02.167387+00:00",
+   "medication_name": "Inhaled bronchodilator (demo label)",
+   "dose": "2 puffs",
+   "frequency": "twice daily"
+  }
+ ],
+ "care_plan": null,
+ "follow_ups": [
+  {
+   "id": 1,
+   "patient_id": "PG-0071",
+   "doctor": "dr-atlas",
+   "instructions": "Demo instruction: keep recording sputum colour daily and bring the diary to the next review.",
+   "due_at": "2026-11-10T09:00:00+00:00",
+   "status": "scheduled",
+   "created_at": "2026-11-07T05:50:02.167054+00:00",
+   "updated_at": "2026-11-07T05:50:02.167054+00:00",
+   "completed_at": null,
+   "completed_by": null
+  }
+ ],
+ "overdue_follow_ups": [],
+ "documents_count": 1,
+ "documents_recent": [
+  {
+   "id": 1,
+   "patient_id": "PG-0071",
+   "title": "Demo COPD action plan summary (fictional)",
+   "doc_type": "action_plan",
+   "doc_date": "2026-11-07",
+   "notes": "Seeded demonstration record. Not real medical advice.",
+   "filename": "demo-action-plan.txt",
+   "media_type": "text/plain",
+   "size": 167,
+   "sha256": "a8e13c38671629b70504befe268921268b843af4ed9bdcbd9d82cafe5e419d1c",
+   "uploaded_by": "dr-atlas",
+   "created_at": "2026-11-07T05:50:02.167054+00:00"
+  }
+ ],
+ "latest_review": {
+  "reviewed": false,
+  "reviewed_by": null,
+  "reviewed_at": null
+ },
+ "note": "Everything here is synthetic demo data shared with the assigned doctor. For emergencies, follow your real clinician-given action plan \u2014 this app never overrides it."
+}

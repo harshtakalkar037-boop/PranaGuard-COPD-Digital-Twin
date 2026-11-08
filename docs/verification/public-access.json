@@ -1,0 +1,12 @@
+{
+  "repository": {
+    "status": "PENDING",
+    "reason": "No actual public repository URL supplied; authorized publication unavailable in this build."
+  },
+  "video": {
+    "status": "PENDING",
+    "reason": "Actual recording, Unlisted upload and signed-out playback evidence absent."
+  },
+  "artifact_urls": [],
+  "authentication_used": false
+}

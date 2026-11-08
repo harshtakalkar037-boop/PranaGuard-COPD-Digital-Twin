@@ -1,0 +1,52 @@
+{
+  "readings": [
+    {
+      "id": 59,
+      "event_pk": 27,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-93AC87A3F643424F",
+      "metric": "heart_rate",
+      "value": 78.4,
+      "unit": "bpm",
+      "observed_at": "2026-11-05T14:06:42.806899+00:00",
+      "received_at": "2026-11-05T14:06:42.809178+00:00",
+      "source_type": "simulated_device"
+    },
+    {
+      "id": 58,
+      "event_pk": 27,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-93AC87A3F643424F",
+      "metric": "spo2",
+      "value": 95.9,
+      "unit": "%",
+      "observed_at": "2026-11-05T14:06:42.806899+00:00",
+      "received_at": "2026-11-05T14:06:42.809178+00:00",
+      "source_type": "simulated_device"
+    },
+    {
+      "id": 57,
+      "event_pk": 26,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-93AC87A3F643424F",
+      "metric": "heart_rate",
+      "value": 76.8,
+      "unit": "bpm",
+      "observed_at": "2026-11-05T14:06:40.795848+00:00",
+      "received_at": "2026-11-05T14:06:40.798090+00:00",
+      "source_type": "simulated_device"
+    },
+    {
+      "id": 56,
+      "event_pk": 26,
+      "patient_id": "PG-DEMO-24BE5BE35541",
+      "device_id": "SIM-93AC87A3F643424F",
+      "metric": "spo2",
+      "value": 96.1,
+      "unit": "%",
+      "observed_at": "2026-11-05T14:06:40.795848+00:00",
+      "received_at": "2026-11-05T14:06:40.798090+00:00",
+      "source_type": "simulated_device"
+    }
+  ]
+}

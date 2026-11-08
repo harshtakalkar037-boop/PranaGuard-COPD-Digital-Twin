@@ -1,0 +1,580 @@
+{
+ "summary": {
+  "total_entries": 80,
+  "unique_participants": 42,
+  "missing_dates": 0,
+  "device_window": {
+   "inside": 50,
+   "outside": 30
+  },
+  "observed_frame": {
+   "inside": 42,
+   "outside": 38
+  },
+  "events_with_valid_measurements_in_prior_7d": 32,
+  "in_frame_events_with_prior_7d_measurements": 30,
+  "note": "Counts reconciled: prior-7d validity is computed against observed participant-days only; many register events fall outside any device/observed window."
+ },
+ "events": [
+  {
+   "participant_id": "tolife:GER-002",
+   "event_date": "2024-08-19",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 2
+  },
+  {
+   "participant_id": "tolife:GER-002",
+   "event_date": "2024-10-25",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-003",
+   "event_date": "2025-03-29",
+   "in_device_window": true,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-003",
+   "event_date": "2025-03-31",
+   "in_device_window": true,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-006",
+   "event_date": "2024-09-11",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:GER-006",
+   "event_date": "2024-12-09",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:GER-006",
+   "event_date": "2025-01-24",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:GER-006",
+   "event_date": "2025-05-12",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-008",
+   "event_date": "2025-04-08",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-009",
+   "event_date": "2025-02-18",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-013",
+   "event_date": "2025-04-02",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 1
+  },
+  {
+   "participant_id": "tolife:GER-014",
+   "event_date": "2025-08-12",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-018",
+   "event_date": "2025-04-23",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:GER-018",
+   "event_date": "2025-05-02",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:GER-022",
+   "event_date": "2024-12-15",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:GER-022",
+   "event_date": "2025-02-11",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-023",
+   "event_date": "2025-03-03",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-023",
+   "event_date": "2025-11-11",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-024",
+   "event_date": "2025-12-01",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-028",
+   "event_date": "2025-04-06",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 5
+  },
+  {
+   "participant_id": "tolife:GER-028",
+   "event_date": "2025-06-10",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:GER-028",
+   "event_date": "2025-07-15",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:GER-028",
+   "event_date": "2025-09-26",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-028",
+   "event_date": "2025-11-20",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-028",
+   "event_date": "2025-12-14",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-028",
+   "event_date": "2026-01-18",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-029",
+   "event_date": "2025-06-30",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 2
+  },
+  {
+   "participant_id": "tolife:GER-039",
+   "event_date": "2025-11-20",
+   "in_device_window": true,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-042",
+   "event_date": "2025-11-24",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 2
+  },
+  {
+   "participant_id": "tolife:GER-043",
+   "event_date": "2025-11-10",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-044",
+   "event_date": "2025-09-30",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:GER-044",
+   "event_date": "2025-11-27",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 1
+  },
+  {
+   "participant_id": "tolife:GER-046",
+   "event_date": "2026-01-10",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:ITA-002",
+   "event_date": "2025-10-02",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 3
+  },
+  {
+   "participant_id": "tolife:ITA-002",
+   "event_date": "2026-02-11",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:ITA-004",
+   "event_date": "2026-04-13",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-001",
+   "event_date": "2025-01-10",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-001",
+   "event_date": "2025-01-20",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-006",
+   "event_date": "2024-12-18",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-007",
+   "event_date": "2024-09-05",
+   "in_device_window": true,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-008",
+   "event_date": "2025-03-07",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-008",
+   "event_date": "2025-04-11",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-011",
+   "event_date": "2025-07-23",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-012",
+   "event_date": "2025-01-09",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 4
+  },
+  {
+   "participant_id": "tolife:SPA-012",
+   "event_date": "2025-03-02",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-013",
+   "event_date": "2025-09-01",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-015",
+   "event_date": "2024-11-21",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:SPA-015",
+   "event_date": "2024-12-09",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 6
+  },
+  {
+   "participant_id": "tolife:SPA-015",
+   "event_date": "2024-12-11",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:SPA-017",
+   "event_date": "2025-01-10",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 3
+  },
+  {
+   "participant_id": "tolife:SPA-017",
+   "event_date": "2025-02-10",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 3
+  },
+  {
+   "participant_id": "tolife:SPA-017",
+   "event_date": "2025-02-16",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 3
+  },
+  {
+   "participant_id": "tolife:SPA-019",
+   "event_date": "2024-12-24",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:SPA-020",
+   "event_date": "2025-04-29",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 2
+  },
+  {
+   "participant_id": "tolife:SPA-020",
+   "event_date": "2025-06-13",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 3
+  },
+  {
+   "participant_id": "tolife:SPA-023",
+   "event_date": "2025-08-01",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-025",
+   "event_date": "2025-05-08",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-025",
+   "event_date": "2025-07-09",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-028",
+   "event_date": "2025-05-16",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 4
+  },
+  {
+   "participant_id": "tolife:SPA-028",
+   "event_date": "2025-05-30",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 3
+  },
+  {
+   "participant_id": "tolife:SPA-028",
+   "event_date": "2025-08-14",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-028",
+   "event_date": "2025-10-07",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-028",
+   "event_date": "2025-11-01",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-029",
+   "event_date": "2025-06-10",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-029",
+   "event_date": "2025-06-11",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-032",
+   "event_date": "2025-03-17",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 6
+  },
+  {
+   "participant_id": "tolife:SPA-034",
+   "event_date": "2025-04-09",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-034",
+   "event_date": "2025-10-07",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-039",
+   "event_date": "2025-02-20",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:SPA-039",
+   "event_date": "2025-03-19",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-039",
+   "event_date": "2025-05-05",
+   "in_device_window": true,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-039",
+   "event_date": "2025-06-12",
+   "in_device_window": true,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-039",
+   "event_date": "2025-11-21",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-040",
+   "event_date": "2025-02-15",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 7
+  },
+  {
+   "participant_id": "tolife:SPA-040",
+   "event_date": "2025-03-20",
+   "in_device_window": true,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 5
+  },
+  {
+   "participant_id": "tolife:SPA-042",
+   "event_date": "2025-04-11",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-042",
+   "event_date": "2025-07-11",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-044",
+   "event_date": "2025-12-18",
+   "in_device_window": true,
+   "in_observed_frame": true,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-044",
+   "event_date": "2026-01-08",
+   "in_device_window": true,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  },
+  {
+   "participant_id": "tolife:SPA-046",
+   "event_date": "2025-09-23",
+   "in_device_window": false,
+   "in_observed_frame": false,
+   "valid_days_in_prior_7d": 0
+  }
+ ]
+}

@@ -1,0 +1,4271 @@
+{
+ "dataset": "Cough-COPD(CC) Zenodo 14881818 (CC-BY-4.0)",
+ "note": "Index of recording filenames, publisher class labels and publisher splits only; raw audio is not redistributed.",
+ "recordings": [
+  {
+   "filename": "test/COPD/COPD_0.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_115.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_121.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_125.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_127.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_129.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_133.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_135.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_136.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_141.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_142.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_151.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_158.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_16.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_167.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_172.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_174.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_179.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_183.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_189.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_192.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_197.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_199.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_201.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_215.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_216.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_217.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_219.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_23.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_33.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_36.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_38.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_48.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_50.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_51.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_56.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_57.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_64.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_66.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_68.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_73.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_77.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_89.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_95.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/COPD/COPD_97.wav",
+   "class_label": "COPD",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_1.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_112.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_118.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_123.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_125.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_141.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_15.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_169.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_17.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_18.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_186.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_188.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_194.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_198.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_199.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_206.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_207.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_214.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_217.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_225.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_227.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_23.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_230.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_234.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_242.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_250.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_253.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_261.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_268.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_28.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_281.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_285.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_286.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_290.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_291.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_301.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_303.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_307.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_314.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_320.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_325.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_329.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_335.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_34.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_343.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_347.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_348.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_349.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_35.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_353.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_358.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_364.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_366.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_368.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_372.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_379.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_382.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_384.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_39.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_392.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_398.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_400.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_402.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_41.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_412.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_414.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_418.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_424.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_426.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_428.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_433.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_434.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_44.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_444.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_45.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_450.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_458.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_461.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_463.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_464.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_465.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_467.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_473.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_480.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_482.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_484.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_491.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_494.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_50.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_509.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_514.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_516.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_519.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_520.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_53.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_530.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_532.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_533.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_534.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_537.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_548.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_56.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_560.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_565.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_571.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_573.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_576.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_578.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_579.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_58.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_580.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_584.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_585.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_59.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_591.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_592.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_608.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_609.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_61.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_615.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_617.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_619.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_620.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_623.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_66.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_77.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "test/Healthy/Healthy_81.wav",
+   "class_label": "Healthy",
+   "publisher_split": "test"
+  },
+  {
+   "filename": "train/COPD/COPD_1.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_10.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_100.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_101.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_102.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_103.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_104.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_105.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_106.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_107.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_108.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_109.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_11.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_110.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_111.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_112.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_113.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_114.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_116.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_117.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_118.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_119.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_12.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_120.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_122.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_123.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_124.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_126.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_128.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_13.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_130.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_131.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_132.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_134.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_137.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_138.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_139.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_14.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_140.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_143.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_144.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_145.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_146.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_147.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_148.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_149.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_15.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_150.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_152.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_153.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_154.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_155.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_156.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_157.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_159.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_160.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_161.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_162.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_163.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_164.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_165.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_166.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_168.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_169.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_17.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_170.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_171.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_173.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_175.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_176.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_177.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_178.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_18.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_180.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_181.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_182.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_184.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_185.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_186.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_187.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_188.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_19.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_190.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_191.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_193.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_194.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_195.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_196.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_198.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_2.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_20.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_200.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_202.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_203.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_204.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_205.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_206.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_207.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_208.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_209.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_21.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_210.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_211.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_212.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_213.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_214.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_218.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_22.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_220.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_24.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_25.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_26.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_27.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_28.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_29.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_3.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_30.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_31.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_32.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_34.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_35.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_37.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_39.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_4.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_40.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_41.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_42.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_43.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_44.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_45.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_46.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_47.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_49.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_5.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_52.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_53.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_54.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_55.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_58.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_59.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_6.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_60.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_61.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_62.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_63.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_65.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_67.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_69.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_7.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_70.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_71.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_72.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_74.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_75.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_76.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_78.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_79.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_8.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_80.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_81.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_82.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_83.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_84.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_85.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_86.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_87.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_88.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_9.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_90.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_91.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_92.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_93.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_94.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_96.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_98.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/COPD/COPD_99.wav",
+   "class_label": "COPD",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_0.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_10.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_100.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_101.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_102.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_103.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_104.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_105.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_106.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_107.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_108.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_109.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_11.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_110.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_111.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_113.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_114.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_115.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_116.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_117.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_119.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_12.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_120.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_121.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_122.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_124.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_126.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_127.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_128.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_129.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_13.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_130.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_131.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_132.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_133.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_134.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_135.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_136.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_137.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_138.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_139.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_14.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_140.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_142.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_143.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_144.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_145.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_146.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_147.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_148.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_149.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_150.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_151.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_152.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_153.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_154.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_155.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_156.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_157.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_158.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_159.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_16.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_160.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_161.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_162.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_163.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_164.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_165.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_166.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_167.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_168.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_170.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_171.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_172.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_173.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_174.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_175.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_176.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_177.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_178.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_179.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_180.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_181.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_182.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_183.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_184.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_185.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_187.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_189.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_19.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_190.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_191.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_192.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_193.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_195.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_196.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_197.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_2.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_20.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_200.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_201.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_202.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_203.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_204.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_205.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_208.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_209.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_21.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_210.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_211.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_212.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_213.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_215.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_216.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_218.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_219.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_22.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_220.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_221.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_222.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_223.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_224.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_226.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_228.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_229.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_231.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_232.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_233.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_235.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_236.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_237.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_238.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_239.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_24.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_240.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_241.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_243.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_244.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_245.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_246.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_247.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_248.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_249.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_25.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_251.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_252.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_254.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_255.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_256.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_257.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_258.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_259.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_26.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_260.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_262.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_263.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_264.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_265.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_266.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_267.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_269.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_27.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_270.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_271.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_272.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_273.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_274.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_275.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_276.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_277.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_278.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_279.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_280.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_282.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_283.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_284.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_287.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_288.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_289.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_29.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_292.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_293.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_294.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_295.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_296.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_297.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_298.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_299.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_3.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_30.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_300.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_302.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_304.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_305.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_306.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_308.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_309.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_31.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_310.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_311.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_312.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_313.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_315.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_316.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_317.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_318.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_319.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_32.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_321.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_322.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_323.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_324.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_326.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_327.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_328.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_33.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_330.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_331.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_332.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_333.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_334.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_336.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_337.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_338.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_339.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_340.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_341.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_342.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_344.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_345.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_346.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_350.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_351.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_352.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_354.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_355.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_356.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_357.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_359.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_36.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_360.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_361.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_362.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_363.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_365.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_367.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_369.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_37.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_370.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_371.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_373.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_374.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_375.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_376.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_377.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_378.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_38.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_380.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_381.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_383.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_385.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_386.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_387.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_388.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_389.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_390.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_391.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_393.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_394.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_395.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_396.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_397.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_399.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_4.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_40.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_401.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_403.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_404.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_405.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_406.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_407.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_408.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_409.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_410.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_411.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_413.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_415.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_416.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_417.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_419.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_42.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_420.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_421.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_422.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_423.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_425.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_427.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_429.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_43.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_430.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_431.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_432.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_435.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_436.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_437.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_438.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_439.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_440.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_441.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_442.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_443.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_445.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_446.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_447.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_448.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_449.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_451.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_452.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_453.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_454.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_455.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_456.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_457.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_459.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_46.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_460.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_462.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_466.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_468.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_469.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_47.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_470.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_471.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_472.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_474.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_475.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_476.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_477.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_478.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_479.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_48.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_481.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_483.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_485.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_486.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_487.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_488.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_489.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_49.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_490.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_492.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_493.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_495.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_496.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_497.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_498.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_499.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_5.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_500.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_501.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_502.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_503.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_504.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_505.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_506.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_507.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_508.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_51.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_510.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_511.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_512.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_513.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_515.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_517.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_518.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_52.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_521.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_522.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_523.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_524.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_525.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_526.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_527.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_528.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_529.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_531.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_535.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_536.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_538.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_539.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_54.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_540.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_541.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_542.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_543.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_544.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_545.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_546.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_547.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_549.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_55.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_550.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_551.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_552.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_553.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_554.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_555.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_556.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_557.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_558.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_559.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_561.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_562.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_563.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_564.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_566.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_567.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_568.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_569.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_57.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_570.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_572.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_574.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_575.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_577.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_581.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_582.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_583.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_586.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_587.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_588.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_589.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_590.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_593.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_594.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_595.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_596.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_597.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_598.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_599.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_6.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_60.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_600.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_601.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_602.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_603.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_604.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_605.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_606.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_607.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_610.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_611.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_612.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_613.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_614.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_616.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_618.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_62.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_621.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_622.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_624.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_625.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_626.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_627.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_628.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_629.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_63.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_630.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_631.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_64.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_65.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_67.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_68.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_69.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_7.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_70.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_71.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_72.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_73.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_74.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_75.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_76.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_78.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_79.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_8.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_80.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_82.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_83.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_84.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_85.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_86.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_87.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_88.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_89.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_9.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_90.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_91.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_92.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_93.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_94.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_95.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_96.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_97.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_98.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  },
+  {
+   "filename": "train/Healthy/Healthy_99.wav",
+   "class_label": "Healthy",
+   "publisher_split": "train"
+  }
+ ]
+}

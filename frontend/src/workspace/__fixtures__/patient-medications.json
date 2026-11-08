@@ -1,0 +1,15 @@
+{
+ "medication_options": [
+  {
+   "id": 1,
+   "patient_id": "PG-0071",
+   "name": "Inhaled bronchodilator (demo label)",
+   "dose": "2 puffs",
+   "frequency": "twice daily",
+   "added_by": "dr-atlas",
+   "created_at": "2026-11-07T05:50:02.167054+00:00",
+   "retired": 0
+  }
+ ],
+ "note": "Clinician-documented demo medication list. Patients only report adherence; they cannot edit prescriptions."
+}
