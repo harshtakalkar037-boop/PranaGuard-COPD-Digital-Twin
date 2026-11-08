@@ -72,7 +72,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     app=FastAPI(title='PranaGuard synthetic COPD twin API',version='0.4.0',lifespan=lifespan,
                 description='Research prototype; not clinically validated. All patient data are fictional/simulated. Optional current modelled city context is excluded from frozen ML inputs. No real patient monitoring or physical device integration.')
     origins=[s.strip() for s in os.getenv('PRANAGUARD_CORS_ORIGINS','*').split(',') if s.strip()]
-    app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=False,allow_methods=['*'],allow_headers=['Content-Type','X-Demo-Token','X-Device-Token'])
+    app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=False,allow_methods=['*'],allow_headers=['Content-Type','X-Demo-Token','X-Device-Token','Authorization'])
     app.include_router(make_router(authorize,hub))
     app.include_router(make_v3_router())
     app.include_router(make_workspace_router())
