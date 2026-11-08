@@ -15,3 +15,6 @@ frontend/dist/
 playwright-report/
 
 *.tsbuildinfo
+
+# jury deck build cache
+tools/jury_deck/__pycache__/
