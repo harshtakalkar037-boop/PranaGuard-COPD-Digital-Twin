@@ -1,5 +1,5 @@
 export type Horizon=24|48|72;
-export type View='overview'|'patient'|'explain'|'scenario'|'validation'|'activity'|'status'|'registry'|'devices'|'environment'|'notifications'|'sources'|'care'|'profile';
+export type View='overview'|'patient'|'explain'|'scenario'|'validation'|'activity'|'status'|'registry'|'devices'|'environment'|'notifications'|'sources'|'care'|'profile'|'research';
 export interface Profile {patient_id:string;display_name:string;synthetic:boolean;city:string;age:number;fev1_pct:number;sex?:string;prior_exacerbations:number;smoking_pack_years:number;bmi:number;environment_source:string;}
 export interface Patient extends Profile {risks:Record<string,number>;risk_category:string;current:Record<string,number|null>;version:number;timestamp:string;missing_fields:string[];prediction_supported:boolean;open_alerts:number;}
 export interface Twin {patient_id:string;synthetic:boolean;profile:Profile;risks:Record<string,number>;risk_category:string;current:Record<string,number|null>;baseline:Record<string,number|null>;version:number;hour:number;timestamp:string;warnings:string[];missing_fields:string[];prediction_supported:boolean;model_version:string;features:Record<string,number|null>;}

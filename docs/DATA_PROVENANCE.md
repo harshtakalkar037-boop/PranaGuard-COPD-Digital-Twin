@@ -44,3 +44,28 @@ Historical atmospheric products may be revised and are not archived, as-issued p
 The original frozen data/model/evaluation provenance above is unchanged. Enhanced registration fields and symptom/adherence entries are explicitly fictional manual demo data; device observations are backend software simulations, never physical measurements. Current Open-Meteo/CAMS air/weather is independently retrieved modelled city-grid context, cached with valid/retrieved timestamps and per-component freshness/error/missingness. Its U.S. AQI is not CPCB Indian NAQI. CPCB/IMD are not integrated.
 
 The dedicated **Data sources** screen and `/api/enhanced/provenance` expose record-level source/type/unit/timestamps/freshness/patient/missingness and whether a record is an original historical model input. New streams/current context are excluded from frozen ML features. Historical fallback preserves original2026 dates and absent AQI/weather/wind fields as null. See [environment](enhanced/ENVIRONMENT.md), [devices](enhanced/DEVICE_INTEGRATION.md), [onboarding/migrations](enhanced/PATIENTS_AND_MIGRATIONS.md) and [provider investigation](enhanced/PROVIDER_INVESTIGATION.md). Dated API responses under `docs/enhanced/verification/` are actual verification evidence, not fabricated or hardcoded production fallback data.
+
+## v7 research modules: external real datasets (additive)
+
+Two public, permissively licensed datasets were added as separate research views. They are
+never merged with the frozen synthetic cohort and never touch the twin feature store.
+
+- **Cough-COPD (CC)** — Zenodo record 14881818 (v2, 2025-02-17), CC-BY-4.0, creators USTC +
+  Hangzhou slan-health. The single `Cough-COPD(CC).rar` archive (md5
+  63094082465da311b478951fdf882853) was extracted offline (unrar binary not bundled;
+  documented on the record page). Labels kept verbatim from `train/`/`test/` folder names —
+  no labels were invented. The platform ships only a filename/class/split index (853 rows)
+  plus a calibrated research model artifact; raw audio is **not** redistributed. No
+  participant identifiers exist in the publication, so participant independence is reported
+  as unverifiable, and inference uploads are hashed, never stored.
+- **TOLIFE Clinical Study A** — Zenodo record 23263785 v2.0, CC-BY-4.0. Processed
+  participant-day aggregates (8,821 days / 86 coded participants) and an 80-entry
+  exacerbation register were re-audited here: 42 events fall inside observed device frames,
+  32 have any valid measurements in the prior 7 days (30 both). Study-provided
+  model-estimated CAT/CCQ/mMRC classes are treated as derived estimates, NOT ground truth,
+  and are excluded from predictors and charts. The platform ships coded IDs only
+  (`tolife:<kit>`), derived aggregates and evaluation results; raw study tables are not
+  redistributed. Horizon metrics (24/48/72h) are reported below chance — exploratory only.
+
+Evidence classes are preserved across models: REAL_OBSERVED (measured) → REAL_DERIVED
+(estimated/fitted) → and the pre-existing SYNTHETIC_GENERATED twin cohort, kept disjoint.

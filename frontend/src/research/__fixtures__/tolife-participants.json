@@ -1,0 +1,110 @@
+{
+ "participants": [
+  {
+   "participant_id": "tolife:GER-001",
+   "country": "GERMANY",
+   "monitoring_days": 93,
+   "first_day": "2024-05-21",
+   "last_day": "2024-08-22",
+   "n_register_exacerbations": 0,
+   "coverage_days": 58,
+   "n_fev1": 3,
+   "n_hr": 0,
+   "n_sleep": 0,
+   "n_env": 56
+  },
+  {
+   "participant_id": "tolife:GER-002",
+   "country": "GERMANY",
+   "monitoring_days": 365,
+   "first_day": "2024-06-12",
+   "last_day": "2025-06-12",
+   "n_register_exacerbations": 2,
+   "coverage_days": 65,
+   "n_fev1": 8,
+   "n_hr": 2,
+   "n_sleep": 2,
+   "n_env": 7
+  },
+  {
+   "participant_id": "tolife:GER-003",
+   "country": "GERMANY",
+   "monitoring_days": 361,
+   "first_day": "2024-05-23",
+   "last_day": "2025-05-19",
+   "n_register_exacerbations": 2,
+   "coverage_days": 234,
+   "n_fev1": 13,
+   "n_hr": 4,
+   "n_sleep": 2,
+   "n_env": 60
+  },
+  {
+   "participant_id": "tolife:GER-004",
+   "country": "GERMANY",
+   "monitoring_days": 366,
+   "first_day": "2024-05-07",
+   "last_day": "2025-05-08",
+   "n_register_exacerbations": 0,
+   "coverage_days": 357,
+   "n_fev1": 23,
+   "n_hr": 15,
+   "n_sleep": 15,
+   "n_env": 114
+  },
+  {
+   "participant_id": "tolife:GER-005",
+   "country": "GERMANY",
+   "monitoring_days": 364,
+   "first_day": "2024-05-23",
+   "last_day": "2025-05-22",
+   "n_register_exacerbations": 0,
+   "coverage_days": 274,
+   "n_fev1": 22,
+   "n_hr": 13,
+   "n_sleep": 14,
+   "n_env": 52
+  },
+  {
+   "participant_id": "tolife:GER-006",
+   "country": "GERMANY",
+   "monitoring_days": 458,
+   "first_day": "2024-03-01",
+   "last_day": "2025-06-02",
+   "n_register_exacerbations": 4,
+   "coverage_days": 259,
+   "n_fev1": 235,
+   "n_hr": 20,
+   "n_sleep": 19,
+   "n_env": 36
+  },
+  {
+   "participant_id": "tolife:GER-007",
+   "country": "GERMANY",
+   "monitoring_days": 361,
+   "first_day": "2024-07-07",
+   "last_day": "2025-07-03",
+   "n_register_exacerbations": 0,
+   "coverage_days": 271,
+   "n_fev1": 32,
+   "n_hr": 3,
+   "n_sleep": 5,
+   "n_env": 154
+  },
+  {
+   "participant_id": "tolife:GER-008",
+   "country": "GERMANY",
+   "monitoring_days": 273,
+   "first_day": "2024-07-16",
+   "last_day": "2025-04-15",
+   "n_register_exacerbations": 1,
+   "coverage_days": 58,
+   "n_fev1": 6,
+   "n_hr": 32,
+   "n_sleep": 32,
+   "n_env": 51
+  }
+ ],
+ "count": 86,
+ "identity_note": "Identities are study kit codes (tolife:<KIT>); they are never joined to the platform's synthetic PG- patient identities."
+}

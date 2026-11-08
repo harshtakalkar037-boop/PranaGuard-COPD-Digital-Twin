@@ -1,0 +1,169 @@
+{
+ "models": [
+  {
+   "model_id": "cough-copd-rf-calibrated",
+   "model_display_name": "Cough Analysis",
+   "model_kind": "cough_research",
+   "version": "1.0.0",
+   "dataset_source": "Cough-COPD(CC) Zenodo 14881818 (CC-BY-4.0)",
+   "task_type": "binary file-level study-cough classification (COPD vs Healthy controls)",
+   "artifact_path": "research/artifacts/cough_model.joblib",
+   "inference_method": "joblib_calibrated_rf",
+   "provenance_evidence_class": "REAL_DERIVED",
+   "registered_at": "2026-11-08T14:39:24+00:00",
+   "updated_at": "2026-11-08T14:39:24+00:00",
+   "feature_schema": {
+    "features": [
+     "mfcc1_mean",
+     "mfcc1_std",
+     "mfcc2_mean",
+     "\u2026"
+    ],
+    "feature_version": "mfcc13+logmel13+zcr+rms+centroid v1"
+   },
+   "preprocessing": {
+    "mono": "stereo-mean",
+    "frame_ms": 25,
+    "hop_ms": 10,
+    "window": "hamming",
+    "nfft": 2048,
+    "n_mel": 26,
+    "n_mfcc": 13
+   },
+   "supported_outputs": [
+    "class_label",
+    "calibrated_probability",
+    "global_feature_importance"
+   ],
+   "evaluation": {
+    "auroc": 0.931583552055993,
+    "auprc": 0.8293479938575521,
+    "prevalence_copd": 0.2616279069767442,
+    "accuracy": 0.872093023255814,
+    "f1_copd": 0.7027027027027027,
+    "sensitivity_copd": 0.5777777777777777,
+    "specificity": 0.9763779527559056,
+    "precision_copd": 0.896551724137931,
+    "brier": 0.09868053489574997,
+    "log_loss": 0.31790575178207275,
+    "confusion": {
+     "tn": 124,
+     "fp": 3,
+     "fn": 19,
+     "tp": 26
+    }
+   },
+   "limitations": [
+    "No participant identifiers published -> participant independence cannot be verified; file-level upper bounds",
+    "COPD sensitivity ~0.58 at threshold 0.5 (v2 calibrated); low sensitivity at conservative thresholds",
+    "Not a diagnostic; not a validated screening tool; not exacerbation prediction"
+   ]
+  },
+  {
+   "model_id": "tolife-longitudinal-probe-v2",
+   "model_display_name": "Longitudinal COPD Research",
+   "model_kind": "tolife_research",
+   "version": "2.0.0-leakage-corrected",
+   "dataset_source": "TOLIFE Clinical Study A (Zenodo 23263785 v2.0, CC-BY-4.0)",
+   "task_type": "feasibility probe: 24/48/72h exacerbation-onset risk, day-cadence",
+   "artifact_path": null,
+   "inference_method": "report_only",
+   "provenance_evidence_class": "REAL_DERIVED",
+   "registered_at": "2026-11-08T14:39:24+00:00",
+   "updated_at": "2026-11-08T14:39:24+00:00",
+   "feature_schema": {
+    "features": "prior-day-only deltas vs trailing 7d personal baseline + missingness counts; model-estimated symptom classes excluded"
+   },
+   "preprocessing": {
+    "frame": "validity-filtered participant-day",
+    "horizons_evaluated": [
+     24,
+     48,
+     72
+    ]
+   },
+   "supported_outputs": [
+    "horizon_metrics",
+    "event_audit",
+    "longitudinal_series"
+   ],
+   "evaluation": {
+    "24": {
+     "horizon_hours": 24,
+     "definition": "day d positive iff register event begins in [today d, d+0] using only days <= d-1 features",
+     "prediction_cutoff": "after previous-day measurements (strictly prior-day features)",
+     "n_eval_days": 7195,
+     "n_positive_days": 18,
+     "prevalence": 0.002501737317581654,
+     "n_participants": 76,
+     "n_participants_with_positive": 13,
+     "n_independent_register_events_in_frame": 13,
+     "auroc": 0.35529391729753995,
+     "auroc_ci": [
+      0.2332,
+      0.4718
+     ],
+     "auprc": 0.00198121278719702,
+     "auprc_ci": [
+      0.0011,
+      0.0035
+     ],
+     "brier": 0.19087688761952712,
+     "log_loss": 0.5959969951419363
+    },
+    "48": {
+     "horizon_hours": 48,
+     "definition": "day d positive iff register event begins in [today d, d+1] using only days <= d-1 features",
+     "prediction_cutoff": "after previous-day measurements (strictly prior-day features)",
+     "n_eval_days": 7195,
+     "n_positive_days": 39,
+     "prevalence": 0.00542043085476025,
+     "n_participants": 76,
+     "n_participants_with_positive": 17,
+     "n_independent_register_events_in_frame": 17,
+     "auroc": 0.3893666423012426,
+     "auroc_ci": [
+      0.2436,
+      0.5425
+     ],
+     "auprc": 0.0052406768623918555,
+     "auprc_ci": [
+      0.0024,
+      0.0099
+     ],
+     "brier": 0.21260674373558142,
+     "log_loss": 0.6310995106178388
+    },
+    "72": {
+     "horizon_hours": 72,
+     "definition": "day d positive iff register event begins in [today d, d+2] using only days <= d-1 features",
+     "prediction_cutoff": "after previous-day measurements (strictly prior-day features)",
+     "n_eval_days": 7195,
+     "n_positive_days": 56,
+     "prevalence": 0.00778318276580959,
+     "n_participants": 76,
+     "n_participants_with_positive": 17,
+     "n_independent_register_events_in_frame": 17,
+     "auroc": 0.39335991435375106,
+     "auroc_ci": [
+      0.2762,
+      0.5233
+     ],
+     "auprc": 0.00638221715349162,
+     "auprc_ci": [
+      0.0032,
+      0.0103
+     ],
+     "brier": 0.21840121434444978,
+     "log_loss": 0.6390360019904536
+    }
+   },
+   "limitations": [
+    "72h prevalence 0.78%; 17 informative participants; CIs span both sides of chance",
+    "Feasibility probe only. Not a clinical risk predictor.",
+    "Corrected (v2) to remove study-model-estimated symptom predictor channels and same-day leakage"
+   ]
+  }
+ ],
+ "count": 2
+}
