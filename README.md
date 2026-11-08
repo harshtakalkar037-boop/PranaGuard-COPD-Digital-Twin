@@ -30,7 +30,7 @@ PranaGuard explores whether a patient-specific digital-twin workspace can make l
 - **Server-side access rules:** role and patient-assignment checks are enforced by the API, not only by hiding interface elements.
 - **Honest missing-data handling:** surfaces show coverage, freshness, completeness, and empty states rather than inventing values.
 - **Environmental context is separate from model inference:** optional city context is displayed separately and is not silently inserted into the frozen model inputs.
-- **Additive evolution:** care-workspace and v6 capabilities extend the original twin, replay, alert, and study-explorer experience.
+- **Additive evolution:** care-workspace, v6 capabilities, and the separately surfaced Cough Analysis and TOLIFE research modules extend the platform without replacing the original twin.
 
 ## 3. Live prototype and submission resources
 
@@ -43,6 +43,9 @@ PranaGuard explores whether a patient-specific digital-twin workspace can make l
 | Doctor–patient delivery report | [DOCTOR_PATIENT_DELIVERY.md](docs/DOCTOR_PATIENT_DELIVERY.md) |
 | v6 implementation report | [ENHANCEMENT_IMPLEMENTATION_REPORT.md](docs/ENHANCEMENT_IMPLEMENTATION_REPORT.md) |
 | v6 acceptance evidence | [V6_ACCEPTANCE.md](docs/v6-verification/V6_ACCEPTANCE.md) |
+| External research model cards and results | [RESEARCH_MODELS.md](docs/research-models/RESEARCH_MODELS.md) |
+| v7 verification report | [V7_VERIFICATION.md](docs/research-models/V7_VERIFICATION.md) |
+| Data provenance and source boundaries | [DATA_PROVENANCE.md](docs/DATA_PROVENANCE.md) |
 
 The public frontend is hosted on Vercel and the FastAPI backend on Render. The currently audited Render API uses the Free plan and a local SQLite file. **Do not assume user-created demo records survive service restarts, redeployments, or filesystem resets.** This hosting configuration is for demonstration only and must never receive real patient information.
 
@@ -128,9 +131,53 @@ The frozen cohort is read-only research data. Demo write flows are designed to t
 - Patient sessions are blocked with HTTP 403 from doctor-only prediction endpoints.
 - All risk outputs are labelled as experimental synthetic-data estimates and not intended for diagnosis, triage, or treatment decisions.
 
+### 5.5 v7: separate external COPD research modules
+
+The **Research models** area is an additive research workspace containing two external-dataset modules. They are deliberately separate from the original PranaGuard Digital Twin: each has its own dataset, preprocessing, model artifact or report, evaluation protocol, evidence class, API routes and limitations. Their metrics are never combined into a shared leaderboard and do not replace the original twin's 24/48/72-hour outputs.
+
+| Module | Dataset and task | What the app provides | Current interpretation |
+|---|---|---|---|
+| **Cough Analysis** | Cough-COPD(CC), Zenodo record [14881818](https://zenodo.org/records/14881818), CC-BY-4.0. File-level COPD-versus-Healthy cough-audio classification. | Dataset/model information, model-specific feature attribution, and optional WAV/FLAC/OGG upload inference when the bundled artifact and audio dependency load. | Experimental research classifier only. Participant-independent validation is unverifiable; sensitivity is limited. Not diagnosis or screening. |
+| **Longitudinal COPD Research** | TOLIFE Clinical Study A, Zenodo record [23263785](https://zenodo.org/records/23263785), v2.0, CC-BY-4.0. Day-cadence longitudinal feasibility analysis. | Reconciled event-register audit, coded participant summaries, longitudinal series and corrected 24/48/72-hour evaluation results. | Report-only research view. Current results are at or below chance; it is not an operational early-warning predictor. |
+
+**Cough Analysis — reported file-level test split**
+
+| Metric | Result |
+|---|---:|
+| AUROC | 0.9316 |
+| AUPRC (test prevalence 0.262) | 0.8293 |
+| Accuracy | 0.872 |
+| COPD sensitivity | 0.578 (19 of 45 COPD-labelled test files missed) |
+| Specificity | 0.976 |
+| Brier score | 0.0987 |
+
+The published dataset does not provide participant identifiers, so participant-independent separation cannot be verified. These file-level metrics must not be interpreted as patient-level generalisation. Low sensitivity means a Healthy output cannot rule out COPD. Uploaded audio is processed by the backend; only a short SHA-256 input fingerprint and inference metadata are retained in the audit record, not the raw audio. If the model artifact or `soundfile` dependency is unavailable, the API returns an explicit unavailable/error response rather than inventing a result.
+
+**TOLIFE — corrected feasibility results**
+
+The corrected audit reconciles 80 exacerbation-register entries to 42 unique participants with no missing event dates. Of these, 42 events fall inside observed monitoring frames, 32 have valid measurements in the preceding seven days, and 30 are evaluable under the stated eligibility rule. Study-model-estimated CAT/CCQ/mMRC classes are excluded from predictors.
+
+| Horizon | AUROC (95% bootstrap CI) | AUPRC (prevalence) | Brier | Positive days |
+|---|---:|---:|---:|---:|
+| 24h | 0.355 (0.233–0.472) | 0.0020 (0.0025) | 0.191 | 18 / 7,195 |
+| 48h | 0.389 (0.244–0.543) | 0.0052 (0.0054) | 0.213 | 39 / 7,195 |
+| 72h | 0.393 (0.276–0.523) | 0.0064 (0.0078) | 0.218 | 56 / 7,195 |
+
+These results are at or below chance and are retained for transparent research reporting, not presented as a working risk predictor. The view is report-only; it does not generate patient-specific live predictions.
+
+**Separation and navigation**
+
+- The original **PranaGuard Digital Twin** remains the primary platform model, with its original synthetic 24/48/72-hour outputs, replay history, explanations and separately labelled v3 48-hour experiment.
+- **Cough Analysis** is a separate file-level audio research classifier; it does not reuse the Digital Twin's TreeSHAP implementation.
+- **Longitudinal COPD Research** is a report-only TOLIFE analysis; it has no live inference endpoint.
+- External study participant IDs remain coded and are never linked to PranaGuard demo patient IDs.
+- The app exposes these views under **Twin & research → Research models**. Provenance and limitations remain visible in the model cards and research documentation.
+
+Detailed methods, exact API paths, artifacts and limitations: [external research model cards](docs/research-models/RESEARCH_MODELS.md), [v7 verification report](docs/research-models/V7_VERIFICATION.md), and [data provenance](docs/DATA_PROVENANCE.md).
+
 ## 6. System architecture and technology
 
-PranaGuard follows a **layered client–API–domain–data architecture**. The browser application presents separate research, clinician, and patient experiences. A FastAPI service exposes the research and care-workspace APIs, while the digital-twin engine, model artifacts, and persistence layer remain on the backend. The architecture keeps the synthetic research replay distinct from user-entered demo care-workspace records and optional environmental context.
+PranaGuard follows a **layered client–API–domain–data architecture**. The browser application presents the landing/login experience, the original Digital Twin, separate external research modules, and clinician/patient workspaces. A FastAPI service exposes the original research and care-workspace APIs plus additive model-specific endpoints. The architecture keeps the synthetic twin replay, external Cough-COPD and TOLIFE research evidence, demo workspace records, and optional environmental context in distinct data paths.
 
 ### 6.1 High-level system architecture
 
@@ -166,7 +213,9 @@ flowchart TB
         TWIN["TwinEngine · Longitudinal replay"]
         FEATURES["Feature engineering · Data validation"]
         INFERENCE["Frozen baseline inference · 24/48/72h horizons"]
-        EXPERIMENT["Versioned experiment and evaluation artifacts"]
+        EXPERIMENT["Versioned Digital Twin experiment artifacts"]
+        COUGH["Cough Analysis · calibrated audio classifier"]
+        TOLIFE["TOLIFE · report-only longitudinal study"]
         CARESERVICES["Care workspace services · Audit · Documents · Follow-ups"]
         ENVSVC["Optional environmental context service"]
         TWIN --> FEATURES
@@ -177,13 +226,16 @@ flowchart TB
     subgraph DATA["Persistence and artifact layer"]
         SQLITE[("SQLite · WAL · Foreign keys · Migrations")]
         SYNTH["Synthetic longitudinal dataset · Patient profiles"]
-        MODELS["Versioned model bundle · Evaluation metadata"]
+        MODELS["Frozen Digital Twin model bundle · Evaluation metadata"]
+        EXTERNAL["Separate Cough model artifact · TOLIFE reports"]
         WORKDATA["Workspace records · Sessions · Reviews · Documents"]
         ENV["Cached environmental data · Source manifest"]
         SQLITE --- WORKDATA
         SQLITE --- TWIN
         SYNTH --> FEATURES
         MODELS --> INFERENCE
+        EXTERNAL --> COUGH
+        EXTERNAL --> TOLIFE
         ENV --> ENVSVC
     end
 
@@ -191,6 +243,8 @@ flowchart TB
     WEB <-->|"WebSocket events"| WS
     RESEARCH --> TWIN
     V3 --> EXPERIMENT
+    RESEARCH --> COUGH
+    RESEARCH --> TOLIFE
     WORKSPACE --> CARESERVICES
     AUTH --> SQLITE
     CARESERVICES --> SQLITE
@@ -203,8 +257,8 @@ flowchart TB
     classDef data fill:#f2edff,stroke:#8064b5,color:#38265e
     class WEB,ROUTES,CARE client
     class FASTAPI,CORS,RESEARCH,V3,WORKSPACE,AUTH,WS api
-    class TWIN,FEATURES,INFERENCE,EXPERIMENT,CARESERVICES,ENVSVC domain
-    class SQLITE,SYNTH,MODELS,WORKDATA,ENV data
+    class TWIN,FEATURES,INFERENCE,EXPERIMENT,COUGH,TOLIFE,CARESERVICES,ENVSVC domain
+    class SQLITE,SYNTH,MODELS,EXTERNAL,WORKDATA,ENV data
 ```
 
 ### 6.2 Layer responsibilities
@@ -215,6 +269,7 @@ flowchart TB
 | **API — FastAPI** | Hosts REST endpoints, request/response validation, CORS configuration, application lifecycle, and route composition. Uvicorn runs the service. |
 | **Research API** | Exposes cohort, patient, history, replay, scenario, alert, and research-evidence operations over the synthetic twin. |
 | **Experimental model API** | Exposes the separately versioned v3 study path. Its experimental evidence is not interchangeable with frozen baseline runtime outputs. |
+| **External research-model API** | Exposes the independent Cough Analysis inference/info/attribution/history endpoints and the report-only TOLIFE overview/series/participant endpoints. It does not access or modify Digital Twin inference state. |
 | **Workspace API and services** | Handles demo sign-in, doctor/patient workspace operations, assignment-scoped access, patient-submitted records, document sharing/downloads, follow-ups, and audit events. |
 | **TwinEngine** | Loads and validates the synthetic longitudinal dataset, derives features, loads the frozen model bundle, generates patient states, and manages deterministic replay/version history. |
 | **Model and feature layer** | Performs feature engineering and inference for the supported 24-, 48-, and 72-hour horizons. Model artifacts and evaluation metadata are versioned separately from workspace records. |
@@ -229,7 +284,8 @@ flowchart TB
 3. **Clinician/patient workflow:** the browser authenticates with the workspace API. Workspace services apply the relevant demo role and doctor-assignment/patient ownership checks before reading or changing workspace records. Actions such as reviews, corrections, document sharing, and follow-ups are recorded in workspace persistence/audit data.
 4. **Document download:** the frontend requests the document file from the configured backend API origin. The backend authorizes the workspace request and returns the stored file bytes with the document's media type and filename.
 5. **Experimental study path:** the v3 API uses its own experiment/model evidence path. Its results remain distinct from the frozen baseline replay path.
-6. **Environmental context:** optional provider data is handled by the environmental service and surfaced as contextual information; it is not represented as a personal sensor measurement or a frozen-model feature.
+6. **External research models:** the Cough API processes an uploaded audio file with its own bundled artifact and stores only an input fingerprint and inference audit metadata; TOLIFE endpoints serve the corrected study audit, participant summaries and longitudinal series as reports. Neither path writes into the Digital Twin's patient/replay tables.
+7. **Environmental context:** optional provider data is handled by the environmental service and surfaced as contextual information; it is not represented as a personal sensor measurement or a frozen-model feature.
 
 ### 6.4 Deployment topology
 
@@ -271,7 +327,8 @@ docs/                              Architecture-adjacent reports and verificatio
 frontend/src/
   pages/                           Original dashboard and research pages
   pages-enhanced/                  Study and model-science pages
-  workspace/                       Login, directory, patient profile, care workflows
+  workspace/                       Animated landing/login, directory, patient profile, care workflows
+  research/                        Cough Analysis and TOLIFE research modules
 ```
 
 > **Architecture and safety boundary:** this is a research/demo deployment, not a production clinical system. Demo authentication is not production identity management; the hosted SQLite filesystem is not durable storage; model outputs are not clinically validated; and the optional environmental feed is not a personal exposure sensor. Do not store real patient information or use the system for diagnosis, triage, prescribing, or treatment decisions.
@@ -498,6 +555,9 @@ The complete endpoint catalogue, request examples, response semantics, error cod
 | Care workspace | `POST /api/workspace/login`, `GET /api/workspace/patients`, `GET /api/workspace/care/reviews` | Demo sign-in, scoped patient directory and review workflow. |
 | Enhanced services | `GET /api/enhanced/status`, `GET /api/enhanced/notifications`, `GET /api/enhanced/environment/{city}` | Monitoring status, notification workflow and optional city context. |
 | Experimental v3 | `GET /api/model48/v3/study`, `GET /api/model48/v3/patients/{id}` | Separately versioned experimental synthetic 48-hour result and evidence. |
+| Research registry | `GET /api/models/registry` | Lists the two external research modules and their evidence metadata; the production Digital Twin is intentionally not in this external registry. |
+| Cough Analysis | `GET /api/models/cough/info`, `POST /api/models/cough/infer`, `GET /api/models/cough/attribution`, `GET /api/models/cough/history` | Cough model information, optional audio inference, its own global feature importance, and inference audit history. |
+| TOLIFE research | `GET /api/models/tolife/overview`, `GET /api/models/tolife/series`, `GET /api/models/tolife/participants` | Report-only event audit, horizon metrics, coded participant rows and longitudinal series. |
 | Live updates | `WS /api/ws` | Replay/alert invalidation events for connected clients. |
 
 Most original synthetic research read endpoints are public in the demo configuration. Workspace routes use a bearer session; configured protected write routes may also require the shared demo header. This is not production-grade authorization. Consult the API guide before calling write/reset endpoints.
@@ -508,6 +568,8 @@ Most original synthetic research read endpoints are public in the demo configura
 - The research cohort contains 120 synthetic patient profiles and 3,000 synthetic window states. These records do not represent real people.
 - The frozen baseline model is `pg-synthetic-v1`. Its runtime scores are raw replay-model outputs and must not be described as calibrated clinical probabilities.
 - The separate `pg48-v3-multiseed` experiment is a synthetic-only 48-hour study model. Do not conflate its evaluation with the frozen baseline runtime.
+- Cough Analysis is an external-dataset, file-level audio classifier; its test split does not establish participant-independent performance.
+- TOLIFE Longitudinal COPD Research is a report-only feasibility analysis with weak/below-chance 24/48/72-hour results, not a live prediction service.
 - The v6 prediction-history feature records timestamped outputs and model/state versions; it does not modify historical raw scores.
 - Environmental context is optional, city-level gridded/modelled information. USAQI is not CPCB/Indian NAQI; environmental context is not a personal exposure measurement and is not a frozen-model input.
 - What-if scenarios are conditional sensitivity analyses, not validated disease trajectories, causal intervention effects, or treatment recommendations.
@@ -579,7 +641,7 @@ Reproducible sources: [executed baseline evaluation](artifacts/evaluation.md), [
 
 ## 8. Validation, tests, and verification evidence
 
-Latest recorded v6 verification (2026-11-07):
+Recorded v6 platform verification (2026-11-07) and additive v7 research-module verification (2026-11-08):
 
 | Check | Recorded result |
 |---|---:|
@@ -598,7 +660,7 @@ Evidence files:
 - [Workspace browser results](docs/workspace-verification/BROWSER_WORKSPACE.json)
 - [v6 browser results](docs/v6-verification/V6_BROWSER_RESULTS.json)
 
-These are recorded software tests and browser checks on synthetic data. They are **not** independent clinical validation, prospective evaluation, regulatory verification, or evidence of patient benefit. Re-run the suites against the exact commit used for final submission.
+These are recorded software tests and browser checks, not independent clinical validation, prospective evaluation, regulatory verification, or evidence of patient benefit. The v7 research-module report additionally records 12 backend research tests, 8 frontend research tests, all 8 research endpoint smoke checks returning HTTP 200, and successful real-artifact cough inference in the test workspace. The production landing-page redesign was subsequently built successfully by Vercel. Re-run the suites against the exact commit used for final submission.
 
 ## 9. Security, privacy, and limitations
 
@@ -731,8 +793,7 @@ For a same-origin local Vite workflow, leave `VITE_API_BASE_URL` empty and set `
 
 - **Challenge:** Happiest Health Digital Twin Challenge 2026.
 - **Institution:** Pune Institute of Computer Technology (PICT), Pune.
-- **Team lead / original submission repository owner:** Anuja Naik.
-- **Engineering, frontend/backend implementation, and documentation:** Harsh Takalkar.
+- **Team members:** Harsh Takalkar and Anuja Naik.
 - **Clinical advisor:** None claimed.
 
 Please ensure the final challenge submission uses the official complete team roster and role wording agreed by the team.
@@ -758,11 +819,8 @@ Refer to the repository [LICENSE](LICENSE) and [third-party notices](docs/THIRD_
   Patient-specific digital-twin research workspace · Synthetic data only · No clinical validation
 </p>
 
-## 15. Additional external research modules (separate from the Digital Twin)
+## 15. Additional external research modules
 
-The research branch adds two independent research views alongside the existing Digital Twin. They retain their own datasets, preprocessing, artifacts, evaluation metrics, provenance and limitations; their scores are not combined with or ranked against the core Digital Twin.
+The external modules are now documented in the main [v7 feature section](#55-v7-separate-external-copd-research-modules), including their dataset sources, reported metrics, evaluation limitations, and API routes. The original Digital Twin and its existing workflows remain separate.
 
-- **Cough Analysis:** file-level COPD-versus-Healthy cough-audio classification using the Cough-COPD(CC) dataset. The bundled inference endpoint is available only when its model artifact and audio dependency load successfully. Participant-independent validation is not established, and sensitivity is insufficient for ruling disease out. It is not a diagnostic, screening, triage or treatment tool.
-- **Longitudinal COPD Research:** exploratory analysis of TOLIFE Clinical Study A with corrected event eligibility and leave-one-participant-out evaluation. Current 24/48/72-hour results are at or below chance and do not establish an early-warning capability. This module is report-only; do not interpret its outputs as patient predictions.
-
-The original PranaGuard Digital Twin, its 24/48/72-hour outputs, historical replay, and existing clinician/patient workflows remain separate. See [research model cards and results](docs/research-models/RESEARCH_MODELS.md), [verification notes](docs/research-models/V7_VERIFICATION.md), and [data provenance](docs/DATA_PROVENANCE.md) for detailed methods and source boundaries.
+See [research model cards](docs/research-models/RESEARCH_MODELS.md), [v7 verification](docs/research-models/V7_VERIFICATION.md), and [data provenance](docs/DATA_PROVENANCE.md).
