@@ -13,6 +13,7 @@ from backend.app.enhanced.routes import make_router
 from backend.app.model48_v3_api import make_v3_router
 from backend.app.workspace.service import Workspace
 from backend.app.workspace.routes import make_workspace_router
+from backend.app.research.routes import router as research_router, bind_service as bind_research_service
 
 class StrictModel(BaseModel):model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
 class Step(StrictModel):hours:int=Field(default=1,ge=1,le=72)
@@ -45,6 +46,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         app.state.engine=await asyncio.to_thread(TwinEngine,db_path or DB_PATH)
         app.state.enhanced=Services(app.state.engine,enhanced_settings)
         app.state.workspace=Workspace(app.state.engine,app.state.enhanced)
+        app.state.research=await asyncio.to_thread(bind_research_service,app.state.engine.store)
         async def enhanced_loop():
             while True:
                 await asyncio.sleep(1)
@@ -74,6 +76,7 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
     app.include_router(make_router(authorize,hub))
     app.include_router(make_v3_router())
     app.include_router(make_workspace_router())
+    app.include_router(research_router)
     def engine(request:Request):return request.app.state.engine
     @app.exception_handler(KeyError)
     async def key_error(request,exc):return JSONResponse(status_code=404,content={'detail':str(exc)})

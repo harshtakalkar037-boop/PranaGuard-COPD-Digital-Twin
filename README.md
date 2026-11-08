@@ -757,3 +757,12 @@ Refer to the repository [LICENSE](LICENSE) and [third-party notices](docs/THIRD_
   <strong>PranaGuard</strong><br/>
   Patient-specific digital-twin research workspace · Synthetic data only · No clinical validation
 </p>
+
+## 15. Additional external research modules (separate from the Digital Twin)
+
+The research branch adds two independent research views alongside the existing Digital Twin. They retain their own datasets, preprocessing, artifacts, evaluation metrics, provenance and limitations; their scores are not combined with or ranked against the core Digital Twin.
+
+- **Cough Analysis:** file-level COPD-versus-Healthy cough-audio classification using the Cough-COPD(CC) dataset. The bundled inference endpoint is available only when its model artifact and audio dependency load successfully. Participant-independent validation is not established, and sensitivity is insufficient for ruling disease out. It is not a diagnostic, screening, triage or treatment tool.
+- **Longitudinal COPD Research:** exploratory analysis of TOLIFE Clinical Study A with corrected event eligibility and leave-one-participant-out evaluation. Current 24/48/72-hour results are at or below chance and do not establish an early-warning capability. This module is report-only; do not interpret its outputs as patient predictions.
+
+The original PranaGuard Digital Twin, its 24/48/72-hour outputs, historical replay, and existing clinician/patient workflows remain separate. See [research model cards and results](docs/research-models/RESEARCH_MODELS.md), [verification notes](docs/research-models/V7_VERIFICATION.md), and [data provenance](docs/DATA_PROVENANCE.md) for detailed methods and source boundaries.

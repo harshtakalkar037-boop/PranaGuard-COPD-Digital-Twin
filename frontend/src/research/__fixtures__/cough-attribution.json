@@ -1,0 +1,86 @@
+{
+ "model_id": "cough-copd-rf-calibrated",
+ "global_feature_importance": [
+  {
+   "feature": "logmel3_mean",
+   "importance": 0.04009
+  },
+  {
+   "feature": "mfcc2_std",
+   "importance": 0.03732
+  },
+  {
+   "feature": "logmel9_mean",
+   "importance": 0.02858
+  },
+  {
+   "feature": "mfcc10_mean",
+   "importance": 0.02853
+  },
+  {
+   "feature": "mfcc11_mean",
+   "importance": 0.02802
+  },
+  {
+   "feature": "logmel5_mean",
+   "importance": 0.02719
+  },
+  {
+   "feature": "mfcc8_mean",
+   "importance": 0.02656
+  },
+  {
+   "feature": "mfcc9_mean",
+   "importance": 0.02545
+  },
+  {
+   "feature": "mfcc4_std",
+   "importance": 0.02538
+  },
+  {
+   "feature": "logmel13_mean",
+   "importance": 0.02182
+  },
+  {
+   "feature": "logmel1_mean",
+   "importance": 0.02075
+  },
+  {
+   "feature": "logmel25_mean",
+   "importance": 0.02055
+  },
+  {
+   "feature": "mfcc7_mean",
+   "importance": 0.0204
+  },
+  {
+   "feature": "rms_std",
+   "importance": 0.02014
+  },
+  {
+   "feature": "mfcc3_mean",
+   "importance": 0.02003
+  },
+  {
+   "feature": "mfcc4_mean",
+   "importance": 0.0197
+  },
+  {
+   "feature": "logmel17_mean",
+   "importance": 0.01964
+  },
+  {
+   "feature": "zcr_mean",
+   "importance": 0.01913
+  },
+  {
+   "feature": "logmel7_mean",
+   "importance": 0.01901
+  },
+  {
+   "feature": "logmel11_mean",
+   "importance": 0.01818
+  }
+ ],
+ "note": "Dataset-level feature attribution (LightGBM split importance), not a causal effect."
+}
