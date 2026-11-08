@@ -794,7 +794,6 @@ For a same-origin local Vite workflow, leave `VITE_API_BASE_URL` empty and set `
 - **Challenge:** Happiest Health Digital Twin Challenge 2026.
 - **Institution:** Pune Institute of Computer Technology (PICT), Pune.
 - **Team members:** Harsh Takalkar and Anuja Naik.
-- **Institution:** Pune Institute of Computer Technology (PICT), Pune.
 - **Clinical advisor:** None claimed.
 
 Please ensure the final challenge submission uses the official complete team roster and role wording agreed by the team.
