@@ -83,7 +83,7 @@ describe('patient documents',()=>{
   render(<PatientDocumentsPage/>);
   expect(await screen.findByText(documents.items[0].title)).toBeTruthy();
   fetchMock.mockResolvedValueOnce(new Response(new Blob(['demo']),{status:200,headers:{'content-type':'text/plain'}}));
-  await userEvent.click(screen.getAllByRole('button',{name:'Download'})[0]);
+  await userEvent.click(screen.getAllByRole('button',{name:/Download/})[0]);
   await waitFor(()=>expect(fetchMock.mock.calls.some(c=>String(c[0]).includes('/workspace/documents/'))).toBe(true));
  });
  it('shows honest empty state when nothing shared',async()=>{
