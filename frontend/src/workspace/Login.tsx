@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Activity,ArrowDown,ArrowRight,ArrowUpRight,CheckCircle2,HeartPulse,Leaf,LockKeyhole,Mic,ShieldCheck,Sparkles,Wind,Waves} from 'lucide-react';
+import {Activity,ArrowDown,ArrowRight,ArrowUpRight,CheckCircle2,HeartPulse,Leaf,LockKeyhole,ShieldCheck,Sparkles,Wind,Waves} from 'lucide-react';
 import {api,explainError} from '../api';
 import type {SessionUser} from './types';
 
