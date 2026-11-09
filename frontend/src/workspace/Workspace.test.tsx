@@ -37,7 +37,7 @@ describe('sign-in screen',()=>{
   fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({detail:'Incorrect demo username or password.'}),{status:401}));
   render(<LoginScreen onLogin={vi.fn()}/>);
   await userEvent.type(screen.getByLabelText('Username'),'dr-atlas');await userEvent.type(screen.getByLabelText('Password'),'wrong-pass');
-  await userEvent.click(screen.getByRole('button',{name:'Sign in'}));
+  await userEvent.click(screen.getByRole('button',{name:'Sign in to workspace'}));
   await screen.findByText(/Incorrect demo username/);expect(sessionStorage.getItem('pg-workspace-session')).toBe('vitest-token');
  });
 });
