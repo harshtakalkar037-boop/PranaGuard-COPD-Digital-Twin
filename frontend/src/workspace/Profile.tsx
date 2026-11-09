@@ -139,13 +139,12 @@ function ActivityTab({pid,revision}:{pid:string;revision:number}){
  useEffect(()=>{api<Activity>(`/workspace/patients/${pid}/activity`).then(d=>setData(d)).catch(e=>setError(explainError(e)));},[pid,revision]);
  if(error)return <Notice tone="warning">{error}</Notice>;
  if(!data)return <Loading/>;
- const demoAdherence=[0,1,2,3,4,5,6].map((n)=>{const d=new Date();d.setUTCDate(d.getUTCDate()-6+n);return {date:d.toISOString().slice(0,10),adherence_manual:[0.92,0.88,1,0.84,0.96,0.91,0.95][n],symptom_manual:[3,3,2,4,3,2,2][n]};});
- const adherence=data.series.filter(d=>d.adherence_manual!==undefined);const shownAdherence=adherence.length?adherence:demoAdherence;
+ const adherence=data.series.filter(d=>d.adherence_manual!==undefined||d.symptom_manual!==undefined);
  const steps=data.series.filter(d=>d.steps_simulated_device!==undefined||d.heart_rate_simulated_device!==undefined);
- return <><Notice>{data.missing} Sources: {data.sources}. {adherence.length?'':'Illustrative values below are demo-only previews and are not persisted patient observations.'}</Notice>
+ return <><Notice>{data.missing} Sources: {data.sources}.</Notice>
  <div className="two-col">
-  <Panel title="Adherence & symptoms" subtitle={`${adherence.length?data.manual_entries:7} ${adherence.length?'hand-entered fictional observations':'illustrative demo points'}`}>
-   <div style={{height:230}}><ResponsiveContainer width="100%" height="100%"><LineChart data={shownAdherence}><CartesianGrid strokeDasharray="3 4" vertical={false} stroke="#eaf0ed"/><XAxis dataKey="date" tick={{fontSize:10}}/><YAxis tick={{fontSize:10}} width={30}/><Tooltip/><Line type="monotone" dataKey="adherence_manual" name="Adherence (0–1)" stroke="#1c7569" strokeWidth={2} dot/><Line type="monotone" dataKey="symptom_manual" name="Symptom score (0–10)" stroke="#d3a15b" strokeWidth={2} dot/></LineChart></ResponsiveContainer></div>
+  <Panel title="Adherence & symptoms" subtitle={`${data.manual_entries} patient-entered twin observations and persisted daily records`}>
+   {adherence.length?<div style={{height:230}}><ResponsiveContainer width="100%" height="100%"><LineChart data={adherence}><CartesianGrid strokeDasharray="3 4" vertical={false} stroke="#eaf0ed"/><XAxis dataKey="date" tick={{fontSize:10}}/><YAxis tick={{fontSize:10}} width={30}/><Tooltip/><Line type="monotone" dataKey="adherence_manual" name="Adherence (0–1)" stroke="#1c7569" strokeWidth={2} dot/><Line type="monotone" dataKey="symptom_manual" name="Symptom score (0–10)" stroke="#d3a15b" strokeWidth={2} dot/></LineChart></ResponsiveContainer></div>:<Empty text="No patient wellbeing or adherence records yet."/>}
   </Panel>
   <Panel title="Simulated device activity" subtitle={`${data.device_samples} validated ingestion samples`}>
    {steps.length?<div style={{height:230}}><ResponsiveContainer width="100%" height="100%"><LineChart data={steps}><CartesianGrid strokeDasharray="3 4" vertical={false} stroke="#eaf0ed"/><XAxis dataKey="date" tick={{fontSize:10}}/><YAxis tick={{fontSize:10}} width={30}/><Tooltip/><Line type="monotone" dataKey="steps_simulated_device" name="Steps (simulated)" stroke="#247e6d" strokeWidth={2} dot={false}/><Line type="monotone" dataKey="heart_rate_simulated_device" name="Heart rate (simulated)" stroke="#c67c66" strokeWidth={1.5} dot={false}/></LineChart></ResponsiveContainer></div>:<Empty text="No simulated device readings yet — associate and start a device from Onboarding & registrations."/>}
