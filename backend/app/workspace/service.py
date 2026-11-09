@@ -367,6 +367,12 @@ class Workspace:
         for o in manual:bucket(o['at'],'adherence_manual',o['adherence']);bucket(o['at'],'symptom_manual',o['symptom_score'])
         readings=[]
         with self.store.connect() as c:
+            for r in c.execute("SELECT entry_date,wellbeing FROM daily_logs WHERE patient_id=? ORDER BY entry_date DESC LIMIT 90",(pid,)):
+                score={'worse':6,'same':3,'better':2}.get(r['wellbeing'])
+                if score is not None:bucket(r['entry_date'],'symptom_manual',score)
+            for r in c.execute("""SELECT substr(taken_at,1,10) AS date,AVG(as_prescribed) AS adherence
+                                  FROM med_adherence WHERE patient_id=? GROUP BY substr(taken_at,1,10)""",(pid,)):
+                bucket(r['date'],'adherence_manual',float(r['adherence']))
             for r in c.execute("SELECT observed_at,metric,value FROM device_readings WHERE patient_id=? AND metric IN ('steps','heart_rate') ORDER BY observed_at DESC LIMIT 2000",(pid,)):
                 readings.append(dict(r));bucket(r['observed_at'],f"{r['metric']}_simulated_device",r['value'])
         series=sorted(days.values(),key=lambda d:d['date'])
