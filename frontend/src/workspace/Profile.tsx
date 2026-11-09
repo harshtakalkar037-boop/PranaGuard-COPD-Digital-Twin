@@ -1,7 +1,7 @@
 import {useEffect,useState} from 'react';
 import {CalendarClock,CheckCircle2,Download,FileText,HeartPulse,Pencil,Plus,ShieldCheck} from 'lucide-react';
 import {CartesianGrid,Line,LineChart,ResponsiveContainer,Tooltip,XAxis,YAxis} from 'recharts';
-import {api,explainError,patch,post,put} from '../api';
+import {API_BASE,api,explainError,patch,post,put} from '../api';
 import {Empty,Loading,Notice,Panel,Pill,number,pct,time} from '../components';
 import type {Activity,Adherence,CarePlan,DailyLogPage,DocumentItem,FollowUp,MedOption,PlanResponse,Profile,SputumPage} from './types';
 import {RiskSection} from './Risk';
@@ -92,7 +92,7 @@ function DiaryTab({pid,refresh,revision}:{pid:string;refresh:(m?:string)=>void;r
    <div className="care-queue">{data.items.map(e=><div key={e.id} className="care-card">
     <div className="care-card-top"><strong>{time(e.occurred_at,true)}</strong><Pill tone={e.reviewed_at?'low':'amber'}>{e.reviewed_at?'reviewed':'awaiting clinician note'}</Pill></div>
     <p>{e.colour} · {e.volume} · {e.consistency} — cough {e.cough}/10, breathlessness {e.breathlessness}/10{e.note?` — ${e.note}`:''}</p>
-    {e.attachment&&<div className="diary-attachment"><img src={`/api/workspace/attachments/${e.attachment.id}`} alt={`Diary attachment ${e.attachment.filename}`}/><small>{e.attachment.filename} · {Math.round(e.attachment.size/1024)}KB · sha256 {e.attachment.sha256.slice(0,12)}…</small></div>}
+    {e.attachment&&<DiaryAttachment attachment={e.attachment}/>}
     {e.reviewed_at?<small className="muted-cell">Reviewed by {e.reviewed_by} · {time(e.reviewed_at,true)}<br/>{e.review_note}</small>:
      <div className="pgx-inline"><input className="form-input diary-review-input" aria-label={`Review note for entry ${e.id}`} placeholder="Clinician review note (min 3 chars)" value={reviewNote[e.id]||''} onChange={ev=>setReviewNote({...reviewNote,[e.id]:ev.target.value})}/>
      <button className="button secondary small-button" disabled={(reviewNote[e.id]||'').trim().length<3} onClick={async()=>{try{await patch(`/workspace/sputum/${e.id}/review`,{note:reviewNote[e.id]});refresh('Review note saved.');const d=await api<SputumPage>(`/workspace/patients/${pid}/sputum?page=${page}`);setData(d);}catch(err){setError(explainError(err));}}}><CheckCircle2 size={13}/>Mark reviewed</button></div>}
@@ -101,6 +101,23 @@ function DiaryTab({pid,refresh,revision}:{pid:string;refresh:(m?:string)=>void;r
    <div className="table-footer"><span>{data.total} entries</span><div className="pagination"><button className="icon-button" aria-label="Previous diary page" disabled={page<=1} onClick={()=>setPage(p=>p-1)}>‹</button><span>{page}</span><button className="icon-button" aria-label="Next diary page" disabled={!data||(page*data.page_size)>=data.total} onClick={()=>setPage(p=>p+1)}>›</button></div></div>
   </>}
  </Panel></div>;
+}
+
+
+function DiaryAttachment({attachment}:{attachment:{id:number;filename:string;media_type:string;size:number;sha256:string}}){
+ const [src,setSrc]=useState('');const [failed,setFailed]=useState(false);
+ useEffect(()=>{let active=true;let objectUrl='';const token=sessionStorage.getItem('pg-workspace-session');
+  fetch(`${API_BASE}/workspace/attachments/${attachment.id}`,{headers:token?{Authorization:`Bearer ${token}`}:{}})
+   .then(r=>{if(!r.ok)throw new Error('Attachment unavailable');return r.blob();})
+   .then(blob=>{if(!active)return;objectUrl=URL.createObjectURL(blob);setSrc(objectUrl);})
+   .catch(()=>{if(active)setFailed(true);});
+  return()=>{active=false;if(objectUrl)URL.revokeObjectURL(objectUrl);};
+ },[attachment.id]);
+ return <div className="diary-attachment">
+  {src?<a href={src} target="_blank" rel="noreferrer" aria-label={`Open ${attachment.filename}`}><img src={src} alt={`Diary attachment ${attachment.filename}`}/></a>
+   :<div className="diary-attachment-fallback" role="status">{failed?'Attachment could not be loaded':'Loading diary attachment…'}</div>}
+  <small>{attachment.filename} · {Math.round(attachment.size/1024)}KB · sha256 {attachment.sha256.slice(0,12)}… {src&&<a href={src} target="_blank" rel="noreferrer">Open image</a>}</small>
+ </div>;
 }
 
 function toBase64(file:File):Promise<string>{return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]);r.onerror=reject;r.readAsDataURL(file);});}
@@ -138,11 +155,13 @@ function ActivityTab({pid,revision}:{pid:string;revision:number}){
  useEffect(()=>{api<Activity>(`/workspace/patients/${pid}/activity`).then(d=>setData(d)).catch(e=>setError(explainError(e)));},[pid,revision]);
  if(error)return <Notice tone="warning">{error}</Notice>;
  if(!data)return <Loading/>;
- const adherence=data.series.filter(d=>d.adherence_manual!==undefined);const steps=data.series.filter(d=>d.steps_simulated_device!==undefined||d.heart_rate_simulated_device!==undefined);
- return <><Notice>{data.missing} Sources: {data.sources}.</Notice>
+ const demoAdherence=[0,1,2,3,4,5,6].map((n)=>{const d=new Date();d.setUTCDate(d.getUTCDate()-6+n);return {date:d.toISOString().slice(0,10),adherence_manual:[0.92,0.88,1,0.84,0.96,0.91,0.95][n],symptom_manual:[3,3,2,4,3,2,2][n]};});
+ const adherence=data.series.filter(d=>d.adherence_manual!==undefined);const shownAdherence=adherence.length?adherence:demoAdherence;
+ const steps=data.series.filter(d=>d.steps_simulated_device!==undefined||d.heart_rate_simulated_device!==undefined);
+ return <><Notice>{data.missing} Sources: {data.sources}. {adherence.length?'':'Illustrative values below are demo-only previews and are not persisted patient observations.'}</Notice>
  <div className="two-col">
-  <Panel title="Adherence & symptoms" subtitle={`${data.manual_entries} hand-entered fictional observations`}>
-   {adherence.length?<div style={{height:230}}><ResponsiveContainer width="100%" height="100%"><LineChart data={adherence}><CartesianGrid strokeDasharray="3 4" vertical={false} stroke="#eaf0ed"/><XAxis dataKey="date" tick={{fontSize:10}}/><YAxis tick={{fontSize:10}} width={30}/><Tooltip/><Line type="monotone" dataKey="adherence_manual" name="Adherence (0–1)" stroke="#1c7569" strokeWidth={2} dot/><Line type="monotone" dataKey="symptom_manual" name="Symptom score (0–10)" stroke="#d3a15b" strokeWidth={2} dot/></LineChart></ResponsiveContainer></div>:<Empty text="No manual observation entries for this patient yet."/>}
+  <Panel title="Adherence & symptoms" subtitle={`${adherence.length?data.manual_entries:7} ${adherence.length?'hand-entered fictional observations':'illustrative demo points'}`}>
+   <div style={{height:230}}><ResponsiveContainer width="100%" height="100%"><LineChart data={shownAdherence}><CartesianGrid strokeDasharray="3 4" vertical={false} stroke="#eaf0ed"/><XAxis dataKey="date" tick={{fontSize:10}}/><YAxis tick={{fontSize:10}} width={30}/><Tooltip/><Line type="monotone" dataKey="adherence_manual" name="Adherence (0–1)" stroke="#1c7569" strokeWidth={2} dot/><Line type="monotone" dataKey="symptom_manual" name="Symptom score (0–10)" stroke="#d3a15b" strokeWidth={2} dot/></LineChart></ResponsiveContainer></div>
   </Panel>
   <Panel title="Simulated device activity" subtitle={`${data.device_samples} validated ingestion samples`}>
    {steps.length?<div style={{height:230}}><ResponsiveContainer width="100%" height="100%"><LineChart data={steps}><CartesianGrid strokeDasharray="3 4" vertical={false} stroke="#eaf0ed"/><XAxis dataKey="date" tick={{fontSize:10}}/><YAxis tick={{fontSize:10}} width={30}/><Tooltip/><Line type="monotone" dataKey="steps_simulated_device" name="Steps (simulated)" stroke="#247e6d" strokeWidth={2} dot={false}/><Line type="monotone" dataKey="heart_rate_simulated_device" name="Heart rate (simulated)" stroke="#c67c66" strokeWidth={1.5} dot={false}/></LineChart></ResponsiveContainer></div>:<Empty text="No simulated device readings yet — associate and start a device from Onboarding & registrations."/>}
