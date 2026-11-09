@@ -27,13 +27,13 @@ export function PatientHomePage({navigate}:{navigate:(v:'patient-home'|'patient-
   </Panel>:null}
   <div className="two-col">
    <Panel title="Follow-up instructions" subtitle="From your doctor — demo instructions, not automatic treatment changes">
-    {(()=>{const all=[...data.overdue_follow_ups,...data.follow_ups];return all.length?all.map(f=><div key={f.id} className="care-card"><div className="care-card-top"><strong>{f.instructions}</strong><Pill tone={data.overdue_follow_ups.some(o=>o.id===f.id)?'coral':'amber'}>{data.overdue_follow_ups.some(o=>o.id===f.id)?'overdue':'scheduled'}</Pill></div><small>{f.due_at?`Due ${time(f.due_at,true)}`: 'No due date'} · Dr. {f.doctor}</small></div>):<Empty text="No upcoming demo follow-ups."/>;})()}
+    {(()=>{const all=[...data.overdue_follow_ups,...data.follow_ups];return all.length?all.map(f=><div key={f.id} className="care-card"><div className="care-card-top"><strong>{f.instructions}</strong><Pill tone={data.overdue_follow_ups.some(o=>o.id===f.id)?'coral':'amber'}>{data.overdue_follow_ups.some(o=>o.id===f.id)?'overdue':'scheduled'}</Pill></div><small>{f.due_at?`Due ${time(f.due_at,true)}`: 'No due date'} · Dr. {f.doctor}</small></div>):<div className="care-card demo-preview"><div className="care-card-top"><strong>Next check-in</strong><Pill tone="blue">demo preview</Pill></div><p>Continue recording daily wellbeing and sputum diary entries so the assigned doctor can review the timeline.</p><small>Illustrative reminder · no follow-up has been sent by a clinician.</small></div>;})()}
    </Panel>
    <Panel title="Current care plan" subtitle="Doctor-documented demo care plan (read-only for you)">
     {data.care_plan?<><h4 className="subheading">Goals</h4><p>{data.care_plan.goals}</p>
      {data.care_plan.activity_guidance&&<><h4 className="subheading">Activity guidance</h4><p>{data.care_plan.activity_guidance}</p></>}
      {data.care_plan.adherence_support&&<><h4 className="subheading">Medication & adherence support</h4><p>{data.care_plan.adherence_support}</p></>}
-     {data.care_plan.review_date&&<p className="input-help"><CalendarClock size={13}/> Next review: {data.care_plan.review_date}</p>}</>:<Empty text="No demo care plan yet."/>}
+     {data.care_plan.review_date&&<p className="input-help"><CalendarClock size={13}/> Next review: {data.care_plan.review_date}</p>}</>:<div className="care-card demo-preview"><div className="care-card-top"><strong>Care plan preview</strong><Pill tone="blue">demo preview</Pill></div><p><b>Goal:</b> Keep daily wellbeing and symptom records up to date.</p><p><b>Activity:</b> Record everyday activity and note changes from the usual routine.</p><p><b>Adherence:</b> Record medication-taking patterns for discussion with the assigned doctor.</p><small>This is illustrative guidance, not a saved care plan or medical instruction.</small></div>}
    </Panel>
   </div>
   <Panel title="Recent daily records" subtitle="What you logged recently · your doctor sees the same records">
