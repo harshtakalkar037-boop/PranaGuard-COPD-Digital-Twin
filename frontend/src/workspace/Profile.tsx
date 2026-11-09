@@ -1,7 +1,7 @@
 import {useEffect,useState} from 'react';
-import {CalendarClock,CheckCircle2,Download,FileText,HeartPulse,Pencil,Plus,ShieldCheck} from 'lucide-react';
+import {CalendarClock,CheckCircle2,Download,FileText,HeartPulse,Image as ImageIcon,Pencil,Plus,ShieldCheck} from 'lucide-react';
 import {CartesianGrid,Line,LineChart,ResponsiveContainer,Tooltip,XAxis,YAxis} from 'recharts';
-import {API_BASE,api,explainError,patch,post,put} from '../api';
+import {api,explainError,patch,post,put} from '../api';
 import {Empty,Loading,Notice,Panel,Pill,number,pct,time} from '../components';
 import type {Activity,Adherence,CarePlan,DailyLogPage,DocumentItem,FollowUp,MedOption,PlanResponse,Profile,SputumPage} from './types';
 import {RiskSection} from './Risk';
@@ -34,8 +34,8 @@ export function ProfilePage({pid,revision,notify,openTwin}:{pid:string;revision:
   {tab==='Activity & adherence'&&<ActivityTab pid={pid} revision={revision}/>}
   {tab==='Documents & follow-ups'&&<DocumentsTab pid={pid} refresh={refresh}/>}
   {tab==='Reviews & notifications'&&<div className="two-col">
-   <Panel title="Care review history" subtitle="Persisted workspace reviews">{data.reviews.length?<ol className="care-timeline">{data.reviews.map(r=><li key={r.id}><span className="status-dot"/><div><strong>{r.status.replaceAll('_',' ')}</strong><small>{time(r.updated_at,true)} · {r.doctor}</small><p>{r.note.split('\n')[0]}</p></div></li>)}</ol>:<div className="care-card demo-preview"><div className="care-card-top"><strong>Routine record review</strong><Pill tone="blue">demo preview</Pill></div><small>Dr. Atlas · illustrative workflow</small><p>Review recent wellbeing entries, confirm diary completeness and document follow-up questions for the next visit.</p></div>}</Panel>
-   <Panel title="Notification history" subtitle="Actual persisted notification records">{data.notifications.notifications.length?<div className="care-queue">{data.notifications.notifications.map(n=><div key={n.id} className="care-card"><div className="care-card-top"><strong>{n.title}</strong><Pill tone={n.status==='resolved'||n.status==='closed'?'low':'amber'}>{n.status.replaceAll('_',' ')}</Pill></div><small>{time(n.created_at,true)}</small></div>)}</div>:<div className="care-card demo-preview"><div className="care-card-top"><strong>Diary update available</strong><Pill tone="amber">demo preview</Pill></div><small>Patient workspace · illustrative notification</small><p>A new patient-reported diary entry can be reviewed from the Sputum diary tab.</p></div>}</Panel>
+   <Panel title="Care review history" subtitle="Persisted workspace reviews">{data.reviews.length?<ol className="care-timeline">{data.reviews.map(r=><li key={r.id}><span className="status-dot"/><div><strong>{r.status.replaceAll('_',' ')}</strong><small>{time(r.updated_at,true)} · {r.doctor}</small><p>{r.note.split('\n')[0]}</p></div></li>)}</ol>:<Empty text="No care reviews recorded yet."/>}</Panel>
+   <Panel title="Notification history" subtitle="Persisted notification records">{data.notifications.notifications.length?<div className="care-queue">{data.notifications.notifications.map(n=><div key={n.id} className="care-card"><div className="care-card-top"><strong>{n.title}</strong><Pill tone={n.status==='resolved'||n.status==='closed'?'low':'amber'}>{n.status.replaceAll('_',' ')}</Pill></div><small>{time(n.created_at,true)}</small></div>)}</div>:<Empty text="No notifications recorded yet."/>}</Panel>
   </div>}
  </div>;
 }
@@ -92,7 +92,7 @@ function DiaryTab({pid,refresh,revision}:{pid:string;refresh:(m?:string)=>void;r
    <div className="care-queue">{data.items.map(e=><div key={e.id} className="care-card">
     <div className="care-card-top"><strong>{time(e.occurred_at,true)}</strong><Pill tone={e.reviewed_at?'low':'amber'}>{e.reviewed_at?'reviewed':'awaiting clinician note'}</Pill></div>
     <p>{e.colour} · {e.volume} · {e.consistency} — cough {e.cough}/10, breathlessness {e.breathlessness}/10{e.note?` — ${e.note}`:''}</p>
-    {e.attachment&&<DiaryAttachment attachment={e.attachment}/>}
+    {e.attachment&&<div className="diary-attachment"><ImageIcon size={16}/><span>{e.attachment.filename}</span><small>{Math.round(e.attachment.size/1024)}KB</small></div>}
     {e.reviewed_at?<small className="muted-cell">Reviewed by {e.reviewed_by} · {time(e.reviewed_at,true)}<br/>{e.review_note}</small>:
      <div className="pgx-inline"><input className="form-input diary-review-input" aria-label={`Review note for entry ${e.id}`} placeholder="Clinician review note (min 3 chars)" value={reviewNote[e.id]||''} onChange={ev=>setReviewNote({...reviewNote,[e.id]:ev.target.value})}/>
      <button className="button secondary small-button" disabled={(reviewNote[e.id]||'').trim().length<3} onClick={async()=>{try{await patch(`/workspace/sputum/${e.id}/review`,{note:reviewNote[e.id]});refresh('Review note saved.');const d=await api<SputumPage>(`/workspace/patients/${pid}/sputum?page=${page}`);setData(d);}catch(err){setError(explainError(err));}}}><CheckCircle2 size={13}/>Mark reviewed</button></div>}
@@ -103,22 +103,6 @@ function DiaryTab({pid,refresh,revision}:{pid:string;refresh:(m?:string)=>void;r
  </Panel></div>;
 }
 
-
-function DiaryAttachment({attachment}:{attachment:{id:number;filename:string;media_type:string;size:number;sha256:string}}){
- const [src,setSrc]=useState('');const [failed,setFailed]=useState(false);
- useEffect(()=>{let active=true;let objectUrl='';const token=sessionStorage.getItem('pg-workspace-session');
-  fetch(`${API_BASE}/workspace/attachments/${attachment.id}`,{headers:token?{Authorization:`Bearer ${token}`}:{}})
-   .then(r=>{if(!r.ok)throw new Error('Attachment unavailable');return r.blob();})
-   .then(blob=>{if(!active)return;objectUrl=URL.createObjectURL(blob);setSrc(objectUrl);})
-   .catch(()=>{if(active)setFailed(true);});
-  return()=>{active=false;if(objectUrl)URL.revokeObjectURL(objectUrl);};
- },[attachment.id]);
- return <div className="diary-attachment">
-  {src?<a href={src} target="_blank" rel="noreferrer" aria-label={`Open ${attachment.filename}`}><img src={src} alt={`Diary attachment ${attachment.filename}`}/></a>
-   :<div className="diary-attachment-fallback" role="status">{failed?'Attachment could not be loaded':'Loading diary attachment…'}</div>}
-  <small>{attachment.filename} · {Math.round(attachment.size/1024)}KB · sha256 {attachment.sha256.slice(0,12)}… {src&&<a href={src} target="_blank" rel="noreferrer">Open image</a>}</small>
- </div>;
-}
 
 function toBase64(file:File):Promise<string>{return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]);r.onerror=reject;r.readAsDataURL(file);});}
 
@@ -142,10 +126,10 @@ function PlanTab({pid,refresh}:{pid:string;refresh:(m?:string)=>void}){
    {error&&<Notice tone="warning">{error}</Notice>}
    <div className="pgx-inline" style={{marginTop:10}}><button className="button primary" disabled={busy||form.goals.trim().length<3} onClick={save}>{busy?'Saving…':'Save plan'}</button><button className="button subtle" onClick={()=>setEditing(false)}>Cancel</button></div>
   </>:data.plan?<><div className="pgx-inline"><Pill tone={data.plan.status==='active'?'low':'elevated'}>{data.plan.status}</Pill>{data.plan.review_date&&<small><CalendarClock size={12}/> review {data.plan.review_date}</small>}</div>
-   <dl className="pgx-definition"><dt>Goals</dt><dd>{data.plan.goals}</dd>{data.plan.activity_guidance&&<><dt>Activity guidance</dt><dd>{data.plan.activity_guidance}</dd></>}{data.plan.adherence_support&&<><dt>Adherence support</dt><dd>{data.plan.adherence_support}</dd></>}{data.plan.environment_notes&&<><dt>Environment</dt><dd>{data.plan.environment_notes}</dd></>}<dt>Saved</dt><dd>{time(data.plan.updated_at,true)} by {data.plan.doctor}</dd></dl></>:<div className="care-card demo-preview"><div className="care-card-top"><strong>Example care-plan layout</strong><Pill tone="blue">demo preview</Pill></div><dl className="pgx-definition"><dt>Goals</dt><dd>Keep a consistent daily wellbeing and symptom diary for the demonstration.</dd><dt>Activity notes</dt><dd>Record comfortable daily activity and note any change from the usual routine.</dd><dt>Adherence support</dt><dd>Use the diary to document patient-reported medication-taking patterns for clinician review.</dd><dt>Environment</dt><dd>Record city-level context separately from personal exposure measurements.</dd></dl><p className="input-help">Illustrative content only. No care plan has been saved by a clinician. Use “Create plan” to add a persisted doctor-authored record.</p></div>}
+   <dl className="pgx-definition"><dt>Goals</dt><dd>{data.plan.goals}</dd>{data.plan.activity_guidance&&<><dt>Activity guidance</dt><dd>{data.plan.activity_guidance}</dd></>}{data.plan.adherence_support&&<><dt>Adherence support</dt><dd>{data.plan.adherence_support}</dd></>}{data.plan.environment_notes&&<><dt>Environment</dt><dd>{data.plan.environment_notes}</dd></>}<dt>Saved</dt><dd>{time(data.plan.updated_at,true)} by {data.plan.doctor}</dd></dl></>:<Empty text="No care-plan documentation yet."/>}
  </Panel>
  <Panel title="Revision history" subtitle="Previous saved versions are kept, never overwritten silently">
-  {data.revisions.length?<ol className="care-timeline">{data.revisions.map(r=><li key={r.id}><span className="status-dot"/><div><strong>Revision #{r.id}</strong><small>{time(r.created_at,true)} · {r.actor}</small><p>{r.change_note||'Update'}</p></div></li>)}</ol>:<div className="care-card demo-preview"><strong>Revision history will appear here</strong><p className="input-help">Save the first clinician-authored plan to create an auditable revision.</p></div>}
+  {data.revisions.length?<ol className="care-timeline">{data.revisions.map(r=><li key={r.id}><span className="status-dot"/><div><strong>Revision #{r.id}</strong><small>{time(r.created_at,true)} · {r.actor}</small><p>{r.change_note||'Update'}</p></div></li>)}</ol>:<Empty text="No revisions recorded yet."/>}
   <p className="input-help"><ShieldCheck size={12}/> This demo documents plans only. It never prescribes medication or treatment.</p>
  </Panel></div>;
 }
@@ -155,13 +139,12 @@ function ActivityTab({pid,revision}:{pid:string;revision:number}){
  useEffect(()=>{api<Activity>(`/workspace/patients/${pid}/activity`).then(d=>setData(d)).catch(e=>setError(explainError(e)));},[pid,revision]);
  if(error)return <Notice tone="warning">{error}</Notice>;
  if(!data)return <Loading/>;
- const demoAdherence=[0,1,2,3,4,5,6].map((n)=>{const d=new Date();d.setUTCDate(d.getUTCDate()-6+n);return {date:d.toISOString().slice(0,10),adherence_manual:[0.92,0.88,1,0.84,0.96,0.91,0.95][n],symptom_manual:[3,3,2,4,3,2,2][n]};});
- const adherence=data.series.filter(d=>d.adherence_manual!==undefined);const shownAdherence=adherence.length?adherence:demoAdherence;
+ const adherence=data.series.filter(d=>d.adherence_manual!==undefined||d.symptom_manual!==undefined);
  const steps=data.series.filter(d=>d.steps_simulated_device!==undefined||d.heart_rate_simulated_device!==undefined);
- return <><Notice>{data.missing} Sources: {data.sources}. {adherence.length?'':'Illustrative values below are demo-only previews and are not persisted patient observations.'}</Notice>
+ return <><Notice>{data.missing} Sources: {data.sources}.</Notice>
  <div className="two-col">
-  <Panel title="Adherence & symptoms" subtitle={`${adherence.length?data.manual_entries:7} ${adherence.length?'hand-entered fictional observations':'illustrative demo points'}`}>
-   <div style={{height:230}}><ResponsiveContainer width="100%" height="100%"><LineChart data={shownAdherence}><CartesianGrid strokeDasharray="3 4" vertical={false} stroke="#eaf0ed"/><XAxis dataKey="date" tick={{fontSize:10}}/><YAxis tick={{fontSize:10}} width={30}/><Tooltip/><Line type="monotone" dataKey="adherence_manual" name="Adherence (0–1)" stroke="#1c7569" strokeWidth={2} dot/><Line type="monotone" dataKey="symptom_manual" name="Symptom score (0–10)" stroke="#d3a15b" strokeWidth={2} dot/></LineChart></ResponsiveContainer></div>
+  <Panel title="Adherence & symptoms" subtitle={`${data.manual_entries} patient-entered twin observations and persisted daily records`}>
+   {adherence.length?<div style={{height:230}}><ResponsiveContainer width="100%" height="100%"><LineChart data={adherence}><CartesianGrid strokeDasharray="3 4" vertical={false} stroke="#eaf0ed"/><XAxis dataKey="date" tick={{fontSize:10}}/><YAxis tick={{fontSize:10}} width={30}/><Tooltip/><Line type="monotone" dataKey="adherence_manual" name="Adherence (0–1)" stroke="#1c7569" strokeWidth={2} dot/><Line type="monotone" dataKey="symptom_manual" name="Symptom score (0–10)" stroke="#d3a15b" strokeWidth={2} dot/></LineChart></ResponsiveContainer></div>:<Empty text="No patient wellbeing or adherence records yet."/>}
   </Panel>
   <Panel title="Simulated device activity" subtitle={`${data.device_samples} validated ingestion samples`}>
    {steps.length?<div style={{height:230}}><ResponsiveContainer width="100%" height="100%"><LineChart data={steps}><CartesianGrid strokeDasharray="3 4" vertical={false} stroke="#eaf0ed"/><XAxis dataKey="date" tick={{fontSize:10}}/><YAxis tick={{fontSize:10}} width={30}/><Tooltip/><Line type="monotone" dataKey="steps_simulated_device" name="Steps (simulated)" stroke="#247e6d" strokeWidth={2} dot={false}/><Line type="monotone" dataKey="heart_rate_simulated_device" name="Heart rate (simulated)" stroke="#c67c66" strokeWidth={1.5} dot={false}/></LineChart></ResponsiveContainer></div>:<Empty text="No simulated device readings yet — associate and start a device from Onboarding & registrations."/>}

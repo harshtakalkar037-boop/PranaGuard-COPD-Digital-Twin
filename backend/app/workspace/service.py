@@ -39,6 +39,7 @@ class Workspace:
                 for pid in self.engine.profiles:
                     c.execute('INSERT OR IGNORE INTO patient_assignments VALUES (?,?,?)',(pid,'dr-atlas',stamp()))
             self._seed_demo_content(c)
+            self._ensure_patient_workspace_records(c)
             self._ensure_demo_prescription_pdf(c)
     def _seed_demo_content(self,c):
         """One-to-one demo: linked patient PG-0071 gets a little example history so the dashboards
@@ -70,6 +71,75 @@ class Workspace:
                   (pid,'Sample COPD prescription (fictional)','prescription',today.isoformat(),'Formatted fictional PDF for software demonstration only; not medical advice.','sample-copd-prescription.pdf','application/pdf',len(demo_doc),_hl.sha256(demo_doc).hexdigest(),demo_doc,'dr-atlas',at))
         c.execute('INSERT INTO audit_events(created_at,actor,role,action,entity,entity_id,patient_id,after_json) VALUES (?,?,?,?,?,?,?,?)',
                   (at,'dr-atlas','doctor','seeded','document','demo',pid,json.dumps({'title':'Sample COPD prescription (fictional)','seeded_demo':True})))
+    def _ensure_patient_workspace_records(self,c):
+        """Idempotently populate the linked synthetic patient with persisted workspace history.
+        These are fictional records in the already-disclosed synthetic cohort, not real patient data."""
+        pid='PG-0071'
+        today=utcnow().date()
+        from datetime import timedelta as _td
+        def day(n): return (today-_td(days=n)).isoformat()
+        def at(n,hour=8,minute=0): return (datetime.combine(today-_td(days=n),datetime.min.time(),tzinfo=timezone.utc)+_td(hours=hour,minutes=minute)).isoformat()
+        # Patient-submitted daily wellbeing records. Seed per patient, not only on an empty database.
+        if not c.execute('SELECT 1 FROM daily_logs WHERE patient_id=? LIMIT 1',(pid,)).fetchone():
+            entries=[
+                (0,1900,'Oats, dal, rice and cooked vegetables',28,7.5,'good','better','Morning walk completed; slept well.'),
+                (1,1650,'Khichdi, curd and fruit',18,7.0,'fair','same','Usual morning cough; no notable change reported.'),
+                (2,1750,'Rice, dal and vegetable soup',22,7.0,'good','same','Completed usual household activity.'),
+                (3,1500,'Soft rice, dal and banana',12,6.5,'fair','same','Needed a short rest after walking.'),
+                (4,1800,'Chapati, dal and cooked vegetables',25,7.5,'good','better','Reported a comfortable day overall.')
+            ]
+            for offset,water,food,activity,sleep,quality,wellbeing,note in entries:
+                d=day(offset); created=at(offset,19,30)
+                cur=c.execute('''INSERT INTO daily_logs(patient_id,entry_date,water_ml,food_notes,activity_minutes,sleep_hours,sleep_quality,wellbeing,notes,created_by,created_at,updated_at)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''',(pid,d,water,food,activity,sleep,quality,wellbeing,note,'pat-pg0071',created,created))
+                c.execute('INSERT INTO audit_events(created_at,actor,role,action,entity,entity_id,patient_id,after_json) VALUES (?,?,?,?,?,?,?,?)',
+                    (created,'pat-pg0071','patient','created','daily_log',str(cur.lastrowid),pid,json.dumps({'entry_date':d,'seeded_synthetic_record':True})))
+        # A clinician-authored documentation plan, with an auditable revision row.
+        if not c.execute('SELECT 1 FROM care_plans WHERE patient_id=?',(pid,)).fetchone():
+            created=at(5,10,15)
+            c.execute('INSERT INTO care_plans VALUES (?,?,?,?,?,?,?,?,?,?)',
+                (pid,'dr-atlas','Maintain a consistent symptom and wellbeing diary for review.','Record usual daily activity and note changes from the patient’s reported baseline.','Record medication-taking patterns in the adherence diary for discussion at review.','City-level environmental context is contextual only and is not a personal exposure measurement.',day(-7),'active',created,created))
+            c.execute('INSERT INTO care_plan_revisions(patient_id,created_at,actor,change_note,snapshot) VALUES (?,?,?,?,?)',
+                (pid,created,'dr-atlas','Initial documented plan',json.dumps({'status':'active','seeded_synthetic_record':True})))
+            c.execute('INSERT INTO audit_events(created_at,actor,role,action,entity,entity_id,patient_id,after_json) VALUES (?,?,?,?,?,?,?,?)',
+                (created,'dr-atlas','doctor','created','care_plan',pid,pid,json.dumps({'status':'active','seeded_synthetic_record':True})))
+        # Sputum diary: patient-entered records; no clinical interpretation is attached.
+        if not c.execute('SELECT 1 FROM sputum_entries WHERE patient_id=? LIMIT 1',(pid,)).fetchone():
+            entries=[
+                (1,8,15,'clear','scant','thin',2,1,'Usual morning entry.'),
+                (2,8,10,'white','scant','thin',3,2,'No notable change from usual report.'),
+                (4,8,12,'clear','none','thin',2,1,'No sputum reported at this entry.')
+            ]
+            for offset,hour,minute,colour,volume,consistency,cough,breath,note in entries:
+                created=at(offset,hour,minute)
+                cur=c.execute('INSERT INTO sputum_entries(patient_id,occurred_at,colour,volume,consistency,cough,breathlessness,note,created_at) VALUES (?,?,?,?,?,?,?,?,?)',
+                    (pid,created,colour,volume,consistency,cough,breath,note,created))
+                c.execute('INSERT INTO audit_events(created_at,actor,role,action,entity,entity_id,patient_id,after_json) VALUES (?,?,?,?,?,?,?,?)',
+                    (created,'pat-pg0071','patient','created','sputum_entry',str(cur.lastrowid),pid,json.dumps({'colour':colour,'seeded_synthetic_record':True})))
+        # A review and follow-up are persisted in the same workflow tables used by the UI.
+        if not c.execute('SELECT 1 FROM care_reviews WHERE patient_id=? LIMIT 1',(pid,)).fetchone():
+            created=at(1,11,0)
+            cur=c.execute('INSERT INTO care_reviews(patient_id,doctor,status,note,follow_up_at,state_version,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)',
+                (pid,'dr-atlas','completed','Reviewed the recent patient-entered wellbeing and sputum diary records. No treatment change documented.',None,self.state_version(pid),created,created))
+            c.execute('INSERT INTO care_review_events(review_id,created_at,event,actor,note) VALUES (?,?,?,?,?)',
+                (cur.lastrowid,created,'created → completed','dr-atlas','Routine documentation review.'))
+            c.execute('INSERT INTO audit_events(created_at,actor,role,action,entity,entity_id,patient_id,after_json) VALUES (?,?,?,?,?,?,?,?)',
+                (created,'dr-atlas','doctor','created','care_review',str(cur.lastrowid),pid,json.dumps({'status':'completed','seeded_synthetic_record':True})))
+        if not c.execute('SELECT 1 FROM follow_ups WHERE patient_id=? LIMIT 1',(pid,)).fetchone():
+            created=at(1,11,5)
+            c.execute('INSERT INTO follow_ups(patient_id,doctor,instructions,due_at,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?)',
+                (pid,'dr-atlas','Bring the symptom diary and medication-adherence record to the next routine review.',at(-5,9,0),'scheduled',created,created))
+        # Existing medication/adherence tables power both the patient and clinician views.
+        if not c.execute('SELECT 1 FROM plan_medications WHERE patient_id=? AND retired=0',(pid,)).fetchone():
+            created=at(6,9,0)
+            cur=c.execute('INSERT INTO plan_medications(patient_id,name,dose,frequency,added_by,created_at) VALUES (?,?,?,?,?,?)',
+                (pid,'Maintenance inhaler (fictional record)','As documented','As recorded in the sample history','dr-atlas',created))
+            mid=cur.lastrowid
+            for offset in range(4):
+                taken=at(offset,8,0)
+                c.execute('INSERT INTO med_adherence(patient_id,medication_id,as_prescribed,taken_at,missed_reason,note,created_by,created_at) VALUES (?,?,?,?,?,?,?,?)',
+                    (pid,mid,1,taken,None,'Patient-reported adherence entry.','pat-pg0071',taken))
+
     def _ensure_demo_prescription_pdf(self,c):
         """Upgrade the original seeded TXT demo document to a formatted PDF in existing demo databases."""
         import hashlib as _hl
@@ -297,6 +367,12 @@ class Workspace:
         for o in manual:bucket(o['at'],'adherence_manual',o['adherence']);bucket(o['at'],'symptom_manual',o['symptom_score'])
         readings=[]
         with self.store.connect() as c:
+            for r in c.execute("SELECT entry_date,wellbeing FROM daily_logs WHERE patient_id=? ORDER BY entry_date DESC LIMIT 90",(pid,)):
+                score={'worse':6,'same':3,'better':2}.get(r['wellbeing'])
+                if score is not None:bucket(r['entry_date'],'symptom_manual',score)
+            for r in c.execute("""SELECT substr(taken_at,1,10) AS date,AVG(as_prescribed) AS adherence
+                                  FROM med_adherence WHERE patient_id=? GROUP BY substr(taken_at,1,10)""",(pid,)):
+                bucket(r['date'],'adherence_manual',float(r['adherence']))
             for r in c.execute("SELECT observed_at,metric,value FROM device_readings WHERE patient_id=? AND metric IN ('steps','heart_rate') ORDER BY observed_at DESC LIMIT 2000",(pid,)):
                 readings.append(dict(r));bucket(r['observed_at'],f"{r['metric']}_simulated_device",r['value'])
         series=sorted(days.values(),key=lambda d:d['date'])
