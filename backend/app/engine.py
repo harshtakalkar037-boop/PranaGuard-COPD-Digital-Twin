@@ -107,7 +107,7 @@ class TwinEngine:
         cursor=self.cursor
         return {'running':self.running,'cursor_hour':cursor,'max_hour':self.max_hour,'version':self.store.meta('version',1),
                 'timestamp':str(self.frame.iloc[cursor]['timestamp']) if cursor<len(self.frame) else '',
-                'mode':'deterministic offline replay','seed':2026,'demo':self.demo,'interval_seconds':2}
+                'mode':'deterministic offline replay','seed':2026,'demo':self.demo,'interval_seconds':10}
 
     def cohort(self,patient_ids=None):
         """Whole-cohort by default. Optional patient_ids restricts every aggregate (patient lists,

@@ -20,17 +20,30 @@ export function explainError(e:unknown):string{
   return String((e as Error)?.message||e);
 }
 
+const pendingGetRequests=new Map<string,Promise<unknown>>();
+
 export async function api<T>(path:string, options:RequestInit={}):Promise<T>{
   const token=sessionStorage.getItem('pg-demo-token');
   const session=sessionStorage.getItem('pg-workspace-session');
-  let response:Response;
-  try{
-    response=await fetch(`${API_BASE}${path}`,{...options,headers:{'Content-Type':'application/json',...(token?{'X-Demo-Token':token}:{}),...(session?{'Authorization':`Bearer ${session}`}:{}),...options.headers}});
-  }catch{
-    throw new ApiError(0,'Cannot reach the local PranaGuard backend. Start uvicorn and retry.');
+  const method=(options.method||'GET').toUpperCase();
+  const requestKey=method==='GET'?`${API_BASE}${path}|${session||''}|${token||''}`:null;
+  if(requestKey){
+    const pending=pendingGetRequests.get(requestKey);
+    if(pending)return pending as Promise<T>;
   }
-  if(!response.ok){let detail=response.statusText;try{const body=await response.json();detail=typeof body.detail==='string'?body.detail:Array.isArray(body.detail)?body.detail.map((d:{loc?:string[];msg?:string})=>`${d.loc?.slice(1).join('.')||'request'}: ${d.msg||'Invalid value'}`).join('; '):'Backend request failed.';}catch{/* retain status */}throw new ApiError(response.status,detail);}
-  return response.json();
+  const request=(async()=>{
+    let response:Response;
+    try{
+      response=await fetch(`${API_BASE}${path}`,{...options,headers:{'Content-Type':'application/json',...(token?{'X-Demo-Token':token}:{}),...(session?{'Authorization':`Bearer ${session}`}:{}),...options.headers}});
+    }catch{
+      throw new ApiError(0,'Cannot reach the local PranaGuard backend. Start uvicorn and retry.');
+    }
+    if(!response.ok){let detail=response.statusText;try{const body=await response.json();detail=typeof body.detail==='string'?body.detail:Array.isArray(body.detail)?body.detail.map((d:{loc?:string[];msg?:string})=>`${d.loc?.slice(1).join('.')||'request'}: ${d.msg||'Invalid value'}`).join('; '):'Backend request failed.';}catch{/* retain status */}throw new ApiError(response.status,detail);}
+    return response.json() as Promise<T>;
+  })();
+  if(!requestKey)return request;
+  pendingGetRequests.set(requestKey,request);
+  try{return await request;}finally{if(pendingGetRequests.get(requestKey)===request)pendingGetRequests.delete(requestKey);}
 }
 
 export const post=<T,>(path:string,body:unknown={})=>api<T>(path,{method:'POST',body:JSON.stringify(body)});
