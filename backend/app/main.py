@@ -49,12 +49,12 @@ def create_app(db_path=None,enhanced_settings=None,background_tasks=True):
         app.state.research=await asyncio.to_thread(bind_research_service,app.state.engine.store)
         async def enhanced_loop():
             while True:
-                await asyncio.sleep(1)
+                await asyncio.sleep(3)
                 try:await app.state.enhanced.tick(app)
                 except Exception as exc:app.state.enhanced.failure(exc)
         async def replay_loop():
             while True:
-                await asyncio.sleep(2)
+                await asyncio.sleep(10)
                 engine=app.state.engine
                 if engine.running:
                     try:
