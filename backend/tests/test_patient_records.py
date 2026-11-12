@@ -121,7 +121,7 @@ def test_seeded_demo_seed_only_once(client):
 
 def test_seeded_demo_open_care_review_is_visible_and_idempotent(client):
     doctor=auth(client)
-    reviews=client.get('/api/workspace/care/reviews',headers=doctor,page_size=50).json()['items']
+    reviews=client.get('/api/workspace/care/reviews?page_size=50',headers=doctor).json()['items']
     showcase=[r for r in reviews if 'Routine follow-up review:' in r['note']]
     assert len(showcase)==1
     assert showcase[0]['patient_id']=='PG-0071'
