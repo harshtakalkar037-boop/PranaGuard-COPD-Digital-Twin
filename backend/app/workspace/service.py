@@ -142,29 +142,29 @@ class Workspace:
                     (pid,mid,1,taken,None,'Patient-reported adherence entry.','pat-pg0071',taken))
 
     def _ensure_demo_open_care_review(self,c):
-        """Keep one clearly labelled, open fictional review visible for live demonstrations.
+        """Keep one polished, open fictional review visible for the clinician demo.
 
-        Existing completed/reviewed records are preserved. The marker makes this additive
-        seed idempotent across restarts and database reinitialisation.
+        Existing completed/reviewed records are preserved. The audit marker makes this
+        additive seed idempotent without exposing seed wording in the review queue.
         """
         pid='PG-0071'
-        marker='DEMO SHOWCASE — pending documentation review'
-        if c.execute('SELECT 1 FROM care_reviews WHERE patient_id=? AND note LIKE ? LIMIT 1',(pid,'%'+marker+'%')).fetchone():
+        if c.execute("SELECT 1 FROM audit_events WHERE patient_id=? AND entity='care_review' AND action='seeded' AND after_json LIKE '%demo_showcase_review%' LIMIT 1",(pid,)).fetchone():
             return
         created=stamp()
-        note=(marker+'\\n'
-              'Review the latest synthetic wellbeing and sputum diary entries, confirm the '
-              'documented history is visible, and record any demo follow-up. '
-              'Fictional software-demo content only; not a clinical assessment or treatment instruction.')
+        note=('Routine follow-up review: review the latest patient-reported wellbeing and '
+              'sputum diary entries. Compare reported cough and breathlessness with the '
+              'documented usual pattern, and check recent activity, sleep and adherence notes. '
+              'Record any relevant changes and whether a follow-up discussion is needed. '
+              'No treatment change documented.')
         cur=c.execute(
             'INSERT INTO care_reviews(patient_id,doctor,status,note,follow_up_at,state_version,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)',
             (pid,'dr-atlas','awaiting_review',note,None,self.state_version(pid),created,created))
         rid=cur.lastrowid
         c.execute('INSERT INTO care_review_events(review_id,created_at,event,actor,note) VALUES (?,?,?,?,?)',
-                  (rid,created,'created → awaiting_review','dr-atlas','Seeded open demo showcase review.'))
+                  (rid,created,'created → awaiting_review','dr-atlas','Routine follow-up review opened for the synthetic demo record.'))
         c.execute('INSERT INTO audit_events(created_at,actor,role,action,entity,entity_id,patient_id,after_json) VALUES (?,?,?,?,?,?,?,?)',
                   (created,'dr-atlas','doctor','seeded','care_review',str(rid),pid,
-                   json.dumps({'status':'awaiting_review','seeded_demo_showcase':True})))
+                   json.dumps({'status':'awaiting_review','demo_showcase_review':True})))
 
     def _ensure_demo_prescription_pdf(self,c):
         """Upgrade the original seeded TXT demo document to a formatted PDF in existing demo databases."""
