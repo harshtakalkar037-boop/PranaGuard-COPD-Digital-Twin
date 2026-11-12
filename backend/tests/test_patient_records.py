@@ -117,3 +117,18 @@ def test_seeded_demo_seed_only_once(client):
     docs=client.get('/api/workspace/patient/documents',headers=h).json()['items']
     assert any('fictional' in d['title'] for d in docs)
     with client:pass
+
+
+def test_seeded_demo_open_care_review_is_visible_and_idempotent(client):
+    doctor=auth(client)
+    reviews=client.get('/api/workspace/care/reviews',headers=doctor,page_size=50).json()['items']
+    showcase=[r for r in reviews if 'DEMO SHOWCASE — pending documentation review' in r['note']]
+    assert len(showcase)==1
+    assert showcase[0]['patient_id']=='PG-0071'
+    assert showcase[0]['status']=='awaiting_review'
+    summary=client.get('/api/workspace/care/summary',headers=doctor).json()
+    assert summary['pending_reviews']>=1
+    assert any(r['id']==showcase[0]['id'] for r in summary['recent_reviews'])
+    detail=client.get(f"/api/workspace/care/reviews/{showcase[0]['id']}",headers=doctor).json()
+    assert detail['timeline'] and detail['timeline'][0]['event']=='created → awaiting_review'
+    assert client.get('/api/workspace/care/reviews',headers=auth(client,'dr-nova','prana-nova-demo')).json()['total']==0
